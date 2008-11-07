@@ -63,7 +63,7 @@ private function initProperties(settings:Object):void {
 
 	// Determine a JSON source
 	var domain:String = URLUtil.getServerName(Application.application.url);
-	if(domain=='localhost') domain='livefrompicnic.com';
+	if(domain=='localhost') domain=defaultDomain;
 	props.put('domain', domain);
 	var jsonSource:String;
 	if (Application.application.parameters.photo_id) {

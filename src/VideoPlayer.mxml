@@ -22,10 +22,11 @@
 					
 			private var appAspectRatio:Number = 1;
 			private var context:Object = {};
+			private var defaultDomain:String = 'livefrompicnic.com';
 
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
-				if(domain=='localhost') domain='refresh.dev.23visualblog.com';
+				if(domain=='localhost') domain=defaultDomain;
 				doJSON('http://' + domain + '/js/video-settings?raw', function(o:Object):void{
 					initProperties(o.settings);
 					initActiveElement();
