@@ -28,8 +28,8 @@ private function setActiveElement(i:int):void {
   	var video_p:Boolean = new Boolean(parseInt(o.video_p)) && new Boolean(parseInt(o.video_encoded_p));
   	activeElement.put('video_p', video_p);
   	if (o.content_text.length && !o.title.length) {o.title=o.content_text; o.content_text='';} 
-  	activeElement.put('title', o.title);
-  	activeElement.put('content', o.content_text);
+  	activeElement.put('title', o.title.replace(new RegExp('(<([^>]+)>)', 'ig'), ''));
+  	activeElement.put('content', o.content_text.replace(new RegExp('(<([^>]+)>)', 'ig'), ''));
   	activeElement.put('link', o.one);
   	activeElement.put('videoSource', 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined' ? o.video_medium_download : o.video_small_download));
   	activeElement.put('photoSource', 'http://' + props.get('domain') + o.large_download);

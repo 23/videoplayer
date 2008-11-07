@@ -6,6 +6,11 @@
  	<mx:Script source="doJSON.as"></mx:Script>
 	<mx:Script>
 		<![CDATA[
+			// Default domain (used when testing from localhost)
+			private var defaultDomain:String = 'livefrompicnic.com';
+			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
+			private var defaultPhotoId:String = '';
+
 			import mx.events.VideoEvent;
 			import mx.controls.Alert;
 			import flash.display.StageDisplayState;
@@ -22,7 +27,6 @@
 					
 			private var appAspectRatio:Number = 1;
 			private var context:Object = {};
-			private var defaultDomain:String = 'livefrompicnic.com';
 
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);

@@ -65,15 +65,22 @@ private function initProperties(settings:Object):void {
 	var domain:String = URLUtil.getServerName(Application.application.url);
 	if(domain=='localhost') domain=defaultDomain;
 	props.put('domain', domain);
-	var jsonSource:String;
+	var jsonSource:String = 'http://' + domain + '/js/photos?raw';
+	if (Application.application.parameters.video_p) {
+		jsonSource += '&video_p=' + encodeURI(Application.application.parameters.video_p);
+	} 
+	if (Application.application.parameters.video_p) {
+		jsonSource += '&video_encoded_p=' + encodeURI(Application.application.parameters.video_encoded_p);
+	} 
+
 	if (Application.application.parameters.photo_id) {
-		jsonSource = 'http://' + domain + '/js/photos?raw&photo_id=' + encodeURI(Application.application.parameters.photo_id); 
+		jsonSource += '&photo_id=' + encodeURI(Application.application.parameters.photo_id); 
 	} else if (Application.application.parameters.album_id) {
-		jsonSource = 'http://' + domain + '/js/photos?raw&album_id=' + encodeURI(Application.application.parameters.album_id); 
+		jsonSource += '&album_id=' + encodeURI(Application.application.parameters.album_id); 
 	} else if (Application.application.parameters.tag) {
-		jsonSource = 'http://' + domain + '/js/photos?raw&tag=' + encodeURI(Application.application.parameters.tag); 
-	} else {
-		jsonSource = 'http://' + domain + '/js/photos?raw'; 
+		jsonSource += '&tag=' + encodeURI(Application.application.parameters.tag); 
+	} else if (defaultPhotoId.length) {
+		jsonSource += '&photo_id=' + encodeURI(defaultPhotoId); 
 	} 		 
 	props.put('jsonSource', jsonSource);
 
