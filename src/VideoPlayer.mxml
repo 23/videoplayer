@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="load();" backgroundColor="black" mouseOver="tray.visible=(props.get('showTray') as Boolean);" mouseOut="tray.visible=false;">
+ 	<mx:Script source="AppProperties.as"></mx:Script>
+ 	<mx:Script source="ActiveElement.as"></mx:Script>
+ 	<mx:Script source="Fullscreen.as"></mx:Script>
+ 	<mx:Script source="doJSON.as"></mx:Script>
+	<mx:Script>
+		<![CDATA[
+			import mx.events.VideoEvent;
+			import mx.controls.Alert;
+			import flash.display.StageDisplayState;
+			import com.philemonworks.flex.util.HashCollection;
+			import flash.system.Capabilities;
+			
+			public function h264():Boolean {
+				var re:RegExp = new RegExp('([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)', 'img');
+				var v:Array = re.exec(Capabilities.version);
+				if (v[1]>9) {return(true);}
+				if (v[1]==9 && (v[2]>0 || v[3]>=115)) {return(true);}
+				return(false);
+			}
+					
+			private var appAspectRatio:Number = 1;
+			private var context:Object = {};
+
+			public function load():void {
+				var domain:String = URLUtil.getServerName(Application.application.url);
+				if(domain=='localhost') domain='refresh.dev.23visualblog.com';
+				doJSON('http://' + domain + '/js/video-settings?raw', function(o:Object):void{
+					initProperties(o.settings);
+					initActiveElement();
+					doJSON((props.get('jsonSource') as String), function(o:Object):void{context=o; build();});
+				});
+			}
+			public function build():void {
+				if (context && context.photos && context.photos.length>0) {				
+					if (context.photos.length) setActiveElement(0);
+						loading.visible=false;
+				} else {
+					displayError('Nothing to show...');
+				}
+			}
+			private function doStateChange(evt:VideoEvent):void {
+                switch (evt.currentTarget.state) {
+                    case VideoEvent.CONNECTION_ERROR:
+                        displayError('Unable to connect to video');
+                        break;
+                }
+            }
+			public function displayError(text:String):void {video.visible=false; image.visible=false; bigPlay.visible=false; logo.visible=false; tray.visible=false; loading.visible=true; loading.text=text;}
+			public function formatTime(time:int):String {return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());}
+		]]>
+	</mx:Script>
+	<mx:Box id="background" backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" width="100%" height="100%" verticalCenter="0" horizontalCenter="0"/>
+	<mx:Label id="loading" text="Loading..." color="{(StyleManager.getColorName(props.get('loadingColor')) as Number)}" />
+	
+	<!-- Image and Video -->
+	<mx:VideoDisplay id="video" source="{activeElement.get('videoSource')}" autoRewind="false"  maintainAspectRatio="false"  autoPlay="false" volume="1" horizontalCenter="0" verticalCenter="0" 
+		width="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : Application.application.width)}"
+		height="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? Application.application.height : Application.application.width/(activeElement.get('aspectRatio') as Number))}"
+		click="if(video.playing) pauseVideoElement(); else playVideoElement();" stateChange="doStateChange(event);"/>
+	<mx:Image id="image" source="{activeElement.get('photoSource')}" width="{video.width}" height="{video.height}" horizontalCenter="0" verticalCenter="0"
+		click="playVideoElement();"/>
+
+	<!-- Big Play -->
+	<mx:Image visible="false" id="bigPlay" source="@Embed('assets/play-big.png')" horizontalCenter="0" verticalCenter="0" click="playVideoElement();" width="60" height="60"/> 
+    
+	<!-- Icon/Logo -->
+	<mx:Box id="logo" visible="{(props.get('showLogo') as Boolean)}" top="15" right="15" left="15" bottom="15" horizontalAlign="{props.get('logoAlign')}" verticalAlign="{props.get('logoVAlign')}" horizontalCenter="0" verticalCenter="0">
+		<mx:Image source="{props.get('logoSource')}" alpha="{(props.get('logoAlpha') as Number)}" maxWidth="{(props.get('logoWidth') as Number)}" maxHeight="{(props.get('logoHeight') as Number)}" horizontalAlign="{props.get('logoAlign')}" verticalAlign="{props.get('logoVAlign')}"/> 
+	</mx:Box>
+
+	<!-- Title and Words -->
+	<mx:VBox horizontalScrollPolicy="off" verticalScrollPolicy="off" id="descriptions" width="{video.width-30}" bottom="{(tray.visible ? tray.height+15 : 15)}" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" horizontalCenter="0" visible="{((props.get('showDescriptions') as Boolean) &amp;&amp; tray.visible)}">
+		<mx:Label id="trayTitle" paddingBottom="-8" fontSize="{(props.get('trayTitleFontSize') as Number)}" fontWeight="{props.get('trayTitleFontWeight')}" text="{activeElement.get('title')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayTitle.visible = (trayTitle.text.length>0);"/>
+		<mx:Label id="trayContent" fontSize="{(props.get('trayContentFontSize') as Number)}" fontWeight="{props.get('trayContentFontWeight')}" text="{activeElement.get('content')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayContent.visible = (trayContent.text.length>0);"/>
+	</mx:VBox>
+
+	<!-- Tray -->
+	<mx:Canvas id="tray" bottom="0" left="0" right="0" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="false" horizontalCenter="0" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"	backgroundAlpha="{(props.get('trayAlpha') as Number)}">
+		<mx:HBox visible="false" id="videoControls" bottom="3" top="3" left="5">
+			<!-- Play and Pause -->
+    		<mx:Image id="playImage" source="@Embed('assets/play.png')" visible="{!video.playing}" includeInLayout="{playImage.visible}" click="playVideoElement();" width="29" height="20"/>
+    		<mx:Image id="pauseImage" source="@Embed('assets/pause.png')" visible="{video.playing}" includeInLayout="{pauseImage.visible}" click="pauseVideoElement();" width="29" height="20"/>
+			<!-- Mute and Unmute -->
+	    	<mx:Image id="unmuteImage" source="@Embed('assets/unmute.png')" visible="{video.volume==0}" includeInLayout="{unmuteImage.visible}" click="video.volume=1" width="29" height="20"/>
+    		<mx:Image id="muteImage" source="@Embed('assets/mute.png')" visible="{video.volume>0}" includeInLayout="{muteImage.visible}" click="video.volume=0" width="29" height="20"/>
+			<!-- Fullscreen -->
+    		<mx:Image id="fullscreenImage" source="@Embed('assets/fullscreen.png')" click="toggleFullScreen();" width="29" height="20"/>
+		</mx:HBox>
+
+		<mx:Canvas visible="false" id="videoProgress" mouseDown="video.playheadTime = videoProgress.contentMouseX/videoProgress.width*video.totalTime;" left="{videoControls.width+20}" right="{(trayNextPrev.visible ? trayNextPrev.width+videoTime.width+40 : videoTime.width+20)}" top="3" bottom="3" height="20">
+			<mx:HBox id="videoBufferProgress" left="0" top="7" width="{video.bytesLoaded/video.bytesTotal*videoProgress.width}" height="6" backgroundColor="white" backgroundAlpha="0.2"></mx:HBox>
+			<mx:HBox id="videoPlayProgress" left="0" top="7" width="{video.playheadTime/video.totalTime*videoProgress.width}" height="6" backgroundColor="black" backgroundAlpha="0.6"></mx:HBox>
+		</mx:Canvas>
+
+		<mx:HBox visible="false" id="videoTime" right="{(trayNextPrev.visible ? trayNextPrev.width+20 : 5)}" top="3" bottom="3">
+			<mx:Label text="{formatTime(video.playheadTime) + ' / ' + formatTime(video.totalTime)}" fontSize="12" height="20"/>
+		</mx:HBox>
+
+		<mx:HBox id="trayNextPrev" top="3" bottom="3" right="5" visible="{numElements>1}" includeInLayout="{trayNextPrev.visible}">
+			<!-- Back and Forward -->
+    		<mx:Image source="@Embed('assets/previous.png')" width="29" height="20" alpha="{(currentElementIndex>0 ? 1 : 0.4)}" click="previousElement();"/>
+    		<mx:Label id="trayNextPrevContent" text="{(currentElementIndex+1) + ' / ' + numElements}" fontSize="12" height="20"/>
+    		<mx:Image source="@Embed('assets/next.png')" width="29" height="20" alpha="{(numElements>(currentElementIndex+1) ? 1 : 0.4)}" click="nextElement();"/>
+		</mx:HBox>
+	</mx:Canvas>
+</mx:Application>
