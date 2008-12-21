@@ -31,7 +31,7 @@ private function setActiveElement(i:int):void {
   	activeElement.put('title', o.title.replace(new RegExp('(<([^>]+)>)', 'ig'), ''));
   	activeElement.put('content', o.content_text.replace(new RegExp('(<([^>]+)>)', 'ig'), ''));
   	activeElement.put('link', o.one);
-  	activeElement.put('videoSource', 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined' ? o.video_medium_download : o.video_small_download));
+  	activeElement.put('videoSource', 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined'&&o.video_medium_download.length>0 ? o.video_medium_download : o.video_small_download));
   	activeElement.put('photoSource', 'http://' + props.get('domain') + o.large_download);
   	activeElement.put('photoWidth', new Number(o.large_width));
   	activeElement.put('photoHeight', new Number(o.large_height));
