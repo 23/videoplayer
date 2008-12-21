@@ -4,7 +4,7 @@
  	<mx:Script source="ActiveElement.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
  	<mx:Script source="doJSON.as"></mx:Script>
-	<mx:Script>
+ 	<mx:Script>
 		<![CDATA[
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'livefrompicnic.com';
@@ -38,6 +38,7 @@
 				});
 			}
 			public function build():void {
+				video.mx_internal::videoPlayer.smoothing = true;
 				if (context && context.photos && context.photos.length>0) {				
 					if (context.photos.length) setActiveElement(0);
 						loading.visible=false;
