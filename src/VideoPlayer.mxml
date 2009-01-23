@@ -1,22 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="load();" backgroundColor="black" mouseOver="tray.visible=(props.get('showTray') as Boolean);" mouseOut="tray.visible=false;">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="load();" backgroundColor="black" xmlns:com="com.*" width="100%" height="100%"  preloader="Preloader" verticalScrollPolicy="off" horizontalScrollPolicy="off">
  	<mx:Script source="AppProperties.as"></mx:Script>
  	<mx:Script source="ActiveElement.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
  	<mx:Script source="doJSON.as"></mx:Script>
- 	<mx:Script>
+ 	<mx:Script source="EmbedSources.as"></mx:Script>
+	<mx:Script>
 		<![CDATA[
-			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = 'livefrompicnic.com';
-			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
-			private var defaultPhotoId:String = '';
-
+			import mx.formatters.SwitchSymbolFormatter;
+			import com.PlayListEvent;
+			import com.PlayList;
 			import mx.events.VideoEvent;
 			import mx.controls.Alert;
 			import flash.display.StageDisplayState;
 			import com.philemonworks.flex.util.HashCollection;
 			import flash.system.Capabilities;
+			import mx.core.mx_internal;
 			
+			// Default domain (used when testing from localhost)
+			//private var defaultDomain:String = 'livefrompicnic.com';
+			private var defaultDomain:String = 'white.visualblog.net';
+//			private var defaultDomain:String = 'sibers.23visualblog.net';
+			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
+			private var defaultPhotoId:String = '';
+			private var handleTimer : Timer;
+			private var descTimer : Timer;
+			
+			private var playList : PlayList;
+			[Bindable] private var positionChange : Number = -100;
+			private var trayOut : Boolean = false;
+			private var playListOut : Boolean = true;	
+			private var timeIsDrag : Boolean = false;
+			private var offset : Number = 0;
+			private var bounds : Object;
+			
+			private var pos3 : Number;
+			private var pos2 : Number;
+			private var pos1  : Number;
+						
+
 			public function h264():Boolean {
 				var re:RegExp = new RegExp('([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)', 'img');
 				var v:Array = re.exec(Capabilities.version);
@@ -31,6 +53,7 @@
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
 				if(domain=='localhost') domain=defaultDomain;
+//				var domain:String = defaultDomain;
 				doJSON('http://' + domain + '/js/video-settings?raw', function(o:Object):void{
 					initProperties(o.settings);
 					initActiveElement();
@@ -38,14 +61,47 @@
 				});
 			}
 			public function build():void {
-				video.mx_internal::videoPlayer.smoothing = true;
-				if (context && context.photos && context.photos.length>0) {				
-					if (context.photos.length) setActiveElement(0);
-						loading.visible=false;
+				if(context && context.photos && context.photos.length == 1)
+				{
+					playlistBtn.visible = false;
+					playlistBtn.includeInLayout = false;
+					playlistBtnOn.visible = false;
+					playlistBtnOn.includeInLayout = false;
+					if (context.photos.length) setActiveElement(0,false);
+					loading.visible=false;
+					video.mx_internal::videoPlayer.smoothing = true;
+					onInfoBtnClick();
+					this.addEventListener(MouseEvent.ROLL_OUT, onAppMouseOut);
+					this.addEventListener(MouseEvent.ROLL_OVER, onAppMouseOver);
+				}
+				else
+				if (context && context.photos && context.photos.length>1) {	
+					if (context.photos.length) setActiveElement(0,false);
+					loading.visible=false;
+					video.mx_internal::videoPlayer.smoothing = true;
+					//createItemsArray();
+					createPlayList();
+					onInfoBtnClick();
+					setProperties();
+					this.addEventListener(MouseEvent.ROLL_OUT, onAppMouseOut);
+					this.addEventListener(MouseEvent.ROLL_OVER, onAppMouseOver);
 				} else {
 					displayError('Nothing to show...');
 				}
 			}
+			
+			private function setProperties() : void
+			{
+				pos3 = this.height - tray.height;
+				pos2 = this.height - tray.height + 100;
+				pos1 = this.height + tray.height;
+			}
+			
+			private function onMetaDataGetted() : void
+			{
+				trace("METADATA GET!");
+			}
+			
 			private function doStateChange(evt:VideoEvent):void {
                 switch (evt.currentTarget.state) {
                     case VideoEvent.CONNECTION_ERROR:
@@ -53,10 +109,307 @@
                         break;
                 }
             }
-			public function displayError(text:String):void {video.visible=false; image.visible=false; bigPlay.visible=false; logo.visible=false; tray.visible=false; loading.visible=true; loading.text=text;}
+            
+            private function createPlayList() : void
+            {
+            	trace("create playlist");
+            	playList = new PlayList();
+            	playList.width = tray.width;
+            	playList.verticalScrollPolicy = "off";
+				playList.itemArray = createItemsArray();
+				playList.addEventListener(PlayListEvent.SELECT_ITEM, itemSelectHandler);
+				playListHolder.addChild(playList);
+            }
+            
+            
+            private function createTimer() : void
+            {
+            	if(handleTimer != undefined) handleTimer.stop();
+            	handleTimer = new Timer(1000,5);
+            	handleTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onTimeOut);
+            	handleTimer.addEventListener(TimerEvent.TIMER, onTick);
+            	handleTimer.start();
+            }
+            
+            private function onTick(evt:TimerEvent) : void
+            {
+            	trace(evt.target.currentCount);
+            }
+            
+            private function onTimeOut(evt:TimerEvent) : void
+            {
+            	trace("time is up");
+	            handleTimer.stop();
+	            showPlayList();
+            }
+            
+            private function itemSelectHandler(evt:PlayListEvent) : void
+            {
+            	createTimer();
+            	if(evt.itemID != -1)
+            	{
+            		onInfoBtnClick();
+            		setElementByID(evt.itemID);
+            	}
+            }
+            
+            private function muteSound() : void
+            {
+            	if(!muteImage.visible)
+            	{
+            		video.volume = 1;
+            		unmuteImage.visible = false;
+            		unmuteImage.includeInLayout = false;
+            		muteImage.includeInLayout = true;
+            		muteImage.visible = true;
+            	}
+            	else
+            	{
+            		video.volume = 0;
+            		muteImage.visible = false;
+            		muteImage.includeInLayout = false;
+            		unmuteImage.includeInLayout = true;
+            		unmuteImage.visible = true;
+            	}
+            }
+            
+            private function hdEnable() : void
+            {
+            	if((activeElement.get('hasHD') as Boolean))
+            	{
+	            	if(!hdOffBtn.visible)
+	            	{
+		            	if((activeElement.get('hasHD') as Boolean))
+		            	{
+		            		hdBtn.visible = true;
+		            		hdBtn.includeInLayout = true;
+		            	}
+		            	else
+		            	{
+		            		hdBtn.visible = false;
+		            		hdBtn.includeInLayout = false;
+			            	hdOffBtn.visible = false;
+			            	hdOffBtn.includeInLayout = false;
+		            	}
+	            	}
+            	}
+            	else
+            	{
+		            hdBtn.visible = false;
+		            hdBtn.includeInLayout = false;
+			        hdOffBtn.visible = false;
+			        hdOffBtn.includeInLayout = false;
+	            }
+            }
+            
+            private function onHdBtnClick() : void
+			{
+				if((activeElement.get('hasHD') as Boolean))
+				{
+					trace("HD click");
+	//				visible="{(activeElement.get('hasHD') as Boolean)}" includeInLayout="{(activeElement.get('hasHD') as Boolean)}"
+					if(!hdOffBtn.visible)
+					{
+						trace("HD hdOffBtn");
+						hdBtn.visible = false;
+						hdBtn.includeInLayout = false;
+						hdOffBtn.includeInLayout = true;
+						hdOffBtn.visible = true;
+					}
+					else if(hdOffBtn.visible)
+					{
+						trace("HD hdBtn");
+						hdOffBtn.visible = false;
+						hdOffBtn.includeInLayout = false;
+						hdBtn.includeInLayout = true;
+						hdBtn.visible = true;
+					}
+					setActiveElement(currentElementIndex, true);
+				}
+            }
+            
+            
+            private function onDescTimeOut(evt:TimerEvent=null) : void
+            {
+            	descriptions.visible = false;
+            	descTimer.stop();
+            }
+            
+            private function onInfoBtnClick() : void
+            {
+            	if(descriptions.visible)
+            	{
+	            	descriptions.visible = false;
+	            	if(descTimer != undefined) descTimer.stop();       		
+            	}
+            	else
+            	{
+	            	descriptions.visible = true;
+	            	if(descTimer != undefined) descTimer.stop();
+	            	descTimer = new Timer(1000,5);
+	            	descTimer.addEventListener(TimerEvent.TIMER_COMPLETE , onDescTimeOut);
+	            	descTimer.start();
+	            }
+            }
+            
+
+            private function showPlayList() : void
+            {
+            	if(playListOut)
+            	{
+            		playListOut = false;
+            		playlistBtn.visible = false;
+            		playlistBtn.includeInLayout = false;
+            		playlistBtnOn.includeInLayout = true;
+            		playlistBtnOn.visible = true;
+            		trayHider.end();
+            		positionChange = 0;
+            		trayHider.yFrom = this.height - tray.height + 100;
+	            	trayHider.yTo = this.height - tray.height;;
+	            	trayHider.play();
+            		createTimer();
+            		trace("Not playListOut: "+positionChange);
+            	}
+            	else
+            	{
+            		if(handleTimer != undefined) handleTimer.stop();
+            		playListOut = true;
+            		playlistBtn.includeInLayout = true;
+            		playlistBtn.visible = true;
+            		playlistBtnOn.visible = false;
+            		playlistBtnOn.includeInLayout = false;
+            		trayHider.end();
+            		positionChange = -100;
+            		trayHider.yFrom = this.height - tray.height;;
+	            	trayHider.yTo = this.height - tray.height + 100;
+	            	trayHider.play();
+	            	trace("playListOut: "+positionChange);
+            	}
+            }
+ 
+            private function onAppMouseOut(event:MouseEvent) : void
+            {
+            	if(handleTimer != undefined) handleTimer.stop();
+            	
+            	if(context && context.photos && context.photos.length == 1)
+            	{
+            		playListOut = true;
+            		trayOut = true;
+		           	trayHider.end();
+		           	trayHider.yFrom = this.height - tray.height + 100;
+	            	trayHider.yTo = this.height + tray.height;
+	            	positionChange = - tray.height;
+	            	trayHider.play();
+            	}
+            	else if(context.photos.length > 1)
+            	{
+            		trayHider.end();
+            		if(playListOut)
+            		{
+            			if(handleTimer != undefined) handleTimer.stop();
+	         		    playlistBtnOn.includeInLayout = false;
+	        		    playlistBtnOn.visible = false;
+	     		        playlistBtn.visible = true;
+	       		    	playlistBtn.includeInLayout = true;
+	       		    	trayHider.yFrom = this.height - tray.height + 100;
+            		}
+            		else if(!playListOut)
+            		{
+            			trayHider.yFrom = this.height - tray.height;;
+            			if(handleTimer != undefined) handleTimer.stop();
+	           			playlistBtnOn.includeInLayout = false;
+	          		    playlistBtnOn.visible = false;
+	         		    playlistBtn.visible = true;
+	         		    playlistBtn.includeInLayout = true;
+//            			playListOut = true;
+            			
+            		}
+
+            		playListOut = true;
+            		trayOut = true;
+	            	trayHider.yTo = this.height + tray.height;
+	            	positionChange = - tray.height;
+	            	trayHider.play();
+            	}
+            	trace("onAppMouseOut: "+positionChange);
+            }
+            
+            private function onAppMouseOver(event:MouseEvent) : void
+            {
+//            	if(trayOut)
+//            	{
+            		trayOut = false;
+				  	trayHider.end();
+				  	trayHider.yFrom = this.height + tray.height;
+			        trayHider.yTo = this.height - tray.height + 100;
+            		positionChange = - 100;
+			       	trayHider.play();
+			       	trace("onAppMouseOver: "+positionChange);
+//            	}
+            }       
+            
+            private function onPlayTimeDrag(evt:MouseEvent) : void
+            {
+				videoTime.x = mouseX - offset;
+				if(videoTime.x <= bounds.left)
+				{  
+					videoTime.x = bounds.left;
+				}
+				else if(videoTime.x >= bounds.right)
+				{
+					videoTime.x = bounds.right;
+				}
+				evt.updateAfterEvent();
+            }
+            
+            private function onPlayTimeMouseUp(evt:MouseEvent) : void
+            {
+            	timeIsDrag = false;
+            	trace("B:"+video.playheadTime);
+            	video.playheadTime = (videoTime.x+videoTime.width/2)/videoProgress.width*video.totalTime;
+            	trace("A:"+video.playheadTime);
+            	videoTime.removeEventListener(MouseEvent.MOUSE_MOVE, onPlayTimeDrag);
+            }
+            
+            private function onPlayTimeMouseDown() : void
+            {
+            	timeIsDrag = true;
+            	offset = videoTime.mouseX;
+            	bounds = {left: videoProgress.x - videoTime.width/2, right: videoProgress.x+videoProgress.width- videoTime.width/2};
+            	addEventListener(MouseEvent.MOUSE_UP, onPlayTimeMouseUp);
+            	videoTime.addEventListener(MouseEvent.MOUSE_MOVE , onPlayTimeDrag);
+            }
+            
+            private function onVideoPlayHeadUpdate() : void
+            {
+            	videoPlayProgress.width  = video.playheadTime/video.totalTime*videoProgress.width;
+            	if(!timeIsDrag)
+            	{
+            		videoTime.x = videoProgress.x + video.playheadTime/video.totalTime*videoProgress.width - videoTime.width/2;
+            	}
+            }
+            
+            private function onEmbedClick() : void
+            {
+            	trace("embedClick");
+            	embedPanel.selectText = "yes";
+            }
+            
+            private function onHDShow() : void
+            {
+            	trace("onHDshow");
+//            	progressBg.invalidateProperties();
+        		invalidateProperties();
+      			invalidateSize();
+      		  	invalidateDisplayList();
+            }
+            
+			public function displayError(text:String):void {logo.visible=false; video.visible=false; image.visible=false; tray.visible=false; loading.visible=true; loading.text=text;}
 			public function formatTime(time:int):String {return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());}
 		]]>
 	</mx:Script>
+	<mx:Move id="trayHider" target="{tray}"/>
+	
 	<mx:Box id="background" backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" width="100%" height="100%" verticalCenter="0" horizontalCenter="0"/>
 	<mx:Label id="loading" text="Loading..." color="{(StyleManager.getColorName(props.get('loadingColor')) as Number)}" />
 	
@@ -64,51 +417,85 @@
 	<mx:VideoDisplay id="video" source="{activeElement.get('videoSource')}" autoRewind="false"  maintainAspectRatio="false"  autoPlay="false" volume="1" horizontalCenter="0" verticalCenter="0" 
 		width="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : Application.application.width)}"
 		height="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? Application.application.height : Application.application.width/(activeElement.get('aspectRatio') as Number))}"
-		click="if(video.playing) pauseVideoElement(); else playVideoElement();" stateChange="doStateChange(event);"/>
+		click="if(video.playing) pauseVideoElement(); else playVideoElement();" stateChange="doStateChange(event);"
+		playheadUpdate="{onVideoPlayHeadUpdate()}"
+		metadataReceived="{onMetaDataGetted()}"
+		/>
 	<mx:Image id="image" source="{activeElement.get('photoSource')}" width="{video.width}" height="{video.height}" horizontalCenter="0" verticalCenter="0"
-		click="playVideoElement();"/>
+		click="{playVideoElement()}" />
 
 	<!-- Big Play -->
-	<mx:Image visible="false" id="bigPlay" source="@Embed('assets/play-big.png')" horizontalCenter="0" verticalCenter="0" click="playVideoElement();" width="60" height="60"/> 
-    
+<!--	<mx:Image visible="false" id="bigPlay" source="@Embed('assets/play-big.png')" horizontalCenter="0" verticalCenter="0" click="playVideoElement();" width="60" height="60"/> -->
 	<!-- Icon/Logo -->
 	<mx:Box id="logo" visible="{(props.get('showLogo') as Boolean)}" top="15" right="15" left="15" bottom="15" horizontalAlign="{props.get('logoAlign')}" verticalAlign="{props.get('logoVAlign')}" horizontalCenter="0" verticalCenter="0">
 		<mx:Image source="{props.get('logoSource')}" alpha="{(props.get('logoAlpha') as Number)}" maxWidth="{(props.get('logoWidth') as Number)}" maxHeight="{(props.get('logoHeight') as Number)}" horizontalAlign="{props.get('logoAlign')}" verticalAlign="{props.get('logoVAlign')}"/> 
 	</mx:Box>
-
-	<!-- Title and Words -->
-	<mx:VBox horizontalScrollPolicy="off" verticalScrollPolicy="off" id="descriptions" width="{video.width-30}" bottom="{(tray.visible ? tray.height+15 : 15)}" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" horizontalCenter="0" visible="{((props.get('showDescriptions') as Boolean) &amp;&amp; tray.visible)}">
-		<mx:Label id="trayTitle" paddingBottom="-8" fontSize="{(props.get('trayTitleFontSize') as Number)}" fontWeight="{props.get('trayTitleFontWeight')}" text="{activeElement.get('title')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayTitle.visible = (trayTitle.text.length>0);"/>
-		<mx:Label id="trayContent" fontSize="{(props.get('trayContentFontSize') as Number)}" fontWeight="{props.get('trayContentFontWeight')}" text="{activeElement.get('content')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayContent.visible = (trayContent.text.length>0);"/>
-	</mx:VBox>
-
 	<!-- Tray -->
-	<mx:Canvas id="tray" bottom="0" left="0" right="0" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="false" horizontalCenter="0" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"	backgroundAlpha="{(props.get('trayAlpha') as Number)}">
-		<mx:HBox visible="false" id="videoControls" bottom="3" top="3" left="5">
-			<!-- Play and Pause -->
-    		<mx:Image id="playImage" source="@Embed('assets/play.png')" visible="{!video.playing}" includeInLayout="{playImage.visible}" click="playVideoElement();" width="29" height="20"/>
-    		<mx:Image id="pauseImage" source="@Embed('assets/pause.png')" visible="{video.playing}" includeInLayout="{pauseImage.visible}" click="pauseVideoElement();" width="29" height="20"/>
-			<!-- Mute and Unmute -->
-	    	<mx:Image id="unmuteImage" source="@Embed('assets/unmute.png')" visible="{video.volume==0}" includeInLayout="{unmuteImage.visible}" click="video.volume=1" width="29" height="20"/>
-    		<mx:Image id="muteImage" source="@Embed('assets/mute.png')" visible="{video.volume>0}" includeInLayout="{muteImage.visible}" click="video.volume=0" width="29" height="20"/>
-			<!-- Fullscreen -->
-    		<mx:Image id="fullscreenImage" source="@Embed('assets/fullscreen.png')" click="toggleFullScreen();" width="29" height="20"/>
-		</mx:HBox>
-
-		<mx:Canvas visible="false" id="videoProgress" mouseDown="video.playheadTime = videoProgress.contentMouseX/videoProgress.width*video.totalTime;" left="{videoControls.width+20}" right="{(trayNextPrev.visible ? trayNextPrev.width+videoTime.width+40 : videoTime.width+20)}" top="3" bottom="3" height="20">
-			<mx:HBox id="videoBufferProgress" left="0" top="7" width="{video.bytesLoaded/video.bytesTotal*videoProgress.width}" height="6" backgroundColor="white" backgroundAlpha="0.2"></mx:HBox>
-			<mx:HBox id="videoPlayProgress" left="0" top="7" width="{video.playheadTime/video.totalTime*videoProgress.width}" height="6" backgroundColor="black" backgroundAlpha="0.6"></mx:HBox>
-		</mx:Canvas>
-
-		<mx:HBox visible="false" id="videoTime" right="{(trayNextPrev.visible ? trayNextPrev.width+20 : 5)}" top="3" bottom="3">
-			<mx:Label text="{formatTime(video.playheadTime) + ' / ' + formatTime(video.totalTime)}" fontSize="12" height="20"/>
-		</mx:HBox>
-
-		<mx:HBox id="trayNextPrev" top="3" bottom="3" right="5" visible="{numElements>1}" includeInLayout="{trayNextPrev.visible}">
-			<!-- Back and Forward -->
-    		<mx:Image source="@Embed('assets/previous.png')" width="29" height="20" alpha="{(currentElementIndex>0 ? 1 : 0.4)}" click="previousElement();"/>
-    		<mx:Label id="trayNextPrevContent" text="{(currentElementIndex+1) + ' / ' + numElements}" fontSize="12" height="20"/>
-    		<mx:Image source="@Embed('assets/next.png')" width="29" height="20" alpha="{(numElements>(currentElementIndex+1) ? 1 : 0.4)}" click="nextElement();"/>
-		</mx:HBox>
+	<mx:Canvas id="tray" bottom="{positionChange}" left="0" right="0" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="true" horizontalCenter="0" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" >
+		<mx:VBox>
+			<mx:VBox id="descriptions" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" visible="{(props.get('showDescriptions') as Boolean)}" paddingLeft="4" paddingRight="4" width="{tray.width}">
+				<!-- Title and Words -->
+				<mx:Box id="descBg" horizontalCenter="0" verticalCenter="0" backgroundColor="0x000000" backgroundAlpha="0.7" cornerRadius="5" borderStyle="solid"  borderColor="0x3D3A3A"  left="5" right="5" paddingLeft="5" paddingRight="5" width="100%" paddingTop="5" paddingBottom="5">
+					<mx:Label id="trayTitle" fontSize="{(props.get('trayTitleFontSize') as Number)}" fontWeight="{props.get('trayTitleFontWeight')}" text="{activeElement.get('title')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayTitle.visible = (trayTitle.text.length>0);" fontFamily="Arial" width="{descBg.width - 15}"/>
+					<mx:Text id="trayContent" fontSize="{(props.get('trayContentFontSize') as Number)}" fontWeight="{props.get('trayContentFontWeight')}" text="{activeElement.get('content')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayContent.visible = (trayContent.text.length>0);" height="40"  fontFamily="Arial" width="{descBg.width - 15}"/>
+				</mx:Box>
+			</mx:VBox>
+			
+			<mx:HBox id="controlBox">
+				<mx:Canvas width="{tray.width}">
+					<!-- Play and Pause --> 
+					<mx:HBox visible="true" id="videoControls" bottom="3" top="3" left="5" paddingRight="5" width="{playImage.width}">
+			    		<mx:Image id="playImage" source="{playBtnSkin}" visible="{!video.playing}" includeInLayout="{playImage.visible}" click="playVideoElement();" width="30" height="28"/>
+			    		<mx:Image id="pauseImage" source="{pauseBtnSkin}" visible="{video.playing}" includeInLayout="{pauseImage.visible}" click="pauseVideoElement();" width="30" height="28"/>
+			    	</mx:HBox>
+					
+		<!--		<mx:HBox id="progressBg" visible="true" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+10}" right="{(rightPanel.width+15)}" height="{playImage.height}" top="3"/>
+					<mx:Canvas visible="true" id="videoProgress" click="{video.playheadTime = videoProgress.contentMouseX/videoProgress.width*video.totalTime;}" left="{videoControls.width+15}" right="{(rightPanel.width+20)}" backgroundColor="0xCCCCCC" backgroundAlpha="{(props.get('trayAlpha') as Number)}" bottom="{playImage.height/2}">
+						<mx:HBox id="videoBufferProgress" left="0" width="{video.bytesLoaded/video.bytesTotal*videoProgress.width}" height="6" backgroundColor="white" backgroundAlpha="0.2"></mx:HBox>
+						<mx:HBox id="videoPlayProgress" left="0" height="6" backgroundColor="black" backgroundAlpha="0.6"></mx:HBox>
+					</mx:Canvas>-->
+					
+					<mx:HBox id="progressBg" visible="true" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+10}" right="{(rightPanel.width+15)}" width="{this.width - (videoControls.width + rightPanel.width + 10)}" height="{playImage.height}" top="3"/>
+					<!-- VideoProgress -->
+					<mx:Canvas visible="true" id="videoProgress" click="{video.playheadTime = videoProgress.contentMouseX/videoProgress.width*video.totalTime;}" left="{videoControls.width+15}" right="{(rightPanel.width+20)}" backgroundColor="0xCCCCCC" backgroundAlpha="{(props.get('trayAlpha') as Number)}" bottom="{playImage.height/2}">
+						<mx:HBox id="videoBufferProgress" left="0" width="{video.bytesLoaded/video.bytesTotal*videoProgress.width}" height="6" backgroundColor="white" backgroundAlpha="0.2"></mx:HBox>
+						<!--<mx:HBox id="videoPlayProgress" left="0"  width="{video.playheadTime/video.totalTime*videoProgress.width}" height="6" backgroundColor="black" backgroundAlpha="0.6"></mx:HBox>-->
+						<mx:HBox id="videoPlayProgress" left="0" height="6" backgroundColor="black" backgroundAlpha="0.6"></mx:HBox>
+					</mx:Canvas>					
+					
+					<!-- playTime -->
+					<!--<mx:HBox visible="false" id="videoTime" x="{videoProgress.x + video.playheadTime/video.totalTime*videoProgress.width - videoTime.width/2}" y="{videoPlayProgress.y + playImage.height/2 - videoTime.height/3}" backgroundColor="0xFFFFFF" cornerRadius="3" borderStyle="solid" borderColor="0xFFFFFF" mouseDown="{onPlayTimeMouseDown()}">-->
+					<mx:HBox visible="false" id="videoTime" y="{videoPlayProgress.y + playImage.height/2 - videoTime.height/3}" backgroundColor="0xFFFFFF" cornerRadius="3" borderStyle="solid" borderColor="0xFFFFFF" mouseDown="{onPlayTimeMouseDown()}">
+						<mx:Label selectable="false" fontGridFitType="none" fontAntiAliasType="advanced" fontSharpness="-100"  text="{formatTime(video.playheadTime)}" fontFamily="Arial" fontWeight="bold" fontSize="8" height="13" color="0x000000"/>
+					</mx:HBox>
+					
+					<!-- Right Panel -->
+			    	<mx:HBox id="rightPanel" visible="true" bottom="3" top="3" right="5" > 
+			    		<!-- PlayListBtn -->
+			    		<mx:Image id="playlistBtn" source="{expandBtnSkin}" click="{showPlayList()}"  visible="true" includeInLayout="true" />
+			    		<mx:Image id="playlistBtnOn" source="{expandOnBtnSkin}" click="{showPlayList()}" visible="false" includeInLayout="false" />
+					    <!-- HDbutton-->
+						<mx:Image id="hdBtn" source="{hdBtnSkin}"  click="{onHdBtnClick()}" visible="false" includeInLayout="false" show="{onHDShow()}"/>
+						<mx:Image id="hdOffBtn" source="{hdOffBtnSkin}"  click="{onHdBtnClick()}" includeInLayout="false" visible="false" show="{onHDShow()}"/>
+			    		<!-- InfoBtn -->
+			    		<mx:Image id="infoBtn" source="{infoBtnSkin}" click="{onInfoBtnClick()}"/>
+						<!-- Mute and Unmute -->
+				    	<mx:Image id="unmuteImage" source="{volBtnSkin}" includeInLayout="false" visible="false" click="{muteSound()}"/>
+			    		<mx:Image id="muteImage" source="{volOffBtnSkin}" visible="true" includeInLayout="true" click="{muteSound()}"/>
+						<!-- Fullscreen -->
+			    		<mx:Image id="fullscreenImage" source="{fullScreenBtnSkin}" click="{toggleFullScreen()}"/>
+			    		<!-- FeedPanel -->
+			    		<mx:Image id="feedpanelBtn" source="{shareBtnSkin}" click="{embedPanel.visible ? embedPanel.visible = false : embedPanel.visible = true; onEmbedClick()}" mouseOver="{feedpanelBtn.alpha = 50}" mouseOut="{feedpanelBtn.alpha = 100}"/>
+					</mx:HBox>
+				</mx:Canvas>
+			</mx:HBox>
+			
+			<mx:HBox height="100" id="playListBox">
+				<!-- PlayList -->
+				<mx:Canvas id="playListHolder" bottom="0" />
+			</mx:HBox>
+		
+		</mx:VBox>	
 	</mx:Canvas>
+	<com:EmbedPanel id="embedPanel" visible="false" includeInLayout="false" verticalCenter="0" horizontalCenter="0" width="100%" height="100%" backgroundColor="0x000000" backgroundAlpha="{(props.get('trayAlpha') as Number)}"/>
 </mx:Application>

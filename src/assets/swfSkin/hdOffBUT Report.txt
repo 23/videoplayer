@@ -1,0 +1,33 @@
+hdOffBUT.swf Movie Report
+--------------------------
+
+Frame #    Frame Bytes    Total Bytes    Scene
+-------    -----------    -----------    ----------------
+      1            862            862    Scene 1 (AS 3.0 Classes Export Frame)
+
+Scene                        Shape Bytes    Text Bytes    ActionScript Bytes
+-------------------------    -----------    ----------    ------------------
+Scene 1                                0             0                     0
+
+Symbol                       Shape Bytes    Text Bytes    ActionScript Bytes
+-------------------------    -----------    ----------    ------------------
+hdGR                                  66             0                     0
+pauseGR                                0             0                     0
+playBUT                                0             0                     0
+hdBUT                                  0             0                     0
+pauseBUT                               0             0                     0
+playTween                              0             0                     0
+pauseTween                             0             0                     0
+hdTween                                0             0                     0
+playGR                                 0             0                     0
+bagTween                               0             0                     0
+butGR                                  0             0                     0
+backGR                                46             0                     0
+
+ActionScript Bytes    Location
+------------------    --------
+               402    ActionScript 3.0 Classes
+
+
+
+

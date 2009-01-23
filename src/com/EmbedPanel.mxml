@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import mx.managers.FocusManager;
+			import mx.controls.Alert;
+			
+			private var _embedTextValue : String = null;
+			private var _defaultEmbedtext : String = "Here placed embed text";
+			private var _podcastLink : String;
+			private var _rrsLink : String;
+			private var _mailLink : String;
+			
+			public function set selectText(value : String) : void
+			{
+				embedText.setFocus();
+				selectAllText();
+			}
+			
+//			private var swfUrl:String = _rrsLink;
+//			private var urlStart:Number = swfUrl.indexOf("://")+3;
+//			private var urlEnd:Number = swfUrl.indexOf("/", urlStart);
+			private var domain:String;				
+			
+			
+			public function set mailLink(value : String) : void
+			{
+				_mailLink = value;
+			}
+			
+			public function set embedTextValue(value : String) : void
+			{
+				_embedTextValue = value;
+				embedText.text = _embedTextValue;
+			}
+			
+			public function set podcastLink(value : String) : void
+			{
+				_podcastLink = value;
+			}
+			
+			public function set rssLink(value : String) : void
+			{
+				_rrsLink = value;
+				domain = _rrsLink.substring((_rrsLink.indexOf("://")+3),(_rrsLink.indexOf("/", _rrsLink.indexOf("://")+3)));
+			}
+			
+			private function getRss() : void
+			{
+				trace("getRSS click");
+				var request : URLRequest = new URLRequest(_rrsLink);
+				navigateToURL(request,"_blank");
+			}
+			
+			
+			private function podcastThis() : void
+			{
+				trace("podcast click");
+				var request : URLRequest = new URLRequest(_podcastLink);
+				navigateToURL(request,"_blank");
+			}
+			
+			private function sendMail() : void
+			{
+				trace("send mail click");
+				var request : URLRequest = new URLRequest(_mailLink);
+				navigateToURL(request,"_blank");
+//				
+//				emailService.url = domain + "/email.php";
+//				
+//				var senderName:String = "";
+//				var senderEmail:String = "";
+//				var sendToName:String = "";
+//				var sendToEmail:String = "";
+//				var emailMessage:String = "";
+//			
+//				this.emailService.send({senderName: senderName, senderEmail:senderEmail, sendToName: sendToName, sendToEmail: sendToEmail, emailMessage: emailMessage});		
+			}
+			
+			private function emailResult():void
+			{
+//				Alert.show("Email Has Been Sent");
+			}	
+			
+			
+			private function selectAllText() : void
+			{
+				if(embedText && embedText.length > 0)
+				{
+					embedText.selectionBeginIndex = 0;
+					embedText.selectionEndIndex = embedText.text.length;
+				}
+			}
+		]]>
+	</mx:Script>
+	<!--<mx:HTTPService id="emailService" method="POST" resultFormat="xml" result="emailResult()" useProxy="false"/>-->
+	<mx:Canvas width="{parent.width*0.7}" height="{parent.height*0.7}" horizontalCenter="0" verticalCenter="0" id="embedScreen" backgroundColor="0x000000"  backgroundAlpha="0.8" horizontalScrollPolicy="off" verticalScrollPolicy="off" >
+		<!-- Close Button -->
+		<mx:Image id="closeBtn" source="@Embed('assets/newSkin/closeBtn.gif')" top="7" right="10" click="{this.visible=false}"/>
+		
+		<mx:Label text="Share this video" fontSize="16" fontWeight="bold" color="0xFFFFFF" top="2" left="10"  fontFamily="Arial"/>
+		
+		<mx:Image id="embedLogo" source="@Embed('assets/newSkin/shareIcon.gif')" top="30" left="10"/>
+		
+		<mx:Label text="Embed:" fontSize="12" fontWeight="bold" color="0xFFFFFF" top="30" left="34"/>
+		
+		<mx:TextArea id="embedText" top="55" left="10" right="10" backgroundColor="0xFFFFFF" color="0x000000" fontSize="10"  height="{(downLabel.y - (embedLogo.y + embedLogo.height+7))}" fontFamily="Arial"/>
+
+		<mx:Label id="downLabel" text="You can also..." fontSize="12" fontWeight="bold" left="10" y="{downPanel.y - 25}" color="0xFFFFFF"  fontFamily="Arial"/>
+		
+		<mx:HBox id="downPanel" bottom="10" width="{embedScreen.width}" left="10" horizontalScrollPolicy="off">
+			<mx:VBox left="3"   id="podcastBox"  horizontalScrollPolicy="off" verticalScrollPolicy="off">
+				<mx:VBox verticalAlign="middle" horizontalAlign="center" mouseOver="{podcastBtn.alpha=1}" mouseOut="{podcastBtn.alpha = 0.9}" click="{podcastThis()}">
+					<mx:Image id="podcastBtn" source="@Embed('assets/newSkin/podcastBtn.gif')" alpha="0.8"/>
+					<mx:Label id="podcastLabel" text="Podcast this program" color="0xFFFFFF"  fontFamily="Arial" paddingTop="1"/>
+				</mx:VBox>
+			</mx:VBox>
+			<mx:VBox  id="rssBox"  horizontalScrollPolicy="off" verticalScrollPolicy="off">
+				<mx:VBox  verticalAlign="middle" horizontalAlign="center"  mouseOver="{rssBtn.alpha=1}" mouseOut="{rssBtn.alpha = 0.9}" click="{getRss()}">
+					<mx:Image id="rssBtn" source="@Embed('assets/newSkin/rssBtn.gif')" alpha="0.8"/>
+					<mx:Label id="rssLabel" text="Get this program on RSS" color="0xFFFFFF" fontFamily="Arial"/>		
+				</mx:VBox>
+			</mx:VBox>
+			<mx:VBox right="3"  id="mailBox" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+				<mx:VBox  verticalAlign="middle" horizontalAlign="center" mouseOver="{mailBtn.alpha=1}" mouseOut="{mailBtn.alpha = 0.9}" click="{sendMail()}" >
+					<mx:Image id="mailBtn" source="@Embed('assets/newSkin/mailBtn.gif')" alpha="0.8"/>
+					<mx:Label id="mailLabel" text="Send this video" color="0xFFFFFF" fontFamily="Arial" paddingTop="2"/>				
+				</mx:VBox>
+			</mx:VBox>
+		</mx:HBox>
+		
+	</mx:Canvas>
+</mx:Canvas>

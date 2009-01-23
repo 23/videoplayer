@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100" height="100" creationComplete="init()">
+	<mx:Script>
+		<![CDATA[
+			
+			private var _defaultURL : String = "assets/newSkin/blank.gif";
+			private var _defaultName : String = "movieName";
+			
+			private var _sourceURL : String = null;
+			private var _movieName : String = null;
+			private var _itemID : Number;
+			
+			private var _photoSource : String;
+			private var _title : String;
+			
+			
+			public function set sourceURL(value : String) : void 
+			{
+				_sourceURL = value;
+			}
+			public function set movieName(value : String) : void
+			{
+				_movieName = value;
+			}
+			public function get itemID() : Number
+			{
+				return _itemID;			
+			}
+			public function set itemID(value : Number) : void
+			{
+				_itemID = value;
+			}
+			
+			private function init() : void
+			{
+				moviePreview.source = (_sourceURL != null) ? _sourceURL : _defaultURL;
+				moviePreview.addEventListener(Event.COMPLETE, loadingHandler);
+				nameLabel.text = (_movieName != null) ? (_movieName) : _defaultName;
+				if(nameLabel.width < nameLabel.textWidth)
+				{
+					nameLabel.text = (nameLabel.text).substr(0,nameLabel.width-5) + " [..]"
+				}
+			}
+			
+			private function loadingHandler(evt:Event) : void
+			{
+				if(moviePreview.contentWidth < 5 || moviePreview.contentHeight < 5)
+				{
+					moviePreview.source = _defaultURL;
+				}
+				moviePreview.maintainAspectRatio = false;
+				loadLabel.visible = false;
+				moviePreview.visible = true;
+				nameLabel.visible = true;
+			}
+			
+			
+		]]>
+	</mx:Script>
+	<mx:Image id="moviePreview" top="0" width="100" height="75" scaleContent="true" visible="false"/>
+	<mx:Label id="nameLabel" color="0xFFFFFF" fontSize="10" bottom="2" visible="false" fontFamily="Arial"/>
+	<mx:Label id="loadLabel" color="0xFFFFFF" fontSize="10" verticalCenter="0" horizontalCenter="0" text="LOADING" fontFamily="Arial"/>
+	<mx:Canvas id="clickHolder" width="100" height="100" verticalCenter="0" horizontalCenter="0" backgroundAlpha="0.1" backgroundColor="0xFFFFFF"/>
+</mx:Canvas>

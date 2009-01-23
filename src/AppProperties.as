@@ -62,6 +62,7 @@ private function initProperties(settings:Object):void {
 	}
 
 	// Determine a JSON source
+//	var domain:String = defaultDomain;
 	var domain:String = URLUtil.getServerName(Application.application.url);
 	if(domain=='localhost') domain=defaultDomain;
 	props.put('domain', domain);
