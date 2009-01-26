@@ -1,6 +1,4 @@
 
-import flash.system.ApplicationDomain;
-
 import mx.core.Application;
 [Bindable] public var numElements:int = 0;
 [Bindable] public var currentElementIndex:int = 0;
@@ -40,8 +38,21 @@ private function setActiveElement(i:int, playHD:Boolean):void {
   	activeElement.put('title', o.title.replace(new RegExp('(<([^>]+)>)', 'ig'), ''));
   	activeElement.put('content', o.content_text.replace(new RegExp('(<([^>]+)>)', 'ig'), ''));
   	activeElement.put('link', o.one);
-  	activeElement.put('videoSource', 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined' ? o.video_medium_download : o.video_small_download));
-  	activeElement.put('photoSource', 'http://' + props.get('domain') + o.large_download);
+
+	var hasHD:Boolean = (h264()&&typeof(o.video_hd_download)!='undefined'&&o.video_hd_download.length>0);
+	activeElement.put('hasHD', hasHD);
+
+	// Video source, including referer, depending on flash version and HD context
+	var videoSource:String = 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined' ? o.video_medium_download : o.video_small_download);
+	if (hasHD && playHD) videoSource = 'http://' + props.get('domain') + o.video_hd_download;
+  	videoSource += '?_referer='+encodeURIComponent(referer());
+  	activeElement.put('videoSource', videoSource);
+  	
+  	// Photo source with referer
+  	var photoSource:String = 'http://' + props.get('domain') + o.large_download;
+  	photoSource += '?_referer='+encodeURIComponent(referer());
+  	activeElement.put('photoSource', photoSource);
+
   	activeElement.put('photoWidth', new Number(o.large_width));
   	activeElement.put('photoHeight', new Number(o.large_height));
   	activeElement.put('aspectRatio', parseInt(o.large_width) / parseInt(o.large_height));
@@ -50,17 +61,6 @@ private function setActiveElement(i:int, playHD:Boolean):void {
 	if(props.get('trayTitleTextTranform')=='lowercase') o.title = o.title.toLowerCase();
 	if(props.get('trayContentTextTranform')=='uppercase') o.content = o.content.toUpperCase();
 	if(props.get('trayContentTextTranform')=='lowercase') o.content = o.content.toLowerCase();
-	
-	var hasHD:Boolean = (h264()&&typeof(o.video_hd_download)!='undefined'&&o.video_hd_download.length>0);
-	activeElement.put('hasHD', hasHD);
-	if (hasHD && playHD) 
-	{
-		activeElement.put('videoSource', 'http://' + props.get('domain') + o.video_hd_download);
-	} 
-	else 
-	{
-	     activeElement.put('videoSource', 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined'&&o.video_medium_download.length>0 ? o.video_medium_download : o.video_small_download));
-	}
 	
  	if(video_p) {
  		image.source = null;

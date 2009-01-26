@@ -18,9 +18,7 @@
 			import mx.core.mx_internal;
 			
 			// Default domain (used when testing from localhost)
-			//private var defaultDomain:String = 'livefrompicnic.com';
-			private var defaultDomain:String = 'white.visualblog.net';
-//			private var defaultDomain:String = 'sibers.23visualblog.net';
+			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
 			private var handleTimer : Timer;
@@ -39,6 +37,10 @@
 			private var pos1  : Number;
 						
 
+			public function referer():String {
+				return(mx.core.Application.application.url);
+			}
+			
 			public function h264():Boolean {
 				var re:RegExp = new RegExp('([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)', 'img');
 				var v:Array = re.exec(Capabilities.version);
@@ -53,7 +55,6 @@
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
 				if(domain=='localhost') domain=defaultDomain;
-//				var domain:String = defaultDomain;
 				doJSON('http://' + domain + '/js/video-settings?raw', function(o:Object):void{
 					initProperties(o.settings);
 					initActiveElement();
