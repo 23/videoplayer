@@ -4,7 +4,6 @@
  	<mx:Script source="ActiveElement.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
  	<mx:Script source="doJSON.as"></mx:Script>
- 	<mx:Script source="EmbedSources.as"></mx:Script>
 	<mx:Script>
 		<![CDATA[
 			import mx.controls.Button;
