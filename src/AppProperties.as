@@ -13,7 +13,7 @@ public var propDefaults:Object = {
 	trayContentFontSize: parseFloat('13'),
 	trayContentFontWeight: 'normal',
 	trayContentTextTranform: 'none',
-	trayAlpha: parseFloat('0.5'),
+	trayAlpha: parseFloat('0.7'),
 	showTray: true,
 	showDescriptions: true,
 	autoPlay: false,

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" show="selectEmbedText()">
 	<mx:Script>
 		<![CDATA[
 			import mx.managers.FocusManager;
@@ -10,11 +10,6 @@
 			private var _podcastLink:String;
 			private var _rrsLink:String;
 			private var _mailLink:String;
-			
-			public function set selectText(value:String):void {
-				embedText.setFocus();
-				selectAllText();
-			}
 			
 			private var domain:String;				
 
@@ -55,8 +50,9 @@
 				navigateToURL(request,"_blank");
 			}
 			
-			private function selectAllText():void {
+			private function selectEmbedText():void {
 				if(embedText && embedText.length > 0) {
+					embedText.setFocus();
 					embedText.selectionBeginIndex = 0;
 					embedText.selectionEndIndex = embedText.text.length;
 				}
