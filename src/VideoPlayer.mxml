@@ -21,6 +21,7 @@
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
+			
 			private var handleTimer : Timer;
 			private var descTimer : Timer;
 			
@@ -35,22 +36,13 @@
 			private var pos3 : Number;
 			private var pos2 : Number;
 			private var pos1  : Number;
-						
 
-			public function referer():String {
-				return(mx.core.Application.application.url);
-			}
-			
-			public function h264():Boolean {
-				var re:RegExp = new RegExp('([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)', 'img');
-				var v:Array = re.exec(Capabilities.version);
-				if (v[1]>9) {return(true);}
-				if (v[1]==9 && (v[2]>0 || v[3]>=115)) {return(true);}
-				return(false);
-			}
-					
 			private var appAspectRatio:Number = 1;
 			private var context:Object = {};
+						
+			public function displayError(text:String):void {logo.visible=false; video.visible=false; image.visible=false; tray.visible=false; loading.visible=true; loading.text=text;}
+			public function formatTime(time:int):String {return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());}
+					
 
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
@@ -62,8 +54,7 @@
 				});
 			}
 			public function build():void {
-				if(context && context.photos && context.photos.length == 1)
-				{
+				if(context && context.photos && context.photos.length == 1) {
 					playlistBtn.visible = false;
 					playlistBtn.includeInLayout = false;
 					playlistBtnOn.visible = false;
@@ -74,9 +65,8 @@
 					onInfoBtnClick();
 					this.addEventListener(MouseEvent.ROLL_OUT, onAppMouseOut);
 					this.addEventListener(MouseEvent.ROLL_OVER, onAppMouseOver);
-				}
-				else
-				if (context && context.photos && context.photos.length>1) {	
+					
+				} else if (context && context.photos && context.photos.length>1) {	
 					if (context.photos.length) setActiveElement(0,false);
 					loading.visible=false;
 					video.mx_internal::videoPlayer.smoothing = true;
@@ -86,22 +76,19 @@
 					setProperties();
 					this.addEventListener(MouseEvent.ROLL_OUT, onAppMouseOut);
 					this.addEventListener(MouseEvent.ROLL_OVER, onAppMouseOver);
+					
 				} else {
 					displayError('Nothing to show...');
 				}
 			}
 			
-			private function setProperties() : void
-			{
+			private function setProperties():void {
 				pos3 = this.height - tray.height;
 				pos2 = this.height - tray.height + 100;
 				pos1 = this.height + tray.height;
 			}
 			
-			private function onMetaDataGetted() : void
-			{
-				trace("METADATA GET!");
-			}
+			private function onMetaDataGetted():void {trace("METADATA GET!");}
 			
 			private function doStateChange(evt:VideoEvent):void {
                 switch (evt.currentTarget.state) {
@@ -111,8 +98,7 @@
                 }
             }
             
-            private function createPlayList() : void
-            {
+            private function createPlayList():void  {
             	trace("create playlist");
             	playList = new PlayList();
             	playList.width = tray.width;
@@ -122,9 +108,7 @@
 				playListHolder.addChild(playList);
             }
             
-            
-            private function createTimer() : void
-            {
+            private function createTimer():void {
             	if(handleTimer != undefined) handleTimer.stop();
             	handleTimer = new Timer(1000,5);
             	handleTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onTimeOut);
@@ -132,40 +116,30 @@
             	handleTimer.start();
             }
             
-            private function onTick(evt:TimerEvent) : void
-            {
-            	trace(evt.target.currentCount);
-            }
+            private function onTick(evt:TimerEvent):void {}
             
-            private function onTimeOut(evt:TimerEvent) : void
-            {
+            private function onTimeOut(evt:TimerEvent):void {
             	trace("time is up");
 	            handleTimer.stop();
 	            showPlayList();
             }
             
-            private function itemSelectHandler(evt:PlayListEvent) : void
-            {
+            private function itemSelectHandler(evt:PlayListEvent):void {
             	createTimer();
-            	if(evt.itemID != -1)
-            	{
+            	if(evt.itemID != -1) {
             		onInfoBtnClick();
             		setElementByID(evt.itemID);
             	}
             }
             
-            private function muteSound() : void
-            {
-            	if(!muteImage.visible)
-            	{
+            private function muteSound():void {
+            	if(!muteImage.visible) {
             		video.volume = 1;
             		unmuteImage.visible = false;
             		unmuteImage.includeInLayout = false;
             		muteImage.includeInLayout = true;
             		muteImage.visible = true;
-            	}
-            	else
-            	{
+            	} else {
             		video.volume = 0;
             		muteImage.visible = false;
             		muteImage.includeInLayout = false;
@@ -174,28 +148,20 @@
             	}
             }
             
-            private function hdEnable() : void
-            {
-            	if((activeElement.get('hasHD') as Boolean))
-            	{
-	            	if(!hdOffBtn.visible)
-	            	{
-		            	if((activeElement.get('hasHD') as Boolean))
-		            	{
+            private function hdEnable():void {
+            	if((activeElement.get('hasHD') as Boolean)) {
+	            	if(!hdOffBtn.visible) {
+		            	if((activeElement.get('hasHD') as Boolean)) {
 		            		hdBtn.visible = true;
 		            		hdBtn.includeInLayout = true;
-		            	}
-		            	else
-		            	{
+		            	} else {
 		            		hdBtn.visible = false;
 		            		hdBtn.includeInLayout = false;
 			            	hdOffBtn.visible = false;
 			            	hdOffBtn.includeInLayout = false;
 		            	}
 	            	}
-            	}
-            	else
-            	{
+            	} else {
 		            hdBtn.visible = false;
 		            hdBtn.includeInLayout = false;
 			        hdOffBtn.visible = false;
@@ -203,22 +169,17 @@
 	            }
             }
             
-            private function onHdBtnClick() : void
-			{
-				if((activeElement.get('hasHD') as Boolean))
-				{
+            private function onHdBtnClick():void {
+				if((activeElement.get('hasHD') as Boolean)) {
 					trace("HD click");
 	//				visible="{(activeElement.get('hasHD') as Boolean)}" includeInLayout="{(activeElement.get('hasHD') as Boolean)}"
-					if(!hdOffBtn.visible)
-					{
+					if(!hdOffBtn.visible) {
 						trace("HD hdOffBtn");
 						hdBtn.visible = false;
 						hdBtn.includeInLayout = false;
 						hdOffBtn.includeInLayout = true;
 						hdOffBtn.visible = true;
-					}
-					else if(hdOffBtn.visible)
-					{
+					} else if(hdOffBtn.visible) {
 						trace("HD hdBtn");
 						hdOffBtn.visible = false;
 						hdOffBtn.includeInLayout = false;
@@ -229,22 +190,16 @@
 				}
             }
             
-            
-            private function onDescTimeOut(evt:TimerEvent=null) : void
-            {
+            private function onDescTimeOut(evt:TimerEvent=null):void {
             	descriptions.visible = false;
             	descTimer.stop();
             }
             
-            private function onInfoBtnClick() : void
-            {
-            	if(descriptions.visible)
-            	{
+            private function onInfoBtnClick():void {
+            	if(descriptions.visible) {
 	            	descriptions.visible = false;
 	            	if(descTimer != undefined) descTimer.stop();       		
-            	}
-            	else
-            	{
+            	} else {
 	            	descriptions.visible = true;
 	            	if(descTimer != undefined) descTimer.stop();
 	            	descTimer = new Timer(1000,5);
@@ -253,11 +208,8 @@
 	            }
             }
             
-
-            private function showPlayList() : void
-            {
-            	if(playListOut)
-            	{
+            private function showPlayList():void {
+            	if(playListOut) {
             		playListOut = false;
             		playlistBtn.visible = false;
             		playlistBtn.includeInLayout = false;
@@ -270,9 +222,7 @@
 	            	trayHider.play();
             		createTimer();
             		trace("Not playListOut: "+positionChange);
-            	}
-            	else
-            	{
+            	} else {
             		if(handleTimer != undefined) handleTimer.stop();
             		playListOut = true;
             		playlistBtn.includeInLayout = true;
@@ -288,12 +238,9 @@
             	}
             }
  
-            private function onAppMouseOut(event:MouseEvent) : void
-            {
+            private function onAppMouseOut(event:MouseEvent):void {
             	if(handleTimer != undefined) handleTimer.stop();
-            	
-            	if(context && context.photos && context.photos.length == 1)
-            	{
+            	if(context && context.photos && context.photos.length == 1) {
             		playListOut = true;
             		trayOut = true;
 		           	trayHider.end();
@@ -301,21 +248,16 @@
 	            	trayHider.yTo = this.height + tray.height;
 	            	positionChange = - tray.height;
 	            	trayHider.play();
-            	}
-            	else if(context.photos.length > 1)
-            	{
+            	} else if(context.photos.length > 1) {
             		trayHider.end();
-            		if(playListOut)
-            		{
+            		if(playListOut) {
             			if(handleTimer != undefined) handleTimer.stop();
 	         		    playlistBtnOn.includeInLayout = false;
 	        		    playlistBtnOn.visible = false;
 	     		        playlistBtn.visible = true;
 	       		    	playlistBtn.includeInLayout = true;
 	       		    	trayHider.yFrom = this.height - tray.height + 100;
-            		}
-            		else if(!playListOut)
-            		{
+            		} else if(!playListOut) {
             			trayHider.yFrom = this.height - tray.height;;
             			if(handleTimer != undefined) handleTimer.stop();
 	           			playlistBtnOn.includeInLayout = false;
@@ -323,7 +265,6 @@
 	         		    playlistBtn.visible = true;
 	         		    playlistBtn.includeInLayout = true;
 //            			playListOut = true;
-            			
             		}
 
             		playListOut = true;
@@ -335,10 +276,8 @@
             	trace("onAppMouseOut: "+positionChange);
             }
             
-            private function onAppMouseOver(event:MouseEvent) : void
-            {
-//            	if(trayOut)
-//            	{
+            private function onAppMouseOver(event:MouseEvent):void {
+//            	if(trayOut) {
             		trayOut = false;
 				  	trayHider.end();
 				  	trayHider.yFrom = this.height + tray.height;
@@ -349,22 +288,17 @@
 //            	}
             }       
             
-            private function onPlayTimeDrag(evt:MouseEvent) : void
-            {
+            private function onPlayTimeDrag(evt:MouseEvent):void {
 				videoTime.x = mouseX - offset;
-				if(videoTime.x <= bounds.left)
-				{  
+				if(videoTime.x <= bounds.left) {
 					videoTime.x = bounds.left;
-				}
-				else if(videoTime.x >= bounds.right)
-				{
+				} else if(videoTime.x >= bounds.right) {
 					videoTime.x = bounds.right;
 				}
 				evt.updateAfterEvent();
             }
             
-            private function onPlayTimeMouseUp(evt:MouseEvent) : void
-            {
+            private function onPlayTimeMouseUp(evt:MouseEvent):void {
             	timeIsDrag = false;
             	trace("B:"+video.playheadTime);
             	video.playheadTime = (videoTime.x+videoTime.width/2)/videoProgress.width*video.totalTime;
@@ -372,8 +306,7 @@
             	videoTime.removeEventListener(MouseEvent.MOUSE_MOVE, onPlayTimeDrag);
             }
             
-            private function onPlayTimeMouseDown() : void
-            {
+            private function onPlayTimeMouseDown():void {
             	timeIsDrag = true;
             	offset = videoTime.mouseX;
             	bounds = {left: videoProgress.x - videoTime.width/2, right: videoProgress.x+videoProgress.width- videoTime.width/2};
@@ -381,32 +314,25 @@
             	videoTime.addEventListener(MouseEvent.MOUSE_MOVE , onPlayTimeDrag);
             }
             
-            private function onVideoPlayHeadUpdate() : void
-            {
+            private function onVideoPlayHeadUpdate():void {
             	videoPlayProgress.width  = video.playheadTime/video.totalTime*videoProgress.width;
-            	if(!timeIsDrag)
-            	{
+            	if(!timeIsDrag) {
             		videoTime.x = videoProgress.x + video.playheadTime/video.totalTime*videoProgress.width - videoTime.width/2;
             	}
             }
             
-            private function onEmbedClick() : void
-            {
+            private function onEmbedClick():void {
             	trace("embedClick");
             	embedPanel.selectText = "yes";
             }
             
-            private function onHDShow() : void
-            {
+            private function onHDShow():void {
             	trace("onHDshow");
 //            	progressBg.invalidateProperties();
         		invalidateProperties();
       			invalidateSize();
       		  	invalidateDisplayList();
             }
-            
-			public function displayError(text:String):void {logo.visible=false; video.visible=false; image.visible=false; tray.visible=false; loading.visible=true; loading.text=text;}
-			public function formatTime(time:int):String {return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());}
 		]]>
 	</mx:Script>
 	<mx:Move id="trayHider" target="{tray}"/>
@@ -425,8 +351,6 @@
 	<mx:Image id="image" source="{activeElement.get('photoSource')}" width="{video.width}" height="{video.height}" horizontalCenter="0" verticalCenter="0"
 		click="{playVideoElement()}" />
 
-	<!-- Big Play -->
-<!--	<mx:Image visible="false" id="bigPlay" source="@Embed('assets/play-big.png')" horizontalCenter="0" verticalCenter="0" click="playVideoElement();" width="60" height="60"/> -->
 	<!-- Icon/Logo -->
 	<mx:Box id="logo" visible="{(props.get('showLogo') as Boolean)}" top="15" right="15" left="15" bottom="15" horizontalAlign="{props.get('logoAlign')}" verticalAlign="{props.get('logoVAlign')}" horizontalCenter="0" verticalCenter="0">
 		<mx:Image source="{props.get('logoSource')}" alpha="{(props.get('logoAlpha') as Number)}" maxWidth="{(props.get('logoWidth') as Number)}" maxHeight="{(props.get('logoHeight') as Number)}" horizontalAlign="{props.get('logoAlign')}" verticalAlign="{props.get('logoVAlign')}"/> 
@@ -449,12 +373,6 @@
 			    		<mx:Image id="playImage" source="{playBtnSkin}" visible="{!video.playing}" includeInLayout="{playImage.visible}" click="playVideoElement();" width="30" height="28"/>
 			    		<mx:Image id="pauseImage" source="{pauseBtnSkin}" visible="{video.playing}" includeInLayout="{pauseImage.visible}" click="pauseVideoElement();" width="30" height="28"/>
 			    	</mx:HBox>
-					
-		<!--		<mx:HBox id="progressBg" visible="true" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+10}" right="{(rightPanel.width+15)}" height="{playImage.height}" top="3"/>
-					<mx:Canvas visible="true" id="videoProgress" click="{video.playheadTime = videoProgress.contentMouseX/videoProgress.width*video.totalTime;}" left="{videoControls.width+15}" right="{(rightPanel.width+20)}" backgroundColor="0xCCCCCC" backgroundAlpha="{(props.get('trayAlpha') as Number)}" bottom="{playImage.height/2}">
-						<mx:HBox id="videoBufferProgress" left="0" width="{video.bytesLoaded/video.bytesTotal*videoProgress.width}" height="6" backgroundColor="white" backgroundAlpha="0.2"></mx:HBox>
-						<mx:HBox id="videoPlayProgress" left="0" height="6" backgroundColor="black" backgroundAlpha="0.6"></mx:HBox>
-					</mx:Canvas>-->
 					
 					<mx:HBox id="progressBg" visible="true" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+10}" right="{(rightPanel.width+15)}" width="{this.width - (videoControls.width + rightPanel.width + 10)}" height="{playImage.height}" top="3"/>
 					<!-- VideoProgress -->

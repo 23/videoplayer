@@ -23,70 +23,45 @@
 			private var domain:String;				
 			
 			
-			public function set mailLink(value : String) : void
-			{
+			public function set mailLink(value: String):void {
 				_mailLink = value;
 			}
 			
-			public function set embedTextValue(value : String) : void
-			{
+			public function set embedTextValue(value: String):void {
 				_embedTextValue = value;
 				embedText.text = _embedTextValue;
 			}
 			
-			public function set podcastLink(value : String) : void
-			{
+			public function set podcastLink(value:String):void {
 				_podcastLink = value;
 			}
 			
-			public function set rssLink(value : String) : void
-			{
+			public function set rssLink(value:String):void {
 				_rrsLink = value;
 				domain = _rrsLink.substring((_rrsLink.indexOf("://")+3),(_rrsLink.indexOf("/", _rrsLink.indexOf("://")+3)));
 			}
 			
-			private function getRss() : void
-			{
+			private function getRss():void {
 				trace("getRSS click");
 				var request : URLRequest = new URLRequest(_rrsLink);
 				navigateToURL(request,"_blank");
 			}
 			
 			
-			private function podcastThis() : void
-			{
+			private function podcastThis():void {
 				trace("podcast click");
 				var request : URLRequest = new URLRequest(_podcastLink);
 				navigateToURL(request,"_blank");
 			}
 			
-			private function sendMail() : void
-			{
+			private function sendMail():void {
 				trace("send mail click");
 				var request : URLRequest = new URLRequest(_mailLink);
 				navigateToURL(request,"_blank");
-//				
-//				emailService.url = domain + "/email.php";
-//				
-//				var senderName:String = "";
-//				var senderEmail:String = "";
-//				var sendToName:String = "";
-//				var sendToEmail:String = "";
-//				var emailMessage:String = "";
-//			
-//				this.emailService.send({senderName: senderName, senderEmail:senderEmail, sendToName: sendToName, sendToEmail: sendToEmail, emailMessage: emailMessage});		
 			}
 			
-			private function emailResult():void
-			{
-//				Alert.show("Email Has Been Sent");
-			}	
-			
-			
-			private function selectAllText() : void
-			{
-				if(embedText && embedText.length > 0)
-				{
+			private function selectAllText():void {
+				if(embedText && embedText.length > 0) {
 					embedText.selectionBeginIndex = 0;
 					embedText.selectionEndIndex = embedText.text.length;
 				}

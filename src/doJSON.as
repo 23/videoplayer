@@ -1,4 +1,4 @@
-// ActionScript file
+
 import com.adobe.net.DynamicURLLoader;
 import com.adobe.serialization.json.JSON;
 private function doJSON(url:String, f:Function):DynamicURLLoader {

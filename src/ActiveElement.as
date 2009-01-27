@@ -1,10 +1,20 @@
-
 import mx.core.Application;
 [Bindable] public var numElements:int = 0;
 [Bindable] public var currentElementIndex:int = 0;
 [Bindable] public var activeElement:HashCollection = new HashCollection();
 public var itemsArray : Array;
 
+public function referer():String {
+	return(Application.application.url);
+}
+			
+public function h264():Boolean {
+	var re:RegExp = new RegExp('([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)', 'img');
+	var v:Array = re.exec(Capabilities.version);
+	if (v[1]>9) {return(true);}
+	if (v[1]==9 && (v[2]>0 || v[3]>=115)) {return(true);}
+	return(false);
+}
 
 private function initActiveElement():void {
 	trace("initActiveElement");
@@ -23,9 +33,7 @@ private function resetActiveElement():void {
   	activeElement.put('aspectRatio', new Number(1));
 }
 
-
 private function setActiveElement(i:int, playHD:Boolean):void {
-
 	trace("setActiveElement");
 	if(typeof(playHD)=='undefined') playHD = false;
 	if (!context || !context.photos || !context.photos[i]) return;
@@ -81,11 +89,9 @@ private function setActiveElement(i:int, playHD:Boolean):void {
 	
 } 	
 
-private function createItemsArray() : Array
-{
+private function createItemsArray() : Array {
 	itemsArray = new Array();
-	for(var i:Number = 0 ; i < context.photos.length; i++)
-	{
+	for(var i:Number = 0 ; i < context.photos.length; i++) {
 		var o:Object = context.photos[i];
 		var item : Object = new Object();
 		item.itemID = i;		
@@ -103,14 +109,12 @@ private function createItemsArray() : Array
 
 private function previousElement():void {if(video.playing) video.stop(); setActiveElement(currentElementIndex-1,false);}
 private function nextElement():void {if(video.playing) video.stop(); setActiveElement(currentElementIndex+1,false);}
-private function setElementByID(id:Number):void
-{
+private function setElementByID(id:Number):void {
 	if(video.playing) video.stop();
-	setActiveElement(id,false);
+	setActiveElement(id, false);
 }
 
-private function showImageElement():void 
-{
+private function showImageElement():void {
 	if(video.playing) video.stop();
 	
 	video.visible=false;
@@ -121,8 +125,7 @@ private function showImageElement():void
 	
 	image.visible=true;
 }
-private function showVideoElement():void 
-{
+private function showVideoElement():void {
 	hdEnable();
 	video.visible=false;
 	videoControls.visible=true;
@@ -133,8 +136,7 @@ private function showVideoElement():void
 	image.source = activeElement.get('photoSource');
 	image.visible=true;
 }
-private function playVideoElement():void 
-{
+private function playVideoElement():void {
 	if(!activeElement.get('video_p')) return;
 	video.visible=true;
 	videoControls.visible=true;
@@ -145,8 +147,7 @@ private function playVideoElement():void
 	image.visible=false;
 	video.play();
 }
-private function pauseVideoElement():void 
-{
+private function pauseVideoElement():void {
 	playVideoElement();
 	video.pause();
 }
