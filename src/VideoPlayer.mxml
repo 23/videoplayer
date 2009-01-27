@@ -280,11 +280,11 @@
 			    	</mx:HBox>					
 						
 					<!-- Elements for progress bar -->
-					<mx:Canvas id="progressBg" visible="{videoControls.visible}" click="seekVideoTo((progressBg.contentMouseX-5)/videoProgress.width*video.totalTime);" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+6}" right="{rightPanel.width+6}" height="{playImage.height}" top="3" cornerRadius="3" borderStyle="solid" borderThickness="0" mouseOver="videoTime.visible=true"  mouseOut="videoTime.visible=false">
+					<mx:Canvas id="progressBg" visible="{videoControls.visible}" click="seekVideoTo((progressBg.contentMouseX-5)/videoProgress.width*video.totalTime);" mouseOver="videoTime.visible=true" mouseOut="videoTime.visible=false" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+6}" right="{rightPanel.width+6}" height="{playImage.height}" top="3" cornerRadius="3" borderStyle="solid" borderThickness="0" horizontalScrollPolicy="off" verticalScrollPolicy="off">
 						<!-- VideoProgress -->
 						<mx:Canvas id="videoProgress" left="5" right="5" height="6" backgroundColor="0xCCCCCC" backgroundAlpha="0.6" bottom="{(progressBg.height-6)/2}">
-							<mx:HBox id="videoBufferProgress" left="0" width="{video.bytesLoaded/video.bytesTotal*videoProgress.width}" height="6" backgroundColor="white" backgroundAlpha="0.2"></mx:HBox>
-							<mx:HBox id="videoPlayProgress" left="0" height="6" backgroundColor="black" backgroundAlpha="0.6"></mx:HBox>
+							<mx:Canvas id="videoBufferProgress" left="0" width="{video.bytesLoaded/video.bytesTotal*videoProgress.width}" height="6" backgroundColor="white" backgroundAlpha="0.2"></mx:Canvas>
+							<mx:Canvas id="videoPlayProgress" left="0" height="6" backgroundColor="black" backgroundAlpha="0.6"></mx:Canvas>
 						</mx:Canvas>					
 						<!-- videoTime -->
 						<mx:HBox id="videoTime" visible="false" y="{(progressBg.height-videoTime.height)/2}" backgroundColor="0xFFFFFF" cornerRadius="3" borderStyle="solid" borderColor="0xFFFFFF">
