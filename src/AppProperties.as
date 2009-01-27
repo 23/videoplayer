@@ -7,7 +7,7 @@ public var propDefaults:Object = {
 	trayBackgroundColor: 'black',
 	trayTextColor: 'white',
 	trayFont: 'Helvetica, Arial, sans-serif',
-	trayTitleFontSize: parseFloat('14'),
+	trayTitleFontSize: parseFloat('13'),
 	trayTitleFontWeight: 'bold',
 	trayTitleTextTranform: 'none',
 	trayContentFontSize: parseFloat('11'),
