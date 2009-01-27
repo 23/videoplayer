@@ -5,24 +5,19 @@
 			import mx.managers.FocusManager;
 			import mx.controls.Alert;
 			
-			private var _embedTextValue : String = null;
-			private var _defaultEmbedtext : String = "Here placed embed text";
-			private var _podcastLink : String;
-			private var _rrsLink : String;
-			private var _mailLink : String;
+			private var _embedTextValue:String = null;
+			private var _defaultEmbedtext:String = '';
+			private var _podcastLink:String;
+			private var _rrsLink:String;
+			private var _mailLink:String;
 			
-			public function set selectText(value : String) : void
-			{
+			public function set selectText(value:String):void {
 				embedText.setFocus();
 				selectAllText();
 			}
 			
-//			private var swfUrl:String = _rrsLink;
-//			private var urlStart:Number = swfUrl.indexOf("://")+3;
-//			private var urlEnd:Number = swfUrl.indexOf("/", urlStart);
 			private var domain:String;				
-			
-			
+
 			public function set mailLink(value: String):void {
 				_mailLink = value;
 			}
@@ -68,7 +63,6 @@
 			}
 		]]>
 	</mx:Script>
-	<!--<mx:HTTPService id="emailService" method="POST" resultFormat="xml" result="emailResult()" useProxy="false"/>-->
 	<mx:Canvas width="{parent.width*0.7}" height="{parent.height*0.7}" horizontalCenter="0" verticalCenter="0" id="embedScreen" backgroundColor="0x000000"  backgroundAlpha="0.8" horizontalScrollPolicy="off" verticalScrollPolicy="off" >
 		<!-- Close Button -->
 		<mx:Image id="closeBtn" source="@Embed('assets/newSkin/closeBtn.gif')" top="7" right="10" click="{this.visible=false}"/>
