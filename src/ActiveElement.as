@@ -34,7 +34,7 @@ private function resetActiveElement():void {
   	activeElement.put('aspectRatio', new Number(1));
 }
 
-private function setActiveElement(i:int):void {
+private function setActiveElement(i:int, startPlaying:Boolean=false):void {
 	trace("setActiveElement");
 	if (!context || !context.photos || !context.photos[i]) return;
 	numElements = context.photos.length;
@@ -78,7 +78,7 @@ private function setActiveElement(i:int):void {
  	if(video_p) {
  		image.source = null;
   		showVideoElement();
-  		if (props.get('autoPlay')) playVideoElement();
+  		if (props.get('autoPlay') || startPlaying) playVideoElement();
   	} else {
   		showImageElement();
   	}
@@ -128,7 +128,6 @@ private function showImageElement():void {
 	image.visible=true;
 }
 private function showVideoElement():void {
-	hdEnable();
 	video.visible=false;
 	videoControls.visible=true;
 	//video.playheadTime = 0;
