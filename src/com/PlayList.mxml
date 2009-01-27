@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="400" height="100" backgroundColor="0x000000" backgroundAlpha="0.7" creationComplete="createPlayList()">
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="400" height="100" backgroundColor="black" creationComplete="createPlayList()">
 	<mx:Script>
 		<![CDATA[
 			import mx.effects.Move;
@@ -79,7 +79,7 @@
 		]]>
 	</mx:Script>
 	<mx:Move id="mover" target="{playListBox}"/>
-	<mx:Image id="previousBtn" source="@Embed('assets/newSkin/previousBtn.gif')"  click="{scrollBack()}" left="0" verticalCenter="0" />
+	<mx:Image id="previousBtn" source="@Embed('assets/newSkin/previousBtn.gif')" click="{scrollBack()}" left="0" verticalCenter="0" />
 	<mx:Canvas verticalCenter="0" verticalScrollPolicy="off" horizontalScrollPolicy="off" left="{previousBtn.width}" right="{nextBtn.width}" id="playListCanvas">
 		<mx:HBox id="playListBox" verticalScrollPolicy="off" verticalCenter="0" />
 	</mx:Canvas>
