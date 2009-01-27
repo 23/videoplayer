@@ -34,9 +34,11 @@
 			private var offset : Number = 0;
 			private var bounds : Object;
 			
-			private var pos3 : Number;
-			private var pos2 : Number;
-			private var pos1  : Number;
+			[Bindable] private var rightPanelWidth:Number = 0;
+			
+			private var pos3: Number;
+			private var pos2: Number;
+			private var pos1: Number;
 
 			private var appAspectRatio:Number = 1;
 			private var context:Object = {};
@@ -44,6 +46,9 @@
 			public function displayError(text:String):void {logo.visible=false; video.visible=false; image.visible=false; tray.visible=false; loading.visible=true; loading.text=text;}
 			public function formatTime(time:int):String {return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());}
 					
+			public function recalcBindPositions():void {
+				Application.application.updateDisplayList(0,0);
+   			}
 
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
@@ -55,26 +60,21 @@
 				});
 			}
 			public function build():void {
-				if(context && context.photos && context.photos.length == 1) {
-					showPlayList = false;
-					if (context.photos.length) setActiveElement(0);
+				if(context && context.photos && context.photos.length>0) {
+					if(context.photos.length==1) {
+						showPlayList = false;
+					} else {	
+						showPlayList = true;
+						createPlayList();
+						setProperties();
+					}					
+
+					setActiveElement(0);
 					loading.visible=false;
 					video.mx_internal::videoPlayer.smoothing = true;
-					toggleInfo();
+					toggleInfo('newclip');
 					this.addEventListener(MouseEvent.ROLL_OUT, onAppMouseOut);
 					this.addEventListener(MouseEvent.ROLL_OVER, onAppMouseOver);
-					
-				} else if (context && context.photos && context.photos.length>1) {	
-					if (context.photos.length) setActiveElement(0);
-					loading.visible=false;
-					video.mx_internal::videoPlayer.smoothing = true;
-					//createItemsArray();
-					createPlayList();
-					toggleInfo();
-					setProperties();
-					this.addEventListener(MouseEvent.ROLL_OUT, onAppMouseOut);
-					this.addEventListener(MouseEvent.ROLL_OVER, onAppMouseOver);
-					
 				} else {
 					displayError('Nothing to show...');
 				}
@@ -100,7 +100,13 @@
             	playList.width = tray.width;
             	playList.verticalScrollPolicy = "off";
 				playList.itemArray = createItemsArray();
-				playList.addEventListener(PlayListEvent.SELECT_ITEM, itemSelectHandler);
+				playList.addEventListener(PlayListEvent.SELECT_ITEM, function(evt:PlayListEvent):void {
+            			createTimer();
+            			if(evt.itemID != -1) {
+		            		toggleInfo('newclip');
+        		    		setElementByID(evt.itemID);
+            			}
+            		});
 				playListHolder.addChild(playList);
             }
             
@@ -120,49 +126,26 @@
 	            togglePlayList();
             }
             
-            private function itemSelectHandler(evt:PlayListEvent):void {
-            	createTimer();
-            	if(evt.itemID != -1) {
-            		toggleInfo();
-            		setElementByID(evt.itemID);
-            	}
-            }
-            
-            private function hdEnable():void {
-            	if((activeElement.get('hasHD') as Boolean)) {
-	            	if(!hdOffBtn.visible) {
-		            	if((activeElement.get('hasHD') as Boolean)) {
-		            		hdBtn.visible = true;
-		            	} else {
-		            		hdBtn.visible = false;
-			            	hdOffBtn.visible = false;
-		            	}
-	            	}
-            	} else {
-		            hdBtn.visible = false;
-			        hdOffBtn.visible = false;
-	            }
-            }
-            
-            private function onDescTimeOut(evt:TimerEvent=null):void {
-            	descriptions.visible = false;
-            	descTimer.stop();
-            }
-            
-            private function toggleInfo():void {
+            private function toggleInfo(context:String):void {
             	if(!activeElement.get('hasInfo')) {
+            		trace('no information');
             		descriptions.visible = false;
             		return;	
             	}
-            	if(descriptions.visible) {
+            	if(!descriptions.visible || context=='newclip') {
+	            	descriptions.visible = true;
+	            	if (context!='button') {
+	            		if(descTimer != undefined) descTimer.stop();
+	            		descTimer = new Timer(1000,5);
+	            		descTimer.addEventListener(TimerEvent.TIMER_COMPLETE , function(){
+	            				descriptions.visible = false;
+            					descTimer.stop();
+	            			});
+	            		descTimer.start();
+	            	}
+	            } else {
 	            	descriptions.visible = false;
 	            	if(descTimer != undefined) descTimer.stop();       		
-            	} else {
-	            	descriptions.visible = true;
-	            	if(descTimer != undefined) descTimer.stop();
-	            	descTimer = new Timer(1000,5);
-	            	descTimer.addEventListener(TimerEvent.TIMER_COMPLETE , onDescTimeOut);
-	            	descTimer.start();
 	            }
             }
             
@@ -234,13 +217,11 @@
             }
             
             private function onButtonMouseOver(e:Event):void {
-            	trace('onButtonMouseOver');
             	e.currentTarget.setStyle('backgroundAlpha', 1);
             	e.currentTarget.getChildren()[0].alpha = 1;         	
             }
             private function onButtonMouseOut(e:Event):void {
-            	trace('onButtonMouseOut');
-            	e.currentTarget.setStyle('backgroundAlpha', 0.7);
+            	e.currentTarget.setStyle('backgroundAlpha', props.get('trayAlpha'));
             	e.currentTarget.getChildren()[0].alpha = 0.7;
             }
 		]]>
@@ -266,13 +247,13 @@
 	</mx:Box>
 
 	<!-- Tray -->
-	<mx:Canvas id="tray" bottom="{positionChange}" left="0" right="0" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="true" horizontalCenter="0" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" >
-		<mx:VBox paddingBottom="0" verticalGap="0">
-			<mx:VBox id="descriptions" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" visible="{(props.get('showDescriptions') as Boolean)}" paddingLeft="5" paddingRight="5" width="{tray.width}">
+	<mx:Canvas id="tray" bottom="{positionChange}" left="0" right="0" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="true" horizontalCenter="0">
+		<mx:VBox verticalGap="0">
+			<mx:VBox id="descriptions" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontAntiAliasType="advanced" fontSharpness="-300" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" visible="{(props.get('showDescriptions') as Boolean)}" paddingLeft="3" paddingRight="3" width="{tray.width}">
 				<!-- Title and Words -->
-				<mx:Box id="descBg" horizontalCenter="0" verticalCenter="0" backgroundColor="0x000000" backgroundAlpha="0.7" cornerRadius="3" borderStyle="solid" borderThickness="0" left="5" right="5" paddingLeft="5" paddingRight="5" width="100%" paddingTop="5" paddingBottom="5">
-					<mx:Label id="trayTitle" fontSize="{(props.get('trayTitleFontSize') as Number)}" fontWeight="{props.get('trayTitleFontWeight')}" text="{activeElement.get('title')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayTitle.visible = (trayTitle.text.length>0);" fontFamily="Arial" width="{descBg.width - 15}"/>
-					<mx:Text id="trayContent" fontSize="{(props.get('trayContentFontSize') as Number)}" fontWeight="{props.get('trayContentFontWeight')}" text="{activeElement.get('content')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayContent.visible = (trayContent.text.length>0);" height="40"  fontFamily="Arial" width="{descBg.width - 15}"/>
+				<mx:Box id="descBg" horizontalCenter="0" verticalCenter="0" verticalGap="0" backgroundColor="0x000000" backgroundAlpha="{(props.get('trayAlpha') as Number)}" cornerRadius="3" borderStyle="solid" borderThickness="0" width="100%" paddingTop="6" paddingBottom="6" paddingLeft="6" paddingRight="6">
+					<mx:Label id="trayTitle" fontSize="{(props.get('trayTitleFontSize') as Number)}" fontWeight="{props.get('trayTitleFontWeight')}" text="{activeElement.get('title')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayTitle.visible = (trayTitle.text.length>0);" width="{descBg.width - 15}"/>
+					<mx:Text id="trayContent" fontSize="{(props.get('trayContentFontSize') as Number)}" fontWeight="{props.get('trayContentFontWeight')}" text="{activeElement.get('content')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayContent.visible = (trayContent.text.length>0);" height="{(props.get('trayContentFontSize') as Number)*2.6}" width="{descBg.width - 15}"/>
 				</mx:Box>
 			</mx:VBox>
 			
@@ -280,13 +261,13 @@
 				<mx:Canvas width="{tray.width}">
 				
 					<!-- Play and Pause --> 
-					<mx:HBox visible="true" id="videoControls" bottom="3" top="3" left="5" paddingRight="5" width="{playImage.width}">
-			    		<mx:Canvas id="playImage" includeInLayout="{playImage.visible}" width="30" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
+					<mx:HBox visible="true" id="videoControls" bottom="3" top="3" left="3" width="{playImage.width}" resize="recalcBindPositions()">
+			    		<mx:Canvas id="playImage" includeInLayout="{playImage.visible}" width="30" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
 			    			visible="{!video.playing}"  
 			    			click="playVideoElement()">
 			    			<mx:Image source="@Embed(source='assets/buttons/play.swf')" alpha="0.7"/>
 						</mx:Canvas>
-			    		<mx:Canvas id="pauseImage" includeInLayout="{pauseImage.visible}" width="30" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
+			    		<mx:Canvas id="pauseImage" includeInLayout="{pauseImage.visible}" width="30" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
 			    			visible="{video.playing}"  
 			    			click="pauseVideoElement()">
 			    			<mx:Image source="@Embed(source='assets/buttons/pause.swf')" alpha="0.7"/>
@@ -294,83 +275,86 @@
 			    	</mx:HBox>					
 						
 					<!-- Elements for progress bar -->
-					<mx:HBox id="progressBg" visible="{videoControls.visible}" click="{video.playheadTime = (progressBg.contentMouseX-5)/videoProgress.width*video.totalTime;}" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+10}" right="{(rightPanel.width+10)}" width="{this.width - (videoControls.width + rightPanel.width + 10)}" height="{playImage.height}" top="3" cornerRadius="2" borderStyle="solid" borderThickness="0"/>
+					<mx:HBox id="progressBg" visible="{videoControls.visible}" click="{video.playheadTime = (progressBg.contentMouseX-5)/videoProgress.width*video.totalTime;}" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+6}" right="{rightPanel.width+6}" height="{playImage.height}" top="3" cornerRadius="3" borderStyle="solid" borderThickness="0"/>
 					<!-- VideoProgress -->
-					<mx:Canvas id="videoProgress" visible="{videoControls.visible}" left="{videoControls.width+15}" right="{(rightPanel.width+20)}" backgroundColor="0xCCCCCC" backgroundAlpha="{(props.get('trayAlpha') as Number)}" bottom="{playImage.height/2}">
+					<mx:Canvas id="videoProgress" visible="{videoControls.visible}" left="{videoControls.width+11}" right="{rightPanel.width+11}" backgroundColor="0xCCCCCC" backgroundAlpha="{(props.get('trayAlpha') as Number)}" bottom="{playImage.height/2}">
 						<mx:HBox id="videoBufferProgress" left="0" width="{video.bytesLoaded/video.bytesTotal*videoProgress.width}" height="6" backgroundColor="white" backgroundAlpha="0.2"></mx:HBox>
 						<mx:HBox id="videoPlayProgress" left="0" height="6" backgroundColor="black" backgroundAlpha="0.6"></mx:HBox>
 					</mx:Canvas>					
 					<!-- videoTime -->
 					<mx:HBox id="videoTime" visible="{videoControls.visible}" y="{videoPlayProgress.y + playImage.height/2 - videoTime.height/3}" backgroundColor="0xFFFFFF" cornerRadius="3" borderStyle="solid" borderColor="0xFFFFFF">
-						<mx:Label selectable="false" fontGridFitType="none" fontAntiAliasType="advanced" fontSharpness="-100"  text="{formatTime(video.playheadTime)}" fontFamily="Arial" fontWeight="bold" fontSize="8" height="13" color="0x000000"/>
+						<mx:Label selectable="false" fontGridFitType="none" fontAntiAliasType="advanced" fontSharpness="-100" text="{formatTime(video.playheadTime)}" fontFamily="Arial" fontWeight="bold" fontSize="8" height="13" color="0x000000"/>
 					</mx:HBox>
 
 					<!-- Right Panel -->
-			    	<mx:HBox id="rightPanel" visible="true" bottom="3" top="3" right="5" horizontalGap="5"> 
-			    		<!-- FeedPanel -->
-			    		<mx:Canvas id="feedpanelBtn" includeInLayout="{feedpanelBtn.visible}" width="32" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
-			    			click="embedPanel.visible=!embedPanel.visible;">
-			    			<mx:Image source="@Embed(source='assets/buttons/share.swf')" alpha="0.7"/>
-						</mx:Canvas>
+			    	<mx:HBox id="rightPanel" visible="true" bottom="3" top="3" right="3" horizontalGap="3" resize="recalcBindPositions()"> 
 			    		<!-- PlayListBtn -->
-			    		<mx:Canvas id="playlistBtn" width="32" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
+			    		<mx:Canvas id="playlistBtn" width="32" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
 			    			visible="{showPlayList &amp;&amp; playListOut}" includeInLayout="{showPlayList &amp;&amp; playListOut}" 
 			    			click="togglePlayList()">
 			    			<mx:Image source="@Embed(source='assets/buttons/expand-off.swf')" alpha="0.7"/>
 						</mx:Canvas>
-			    		<mx:Canvas id="playlistBtnOn" width="32" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
+			    		<mx:Canvas id="playlistBtnOn" width="32" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{showPlayList &amp;&amp; !playListOut}" includeInLayout="{showPlayList &amp;&amp; !playListOut}" 
 			    			click="togglePlayList()">
 			    			<mx:Image source="@Embed(source='assets/buttons/expand-on.swf')" alpha="0.7"/>
 						</mx:Canvas>
 
 					    <!-- HDbutton-->
-			    		<mx:Canvas id="hdBtn" width="32" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
+			    		<mx:Canvas id="hdBtn" width="32" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; !playHD}" includeInLayout="{(activeElement.get('hasHD') as Boolean) &amp;&amp; !playHD}"
-			    			click="playHD=true; setActiveElement(currentElementIndex)">
+			    			click="playHD=true; setActiveElement(currentElementIndex, true)">
 			    			<mx:Image source="@Embed(source='assets/buttons/hd-on.swf')" alpha="0.7"/>
 						</mx:Canvas>
-			    		<mx:Canvas id="hdOffBtn" width="32" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
+			    		<mx:Canvas id="hdOffBtn" width="32" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; playHD}" includeInLayout="{(activeElement.get('hasHD') as Boolean) &amp;&amp; playHD}"
-			    			click="playHD=false; setActiveElement(currentElementIndex)">
+			    			click="playHD=false; setActiveElement(currentElementIndex, true)">
 			    			<mx:Image source="@Embed(source='assets/buttons/hd-off.swf')" alpha="0.7"/>
 						</mx:Canvas>
 
 			    		<!-- InfoBtn -->
-			    		<mx:Canvas id="infoImage" width="32" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
+			    		<mx:Canvas id="infoImage" width="32" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{(activeElement.get('hasInfo') as Boolean)}" includeInLayout="{(activeElement.get('hasInfo') as Boolean)}"
-			    			click="toggleInfo();">
+			    			click="toggleInfo('button');">
 			    			<mx:Image source="@Embed(source='assets/buttons/info.swf')" alpha="0.7"/>
 						</mx:Canvas>
+
 						<!-- Mute and Unmute -->
-			    		<mx:Canvas id="muteImage" width="32" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
+			    		<mx:Canvas id="muteImage" width="32" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{video.volume>0}" includeInLayout="{video.volume>0}"
 			    			click="video.volume=0">
 			    			<mx:Image source="@Embed(source='assets/buttons/mute-off.swf')" alpha="0.7"/>
 						</mx:Canvas>
-			    		<mx:Canvas id="unmuteImage" width="32" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
+			    		<mx:Canvas id="unmuteImage" width="32" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{video.volume==0}" includeInLayout="{video.volume==0}"
 			    			click="video.volume=1">
 			    			<mx:Image source="@Embed(source='assets/buttons/mute-on.swf')" alpha="0.7"/>
 						</mx:Canvas>
 
 						<!-- Fullscreen -->
-			    		<mx:Canvas id="fullscreenImage" width="32" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
+			    		<mx:Canvas id="fullscreenImage" width="32" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{!inFullScreen}" includeInLayout="{!inFullScreen}"
 			    			click="toggleFullScreen()">
 			    			<mx:Image source="@Embed(source='assets/buttons/fullscreen-on.swf')" alpha="0.7"/>
 						</mx:Canvas>
-			    		<mx:Canvas id="smallscreenImage" width="32" height="28" backgroundColor="black" backgroundAlpha="0.7" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
+			    		<mx:Canvas id="smallscreenImage" width="32" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{inFullScreen}" includeInLayout="{inFullScreen}"
 			    			click="toggleFullScreen()">
 			    			<mx:Image source="@Embed(source='assets/buttons/fullscreen-off.swf')" alpha="0.7"/>
 						</mx:Canvas>
+
+						<!-- FeedPanel -->
+			    		<mx:Canvas id="feedpanelBtn" includeInLayout="{feedpanelBtn.visible}" width="32" height="28" backgroundColor="black" backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="3" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
+			    			click="embedPanel.visible=!embedPanel.visible;">
+			    			<mx:Image source="@Embed(source='assets/buttons/share.swf')" alpha="0.7"/>
+						</mx:Canvas>
+
 					</mx:HBox>
 				</mx:Canvas>
 			</mx:HBox>
 			
 			<!-- PlayList -->
-			<mx:HBox height="100" id="playListBox"><mx:Canvas id="playListHolder" bottom="0"/></mx:HBox>					
+			<mx:HBox height="100" width="{tray.width}" id="playListBox"><mx:Canvas id="playListHolder" bottom="0"/></mx:HBox>					
 		</mx:VBox>	
 	</mx:Canvas>
 	<com:EmbedPanel id="embedPanel" visible="false" includeInLayout="false" verticalCenter="0" horizontalCenter="0" width="100%" height="100%" backgroundColor="0x000000" backgroundAlpha="{(props.get('trayAlpha') as Number)}"/>
