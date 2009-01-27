@@ -29,7 +29,6 @@
 			[Bindable] private var positionChange : Number = -100;
 			private var trayOut : Boolean = false;
 			private var playListOut : Boolean = true;	
-			private var timeIsDrag : Boolean = false;
 			private var offset : Number = 0;
 			private var bounds : Object;
 			
@@ -266,9 +265,7 @@
             
             private function onVideoPlayHeadUpdate():void {
             	videoPlayProgress.width  = video.playheadTime/video.totalTime*videoProgress.width;
-            	if(!timeIsDrag) {
-            		videoTime.x = videoProgress.x + video.playheadTime/video.totalTime*videoProgress.width - videoTime.width/2;
-            	}
+				videoTime.x = videoProgress.x + video.playheadTime/video.totalTime*videoProgress.width - videoTime.width/2;
             }
             
             private function onEmbedClick():void {
