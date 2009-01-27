@@ -264,32 +264,6 @@
 //            	}
             }       
             
-            private function onPlayTimeDrag(evt:MouseEvent):void {
-				videoTime.x = mouseX - offset;
-				if(videoTime.x <= bounds.left) {
-					videoTime.x = bounds.left;
-				} else if(videoTime.x >= bounds.right) {
-					videoTime.x = bounds.right;
-				}
-				evt.updateAfterEvent();
-            }
-            
-            private function onPlayTimeMouseUp(evt:MouseEvent):void {
-            	timeIsDrag = false;
-            	trace("B:"+video.playheadTime);
-            	video.playheadTime = (videoTime.x+videoTime.width/2)/videoProgress.width*video.totalTime;
-            	trace("A:"+video.playheadTime);
-            	videoTime.removeEventListener(MouseEvent.MOUSE_MOVE, onPlayTimeDrag);
-            }
-            
-            private function onPlayTimeMouseDown():void {
-            	timeIsDrag = true;
-            	offset = videoTime.mouseX;
-            	bounds = {left: videoProgress.x - videoTime.width/2, right: videoProgress.x+videoProgress.width- videoTime.width/2};
-            	addEventListener(MouseEvent.MOUSE_UP, onPlayTimeMouseUp);
-            	videoTime.addEventListener(MouseEvent.MOUSE_MOVE , onPlayTimeDrag);
-            }
-            
             private function onVideoPlayHeadUpdate():void {
             	videoPlayProgress.width  = video.playheadTime/video.totalTime*videoProgress.width;
             	if(!timeIsDrag) {
@@ -358,7 +332,7 @@
 						<mx:HBox id="videoPlayProgress" left="0" height="6" backgroundColor="black" backgroundAlpha="0.6"></mx:HBox>
 					</mx:Canvas>					
 					<!-- videoTime -->
-					<mx:HBox visible="false" id="videoTime" y="{videoPlayProgress.y + playImage.height/2 - videoTime.height/3}" backgroundColor="0xFFFFFF" cornerRadius="3" borderStyle="solid" borderColor="0xFFFFFF" mouseDown="{onPlayTimeMouseDown()}">
+					<mx:HBox visible="false" id="videoTime" y="{videoPlayProgress.y + playImage.height/2 - videoTime.height/3}" backgroundColor="0xFFFFFF" cornerRadius="3" borderStyle="solid" borderColor="0xFFFFFF">
 						<mx:Label selectable="false" fontGridFitType="none" fontAntiAliasType="advanced" fontSharpness="-100"  text="{formatTime(video.playheadTime)}" fontFamily="Arial" fontWeight="bold" fontSize="8" height="13" color="0x000000"/>
 					</mx:HBox>
 					
