@@ -56,9 +56,7 @@
 			public function build():void {
 				if(context && context.photos && context.photos.length == 1) {
 					playlistBtn.visible = false;
-					playlistBtn.includeInLayout = false;
 					playlistBtnOn.visible = false;
-					playlistBtnOn.includeInLayout = false;
 					if (context.photos.length) setActiveElement(0,false);
 					loading.visible=false;
 					video.mx_internal::videoPlayer.smoothing = true;
@@ -136,14 +134,10 @@
             	if(!muteImage.visible) {
             		video.volume = 1;
             		unmuteImage.visible = false;
-            		unmuteImage.includeInLayout = false;
-            		muteImage.includeInLayout = true;
             		muteImage.visible = true;
             	} else {
             		video.volume = 0;
             		muteImage.visible = false;
-            		muteImage.includeInLayout = false;
-            		unmuteImage.includeInLayout = true;
             		unmuteImage.visible = true;
             	}
             }
@@ -153,37 +147,27 @@
 	            	if(!hdOffBtn.visible) {
 		            	if((activeElement.get('hasHD') as Boolean)) {
 		            		hdBtn.visible = true;
-		            		hdBtn.includeInLayout = true;
 		            	} else {
 		            		hdBtn.visible = false;
-		            		hdBtn.includeInLayout = false;
 			            	hdOffBtn.visible = false;
-			            	hdOffBtn.includeInLayout = false;
 		            	}
 	            	}
             	} else {
 		            hdBtn.visible = false;
-		            hdBtn.includeInLayout = false;
 			        hdOffBtn.visible = false;
-			        hdOffBtn.includeInLayout = false;
 	            }
             }
             
             private function onHdBtnClick():void {
 				if((activeElement.get('hasHD') as Boolean)) {
 					trace("HD click");
-	//				visible="{(activeElement.get('hasHD') as Boolean)}" includeInLayout="{(activeElement.get('hasHD') as Boolean)}"
 					if(!hdOffBtn.visible) {
 						trace("HD hdOffBtn");
 						hdBtn.visible = false;
-						hdBtn.includeInLayout = false;
-						hdOffBtn.includeInLayout = true;
 						hdOffBtn.visible = true;
 					} else if(hdOffBtn.visible) {
 						trace("HD hdBtn");
 						hdOffBtn.visible = false;
-						hdOffBtn.includeInLayout = false;
-						hdBtn.includeInLayout = true;
 						hdBtn.visible = true;
 					}
 					setActiveElement(currentElementIndex, true);
@@ -212,8 +196,6 @@
             	if(playListOut) {
             		playListOut = false;
             		playlistBtn.visible = false;
-            		playlistBtn.includeInLayout = false;
-            		playlistBtnOn.includeInLayout = true;
             		playlistBtnOn.visible = true;
             		trayHider.end();
             		positionChange = 0;
@@ -225,10 +207,8 @@
             	} else {
             		if(handleTimer != undefined) handleTimer.stop();
             		playListOut = true;
-            		playlistBtn.includeInLayout = true;
             		playlistBtn.visible = true;
             		playlistBtnOn.visible = false;
-            		playlistBtnOn.includeInLayout = false;
             		trayHider.end();
             		positionChange = -100;
             		trayHider.yFrom = this.height - tray.height;;
@@ -252,18 +232,14 @@
             		trayHider.end();
             		if(playListOut) {
             			if(handleTimer != undefined) handleTimer.stop();
-	         		    playlistBtnOn.includeInLayout = false;
 	        		    playlistBtnOn.visible = false;
 	     		        playlistBtn.visible = true;
-	       		    	playlistBtn.includeInLayout = true;
 	       		    	trayHider.yFrom = this.height - tray.height + 100;
             		} else if(!playListOut) {
             			trayHider.yFrom = this.height - tray.height;;
             			if(handleTimer != undefined) handleTimer.stop();
-	           			playlistBtnOn.includeInLayout = false;
 	          		    playlistBtnOn.visible = false;
 	         		    playlistBtn.visible = true;
-	         		    playlistBtn.includeInLayout = true;
 //            			playListOut = true;
             		}
 
@@ -360,7 +336,7 @@
 		<mx:VBox>
 			<mx:VBox id="descriptions" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" visible="{(props.get('showDescriptions') as Boolean)}" paddingLeft="4" paddingRight="4" width="{tray.width}">
 				<!-- Title and Words -->
-				<mx:Box id="descBg" horizontalCenter="0" verticalCenter="0" backgroundColor="0x000000" backgroundAlpha="0.7" cornerRadius="5" borderStyle="solid"  borderColor="0x3D3A3A"  left="5" right="5" paddingLeft="5" paddingRight="5" width="100%" paddingTop="5" paddingBottom="5">
+				<mx:Box id="descBg" horizontalCenter="0" verticalCenter="0" backgroundColor="0x000000" backgroundAlpha="0.7" cornerRadius="2" borderStyle="solid" borderThickness="0" left="5" right="5" paddingLeft="5" paddingRight="5" width="100%" paddingTop="5" paddingBottom="5">
 					<mx:Label id="trayTitle" fontSize="{(props.get('trayTitleFontSize') as Number)}" fontWeight="{props.get('trayTitleFontWeight')}" text="{activeElement.get('title')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayTitle.visible = (trayTitle.text.length>0);" fontFamily="Arial" width="{descBg.width - 15}"/>
 					<mx:Text id="trayContent" fontSize="{(props.get('trayContentFontSize') as Number)}" fontWeight="{props.get('trayContentFontWeight')}" text="{activeElement.get('content')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayContent.visible = (trayContent.text.length>0);" height="40"  fontFamily="Arial" width="{descBg.width - 15}"/>
 				</mx:Box>
@@ -374,7 +350,7 @@
 			    		<mx:Image id="pauseImage" source="{pauseBtnSkin}" visible="{video.playing}" includeInLayout="{pauseImage.visible}" click="pauseVideoElement();" width="30" height="28"/>
 			    	</mx:HBox>
 					
-					<mx:HBox id="progressBg" visible="true" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+10}" right="{(rightPanel.width+15)}" width="{this.width - (videoControls.width + rightPanel.width + 10)}" height="{playImage.height}" top="3"/>
+					<mx:HBox id="progressBg" visible="true" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+10}" right="{(rightPanel.width+15)}" width="{this.width - (videoControls.width + rightPanel.width + 10)}" height="{playImage.height}" top="3" cornerRadius="2" borderStyle="solid" borderThickness="0"/>
 					<!-- VideoProgress -->
 					<mx:Canvas visible="true" id="videoProgress" click="{video.playheadTime = videoProgress.contentMouseX/videoProgress.width*video.totalTime;}" left="{videoControls.width+15}" right="{(rightPanel.width+20)}" backgroundColor="0xCCCCCC" backgroundAlpha="{(props.get('trayAlpha') as Number)}" bottom="{playImage.height/2}">
 						<mx:HBox id="videoBufferProgress" left="0" width="{video.bytesLoaded/video.bytesTotal*videoProgress.width}" height="6" backgroundColor="white" backgroundAlpha="0.2"></mx:HBox>
@@ -391,16 +367,16 @@
 					<!-- Right Panel -->
 			    	<mx:HBox id="rightPanel" visible="true" bottom="3" top="3" right="5" > 
 			    		<!-- PlayListBtn -->
-			    		<mx:Image id="playlistBtn" source="{expandBtnSkin}" click="{showPlayList()}"  visible="true" includeInLayout="true" />
-			    		<mx:Image id="playlistBtnOn" source="{expandOnBtnSkin}" click="{showPlayList()}" visible="false" includeInLayout="false" />
+			    		<mx:Image id="playlistBtn" source="{expandBtnSkin}" click="{showPlayList()}" visible="true" includeInLayout="{playlistBtn.visible}" />
+			    		<mx:Image id="playlistBtnOn" source="{expandOnBtnSkin}" click="{showPlayList()}" visible="false" includeInLayout="{playlistBtnOn.visible}" />
 					    <!-- HDbutton-->
-						<mx:Image id="hdBtn" source="{hdBtnSkin}"  click="{onHdBtnClick()}" visible="false" includeInLayout="false" show="{onHDShow()}"/>
-						<mx:Image id="hdOffBtn" source="{hdOffBtnSkin}"  click="{onHdBtnClick()}" includeInLayout="false" visible="false" show="{onHDShow()}"/>
+						<mx:Image id="hdBtn" source="{hdBtnSkin}"  click="{onHdBtnClick()}" visible="false" includeInLayout="{hdBtn.visible}" show="{onHDShow()}"/>
+						<mx:Image id="hdOffBtn" source="{hdOffBtnSkin}"  click="{onHdBtnClick()}" visible="false" includeInLayout="{hdOffBtn.visible}" show="{onHDShow()}"/>
 			    		<!-- InfoBtn -->
 			    		<mx:Image id="infoBtn" source="{infoBtnSkin}" click="{onInfoBtnClick()}"/>
 						<!-- Mute and Unmute -->
-				    	<mx:Image id="unmuteImage" source="{volBtnSkin}" includeInLayout="false" visible="false" click="{muteSound()}"/>
-			    		<mx:Image id="muteImage" source="{volOffBtnSkin}" visible="true" includeInLayout="true" click="{muteSound()}"/>
+				    	<mx:Image id="unmuteImage" source="{volBtnSkin}" visible="false" includeInLayout="{unmuteImage.visible}" click="{muteSound()}"/>
+			    		<mx:Image id="muteImage" source="{volOffBtnSkin}" visible="true" includeInLayout="{muteImage.visible}" click="{muteSound()}"/>
 						<!-- Fullscreen -->
 			    		<mx:Image id="fullscreenImage" source="{fullScreenBtnSkin}" click="{toggleFullScreen()}"/>
 			    		<!-- FeedPanel -->
