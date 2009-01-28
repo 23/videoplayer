@@ -51,7 +51,7 @@
 					video.mx_internal::videoPlayer.smoothing = true;
 					setActiveElement(0);
 					loading.visible=false;
-					toggleInfo('newclip');
+					infoShow();
 				} else {
 					displayError('Nothing to show...');
 				}
@@ -73,7 +73,7 @@
 				playList.itemArray = createItemsArray();
 				playList.addEventListener(PlayListEvent.SELECT_ITEM, function(evt:PlayListEvent):void {
             			if(evt.itemID != -1) {
-		            		toggleInfo('newclip');
+		            		infoShow();
         		    		setElementByID(evt.itemID);
             			}
             		});
@@ -118,26 +118,23 @@
             	
             	// INFORMATION BOX WITH TITLE AND DESCRIPTION
             	// Hide when the timer completes
-				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void {toggleInfo('timer')});
+				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, infoHide);
 				// Reset timer when the mouse moves in the application
 				Application.application.addEventListener(MouseEvent.MOUSE_MOVE, function():void {infoTimer.reset();});
-            } 
-            
-            private function toggleInfo(context:String):void {
+            }             
+            private function infoHide():void {
+				infoTimer.stop();
+				descriptions.visible = false;
+            }
+            private function infoShow(timeout:Boolean=true):void {
             	if(!activeElement.get('hasInfo')) {descriptions.visible = false; return;}
 				infoTimer.stop();
-				switch(context) {
-					case "newclip": 
-						descriptions.visible = true;
-						infoTimer.start();
-						break;
-					case "timer": 
-						descriptions.visible = false;
-						break;
-					case "button": 
-						descriptions.visible = !descriptions.visible;
-						break;
-				}
+				descriptions.visible = true;
+				if(timeout) infoTimer.start();
+            }
+            private function infoToggle():void {				
+				if(descriptions.visible) infoHide();
+				else infoShow(false); // no timeout, since this a manual action
             }
             private function onVideoPlayHeadUpdate():void {
             	videoPlayProgress.width  = video.playheadTime/video.totalTime*videoProgress.width;
@@ -246,7 +243,7 @@
 			    		<!-- InfoBtn -->
 			    		<mx:Canvas id="infoImage" width="32" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{(activeElement.get('hasInfo') as Boolean)}" includeInLayout="{(activeElement.get('hasInfo') as Boolean)}"
-			    			click="toggleInfo('button');">
+			    			click="infoToggle();">
 			    			<mx:Image source="@Embed(source='assets/buttons/info.swf')" alpha="0.7"/>
 						</mx:Canvas>
 
