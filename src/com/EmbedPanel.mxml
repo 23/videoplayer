@@ -59,7 +59,7 @@
 			}
 		]]>
 	</mx:Script>
-	<mx:Canvas width="{parent.width*0.7}" height="{parent.height*0.7}" horizontalCenter="0" verticalCenter="0" id="embedScreen" backgroundColor="0x000000"  backgroundAlpha="0.8" horizontalScrollPolicy="off" verticalScrollPolicy="off" >
+	<mx:Canvas width="500" height="200" horizontalCenter="0" verticalCenter="0" id="embedScreen" backgroundColor="0x000000"  backgroundAlpha="0.8" horizontalScrollPolicy="off" verticalScrollPolicy="off" >
 		<!-- Close Button -->
 		<mx:Image id="closeBtn" source="@Embed('assets/newSkin/closeBtn.gif')" top="7" right="10" click="{this.visible=false}"/>
 		
