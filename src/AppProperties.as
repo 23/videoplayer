@@ -4,7 +4,7 @@ import mx.utils.URLUtil;
 public var propDefaults:Object = {
 	backgroundColor: 'black',
 	loadingColor: 'white',
-	trayBackgroundColor: 'green',
+	trayBackgroundColor: 'black',
 	trayTextColor: 'white',
 	trayFont: 'Helvetica, Arial, sans-serif',
 	trayTitleFontSize: parseFloat('13'),
