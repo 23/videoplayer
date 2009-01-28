@@ -4,7 +4,7 @@ import mx.utils.URLUtil;
 public var propDefaults:Object = {
 	backgroundColor: 'black',
 	loadingColor: 'white',
-	trayBackgroundColor: 'black',
+	trayBackgroundColor: 'green',
 	trayTextColor: 'white',
 	trayFont: 'Helvetica, Arial, sans-serif',
 	trayTitleFontSize: parseFloat('13'),
@@ -20,9 +20,10 @@ public var propDefaults:Object = {
 	logoSource: 'no logo',
 	showLogo: true,
 	logoPosition: 'top right',
-	logoAlpha: parseFloat('0.85'),
+	logoAlpha: parseFloat('0.6'),
 	logoWidth: parseFloat('80'),
-	logoHeight: parseFloat('40')
+	logoHeight: parseFloat('40'),
+	logoGrayScale: true
 }
 private function initProperties(settings:Object):void {
 	// Load defaults
