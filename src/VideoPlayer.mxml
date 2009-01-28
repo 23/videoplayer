@@ -22,28 +22,19 @@
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
+
+			private var appAspectRatio:Number = 1;
+			private var context:Object = {};
 			
 			private var handleTimer : Timer;
 			private var descTimer : Timer;
 			
-			private var playList : PlayList;
+			private var playList: PlayList;
 			[Bindable] private var positionChange : Number = -100;
 			private var trayOut : Boolean = false;
 			[Bindable] private var showPlayList: Boolean = true;
 			[Bindable] private var playListOut: Boolean = true;	
-			private var offset : Number = 0;
-			private var bounds : Object;
-			
-			private var appAspectRatio:Number = 1;
-			private var context:Object = {};
 						
-			public function displayError(text:String):void {logo.visible=false; video.visible=false; image.visible=false; tray.visible=false; loading.visible=true; loading.text=text;}
-			public function formatTime(time:int):String {return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());}
-								
-			public function recalcBindPositions():void {
-				Application.application.updateDisplayList(0,0);
-   			}
-
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
 				if(domain=='localhost') domain=defaultDomain;
@@ -101,11 +92,8 @@
             	if(handleTimer != undefined) handleTimer.stop();
             	handleTimer = new Timer(1000,5);
             	handleTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onTimeOut);
-            	handleTimer.addEventListener(TimerEvent.TIMER, onTick);
             	handleTimer.start();
             }
-            
-            private function onTick(evt:TimerEvent):void {}
             
             private function onTimeOut(evt:TimerEvent):void {
             	trace("time is up");
