@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="400" height="100" backgroundColor="black" creationComplete="createPlayList()">
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="createPlayList()">
 	<mx:Script>
 		<![CDATA[
 			import mx.effects.Move;
@@ -18,7 +18,7 @@
 				if(playListBox.width > playListCanvas.width)
 				{
 					mover.end();
-					mover.xTo = mover.target.x+100;
+					mover.xTo = mover.target.x+(playListCanvas.width*.6);
 					if(mover.xTo > 0)
 					{
 						mover.xTo = 0;
@@ -37,7 +37,7 @@
 				if(playListBox.width > playListCanvas.width)
 				{
 					mover.end();
-					mover.xTo = mover.target.x-100;
+					mover.xTo = mover.target.x-(playListCanvas.width*.6);
 					if(mover.xTo < (playListCanvas.width - playListBox.width))
 					{
 						mover.xTo = playListCanvas.width - playListBox.width;
@@ -79,9 +79,9 @@
 		]]>
 	</mx:Script>
 	<mx:Move id="mover" target="{playListBox}"/>
-	<mx:Image id="previousBtn" source="@Embed('assets/newSkin/previousBtn.gif')" click="{scrollBack()}" left="0" verticalCenter="0" />
-	<mx:Canvas verticalCenter="0" verticalScrollPolicy="off" horizontalScrollPolicy="off" left="{previousBtn.width}" right="{nextBtn.width}" id="playListCanvas">
-		<mx:HBox id="playListBox" verticalScrollPolicy="off" verticalCenter="0" />
+	<mx:Canvas id="previousBtn" click="{scrollBack()}" width="25" backgroundImage="@Embed('assets/buttons/previous.swf')" top="0" left="0" bottom="0" alpha="0.7" mouseOver="previousBtn.alpha=1;" mouseOut="previousBtn.alpha=0.7;"/>
+	<mx:Canvas verticalCenter="0" verticalScrollPolicy="off" horizontalScrollPolicy="off" left="{previousBtn.width+5}" right="{nextBtn.width+5}" id="playListCanvas">
+		<mx:HBox id="playListBox" verticalScrollPolicy="off" verticalCenter="0"/>
 	</mx:Canvas>
-	<mx:Image id="nextBtn" source="@Embed('assets/newSkin/nextBtn.gif')" click="{scrollForward()}" right="0" verticalCenter="0" />
+	<mx:Canvas id="nextBtn" click="{scrollForward()}" width="25" backgroundImage="@Embed('assets/buttons/next.swf')" top="0" right="0" bottom="0" alpha="0.7" mouseOver="nextBtn.alpha=1;" mouseOut="nextBtn.alpha=0.7;"/>
 </mx:Canvas>

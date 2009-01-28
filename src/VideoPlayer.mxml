@@ -27,7 +27,7 @@
 			private var context:Object = {};
 			
 			private var playList: PlayList;
-			[Bindable] private var enablePlayList: Boolean = true;		
+			[Bindable] private var enablePlayList: Boolean = false;		
 			[Bindable] private var showPlayList: Boolean = false;
 						
 			public function load():void {
@@ -41,12 +41,7 @@
 			}
 			public function build():void {
 				if(context && context.photos && context.photos.length>0) {
-					if(context.photos.length==1) {
-						enablePlayList = false;
-					} else {	
-						enablePlayList = true;
-						createPlayList();
-					}					
+					if(context.photos.length>1) createPlayList();
 					prepareTimers();
 					video.mx_internal::videoPlayer.smoothing = true;
 					setActiveElement(0);
@@ -66,21 +61,25 @@
             }
             
             private function createPlayList():void  {
-            	trace("create playlist");
+				enablePlayList = true;
             	playList = new PlayList();
-            	playList.width = tray.width;
+            	playList.width = playListContainer.width;
             	playList.verticalScrollPolicy = "off";
 				playList.itemArray = createItemsArray();
 				playList.addEventListener(PlayListEvent.SELECT_ITEM, function(evt:PlayListEvent):void {
-            			if(evt.itemID != -1) {
+            			if(evt.itemID>=0) {
 		            		infoShow();
         		    		setElementByID(evt.itemID);
             			}
             		});
 				playListHolder.addChild(playList);
             }
-			private function togglePlayList():void {
-				showPlayList = !showPlayList;
+			private function playListShow():void {
+				showPlayList = true;
+				trayShow(true);
+            }
+			private function playListHide():void {
+				showPlayList = false;
 				trayShow(true);
             }
             private function trayShow(forceAnimation:Boolean=false):void {
@@ -90,7 +89,7 @@
             		trayHider.end();
             		trayHider.duration = 1000;
 				  	trayHider.yFrom = tray.y; // from current position
-			        trayHider.yTo = Application.application.height - tray.height + (showPlayList ? 0 : playListBox.height); // ... to just inside, depending on context
+			        trayHider.yTo = Application.application.height - tray.height + (showPlayList ? 0 : playListContainer.height); // ... to just inside, depending on context
 			       	trayHider.play();
             	}
             }            
@@ -105,8 +104,8 @@
 	            	trayHider.addEventListener(EffectEvent.EFFECT_END, function():void {if(tray.y>=Application.application.height) tray.visible = false;});
             	}
             }            
-			private var trayTimer:Timer = new Timer(5000,1);
-			private var infoTimer:Timer = new Timer(10000,1);
+			private var trayTimer:Timer = new Timer(10000,1);
+			private var infoTimer:Timer = new Timer(5000,1);
             private function prepareTimers():void {
             	// TRAY AND POSSIBLY PLAYLIST
             	// Hide when the timer completes
@@ -118,7 +117,7 @@
             	
             	// INFORMATION BOX WITH TITLE AND DESCRIPTION
             	// Hide when the timer completes
-				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, infoHide);
+				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void{infoHide();});
 				// Reset timer when the mouse moves in the application
 				Application.application.addEventListener(MouseEvent.MOUSE_MOVE, function():void {infoTimer.reset();});
             }             
@@ -163,10 +162,10 @@
 	<mx:VideoDisplay id="video" source="{activeElement.get('videoSource')}" autoRewind="false"  maintainAspectRatio="false"  autoPlay="false" volume="1" horizontalCenter="0" verticalCenter="0" 
 		width="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : Application.application.width)}"
 		height="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? Application.application.height : Application.application.width/(activeElement.get('aspectRatio') as Number))}"
-		click="if(video.playing) pauseVideoElement(); else playVideoElement();" stateChange="doStateChange(event);"
+		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" stateChange="doStateChange(event);"
 		playheadUpdate="{onVideoPlayHeadUpdate()}"
 		/>
-	<mx:Image id="image" source="{activeElement.get('photoSource')}" width="{video.width}" height="{video.height}" horizontalCenter="0" verticalCenter="0"	click="{playVideoElement()}" />
+	<mx:Image id="image" source="{activeElement.get('photoSource')}" width="{video.width}" height="{video.height}" horizontalCenter="0" verticalCenter="0"	click="{playListHide(); playVideoElement()}" />
 
 	<!-- Icon/Logo -->
 	<mx:Box id="logo" visible="{(props.get('showLogo') as Boolean)}" top="15" right="15" left="15" bottom="15" horizontalAlign="{props.get('logoAlign')}" verticalAlign="{props.get('logoVAlign')}" horizontalCenter="0" verticalCenter="0">
@@ -174,7 +173,7 @@
 	</mx:Box>
 
 	<!-- Tray -->
-	<mx:Canvas id="tray" y="{Application.application.height-tray.height+playListBox.height}" left="0" right="0" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="true" horizontalCenter="0">
+	<mx:Canvas id="tray" y="{Application.application.height-tray.height+playListContainer.height}" left="0" right="0" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="true" horizontalCenter="0">
 		<mx:VBox verticalGap="0">
 			<mx:VBox id="descriptions" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontAntiAliasType="advanced" fontSharpness="-300" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" visible="{(props.get('showDescriptions') as Boolean)}" paddingLeft="2" paddingRight="2" width="{tray.width}">
 				<!-- Title and Words -->
@@ -219,13 +218,13 @@
 			    		<!-- PlayListBtn -->
 			    		<mx:Canvas id="playlistBtn" width="32" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
 			    			visible="{enablePlayList &amp;&amp; showPlayList}" includeInLayout="{enablePlayList &amp;&amp; showPlayList}" 
-			    			click="togglePlayList()">
-			    			<mx:Image source="@Embed(source='assets/buttons/expand-off.swf')" alpha="0.7"/>
+			    			click="playListHide()">
+			    			<mx:Image source="@Embed(source='assets/buttons/expand-on.swf')" alpha="0.7"/>
 						</mx:Canvas>
 			    		<mx:Canvas id="playlistBtnOn" width="32" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{enablePlayList &amp;&amp; !showPlayList}" includeInLayout="{enablePlayList &amp;&amp; !showPlayList}" 
-			    			click="togglePlayList()">
-			    			<mx:Image source="@Embed(source='assets/buttons/expand-on.swf')" alpha="0.7"/>
+			    			click="playListShow()">
+			    			<mx:Image source="@Embed(source='assets/buttons/expand-off.swf')" alpha="0.7"/>
 						</mx:Canvas>
 
 					    <!-- HDbutton-->
@@ -281,10 +280,12 @@
 			</mx:HBox>
 			
 			<!-- PlayList -->
-			<mx:Canvas id="playListBox" height="100" width="{tray.width}"><mx:Canvas id="playListHolder" bottom="0"/></mx:Canvas>					
+			<mx:Canvas id="playListContainer" height="100" width="{tray.width}" backgroundColor="black" borderColor="black" borderSides="top" borderStyle="solid" borderThickness="5">
+				<mx:Canvas id="playListHolder" bottom="0"/>
+			</mx:Canvas>					
 		</mx:VBox>	
 	</mx:Canvas>
-	<com:EmbedPanel id="embedPanel" visible="false" includeInLayout="false" verticalCenter="0" horizontalCenter="0" width="100%" height="100%" backgroundColor="0x000000" backgroundAlpha="{(props.get('trayAlpha') as Number)}"/>
+	<com:EmbedPanel id="embedPanel" visible="false" includeInLayout="false" verticalCenter="0" horizontalCenter="0" width="100%" height="100%" backgroundColor="0x000000" backgroundAlpha="0.8"/>
 	
 	<mx:Move id="trayHider" duration="1500" target="{tray}"/>
 </mx:Application>

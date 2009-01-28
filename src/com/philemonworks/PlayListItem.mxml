@@ -44,7 +44,7 @@
 				{
 					moviePreview.source = _defaultURL;
 				}
-				moviePreview.maintainAspectRatio = false;
+				moviePreview.maintainAspectRatio = true;
 				loadLabel.visible = false;
 				moviePreview.visible = true;
 				nameLabel.visible = true;
@@ -53,8 +53,8 @@
 			
 		]]>
 	</mx:Script>
-	<mx:Image id="moviePreview" top="0" width="100" height="75" scaleContent="true" visible="false"/>
+	<mx:Image id="moviePreview" top="0" width="100" height="75" scaleContent="true" visible="false" verticalAlign="bottom"/>
 	<mx:Label id="nameLabel" color="0xFFFFFF" fontSize="10" width="100" truncateToFit="true"  bottom="2" visible="false" fontFamily="Arial"/>
 	<mx:Label id="loadLabel" color="0xFFFFFF" fontSize="10" verticalCenter="0" horizontalCenter="0" text="LOADING" fontFamily="Arial"/>
-	<mx:Canvas id="clickHolder" width="100" height="100" verticalCenter="0" horizontalCenter="0" backgroundAlpha="0.1" backgroundColor="0xFFFFFF"/>
+	<mx:Canvas id="clickHolder" width="100" height="100" verticalCenter="0" horizontalCenter="0" backgroundColor="black" backgroundAlpha="0.01" useHandCursor="true" buttonMode="true"/>
 </mx:Canvas>
