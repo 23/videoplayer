@@ -7,6 +7,7 @@
  	<mx:Script source="doJSON.as"></mx:Script>
 	<mx:Script>
 		<![CDATA[
+			import mx.events.EffectEvent;
 			import mx.controls.Button;
 			import mx.formatters.SwitchSymbolFormatter;
 			import com.PlayListEvent;
@@ -15,7 +16,6 @@
 			import mx.controls.Alert;
 			import flash.display.StageDisplayState;
 			import com.philemonworks.flex.util.HashCollection;
-			import flash.system.Capabilities;
 			import mx.core.mx_internal;
 			
 			// Default domain (used when testing from localhost)
@@ -26,14 +26,9 @@
 			private var appAspectRatio:Number = 1;
 			private var context:Object = {};
 			
-			private var handleTimer : Timer;
-			private var descTimer : Timer;
-			
 			private var playList: PlayList;
-			[Bindable] private var positionChange : Number = -100;
-			private var trayOut : Boolean = false;
-			[Bindable] private var showPlayList: Boolean = true;
-			[Bindable] private var playListOut: Boolean = true;	
+			[Bindable] private var enablePlayList: Boolean = true;		
+			[Bindable] private var showPlayList: Boolean = false;
 						
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
@@ -47,18 +42,16 @@
 			public function build():void {
 				if(context && context.photos && context.photos.length>0) {
 					if(context.photos.length==1) {
-						showPlayList = false;
+						enablePlayList = false;
 					} else {	
-						showPlayList = true;
+						enablePlayList = true;
 						createPlayList();
 					}					
-
+					prepareTimers();
+					video.mx_internal::videoPlayer.smoothing = true;
 					setActiveElement(0);
 					loading.visible=false;
-					video.mx_internal::videoPlayer.smoothing = true;
 					toggleInfo('newclip');
-					this.addEventListener(MouseEvent.ROLL_OUT, onAppMouseOut);
-					this.addEventListener(MouseEvent.ROLL_OVER, onAppMouseOver);
 				} else {
 					displayError('Nothing to show...');
 				}
@@ -79,7 +72,6 @@
             	playList.verticalScrollPolicy = "off";
 				playList.itemArray = createItemsArray();
 				playList.addEventListener(PlayListEvent.SELECT_ITEM, function(evt:PlayListEvent):void {
-            			createTimer();
             			if(evt.itemID != -1) {
 		            		toggleInfo('newclip');
         		    		setElementByID(evt.itemID);
@@ -87,110 +79,70 @@
             		});
 				playListHolder.addChild(playList);
             }
-            
-            private function createTimer():void {
-            	if(handleTimer != undefined) handleTimer.stop();
-            	handleTimer = new Timer(1000,5);
-            	handleTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onTimeOut);
-            	handleTimer.start();
+			private function togglePlayList():void {
+				showPlayList = !showPlayList;
+				trayShow(true);
             }
-            
-            private function onTimeOut(evt:TimerEvent):void {
-            	trace("time is up");
-	            handleTimer.stop();
-	            togglePlayList();
-            }
+            private function trayShow(forceAnimation:Boolean=false):void {
+            	trayTimer.reset(); trayTimer.start();
+            	if(!tray.visible || forceAnimation) {
+	            	tray.visible = true;
+            		trayHider.end();
+            		trayHider.duration = 1000;
+				  	trayHider.yFrom = tray.y; // from current position
+			        trayHider.yTo = Application.application.height - tray.height + (showPlayList ? 0 : playListBox.height); // ... to just inside, depending on context
+			       	trayHider.play();
+            	}
+            }            
+            private function trayHide():void {
+            	trayTimer.stop();
+            	if(tray.visible) {
+            		trayHider.end();
+            		trayHider.duration = 1500;
+		           	trayHider.yFrom = tray.y; // from current position
+	            	trayHider.yTo = Application.application.height; // ... to outside of frame
+	            	trayHider.play();
+	            	trayHider.addEventListener(EffectEvent.EFFECT_END, function():void {if(tray.y>=Application.application.height) tray.visible = false;});
+            	}
+            }            
+			private var trayTimer:Timer = new Timer(5000,1);
+			private var infoTimer:Timer = new Timer(10000,1);
+            private function prepareTimers():void {
+            	// TRAY AND POSSIBLY PLAYLIST
+            	// Hide when the timer completes
+				trayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void {trayHide();});
+				// Reset timer when the mouse moves in the application
+				Application.application.addEventListener(MouseEvent.MOUSE_MOVE, function():void {trayShow();});
+				// And trigger it
+				trayShow();
+            	
+            	// INFORMATION BOX WITH TITLE AND DESCRIPTION
+            	// Hide when the timer completes
+				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void {toggleInfo('timer')});
+				// Reset timer when the mouse moves in the application
+				Application.application.addEventListener(MouseEvent.MOUSE_MOVE, function():void {infoTimer.reset();});
+            } 
             
             private function toggleInfo(context:String):void {
-            	if(!activeElement.get('hasInfo')) {
-            		trace('no information');
-            		descriptions.visible = false;
-            		return;	
-            	}
-            	if(!descriptions.visible || context=='newclip') {
-	            	descriptions.visible = true;
-	            	if (context!='button') {
-	            		if(descTimer != undefined) descTimer.stop();
-	            		descTimer = new Timer(1000,5);
-	            		descTimer.addEventListener(TimerEvent.TIMER_COMPLETE , function(){
-	            				descriptions.visible = false;
-            					descTimer.stop();
-	            			});
-	            		descTimer.start();
-	            	}
-	            } else {
-	            	descriptions.visible = false;
-	            	if(descTimer != undefined) descTimer.stop();       		
-	            }
+            	if(!activeElement.get('hasInfo')) {descriptions.visible = false; return;}
+				infoTimer.stop();
+				switch(context) {
+					case "newclip": 
+						descriptions.visible = true;
+						infoTimer.start();
+						break;
+					case "timer": 
+						descriptions.visible = false;
+						break;
+					case "button": 
+						descriptions.visible = !descriptions.visible;
+						break;
+				}
             }
-            
-            private function togglePlayList():void {
-            	if(playListOut) {
-            		playListOut = false;
-            		trayHider.end();
-            		positionChange = 0;
-            		trayHider.yFrom = this.height - tray.height + 100;
-	            	trayHider.yTo = this.height - tray.height;;
-	            	trayHider.play();
-            		createTimer();
-            		trace("Not playListOut: "+positionChange);
-            	} else {
-            		if(handleTimer != undefined) handleTimer.stop();
-            		playListOut = true;
-            		trayHider.end();
-            		positionChange = -100;
-            		trayHider.yFrom = this.height - tray.height;;
-	            	trayHider.yTo = this.height - tray.height + 100;
-	            	trayHider.play();
-	            	trace("playListOut: "+positionChange);
-            	}
-            }
- 
-            private function onAppMouseOut(event:MouseEvent):void {
-            	if(handleTimer != undefined) handleTimer.stop();
-            	if(context && context.photos && context.photos.length == 1) {
-            		playListOut = true;
-            		trayOut = true;
-		           	trayHider.end();
-		           	trayHider.yFrom = this.height - tray.height + 100;
-	            	trayHider.yTo = this.height + tray.height;
-	            	positionChange = - tray.height;
-	            	trayHider.play();
-            	} else if(context.photos.length > 1) {
-            		trayHider.end();
-            		if(playListOut) {
-            			if(handleTimer != undefined) handleTimer.stop();
-	       		    	trayHider.yFrom = this.height - tray.height + 100;
-            		} else if(!playListOut) {
-            			trayHider.yFrom = this.height - tray.height;;
-            			if(handleTimer != undefined) handleTimer.stop();
-            		}
-            		playListOut = true;
-            		trayOut = true;
-	            	trayHider.yTo = this.height + tray.height;
-	            	positionChange = - tray.height;
-	            	trayHider.play();
-            	}
-            	trace("onAppMouseOut: "+positionChange);
-            }
-            
-            private function onAppMouseOver(event:MouseEvent):void {
-//            	if(trayOut) {
-            		trayOut = false;
-				  	trayHider.end();
-				  	trayHider.yFrom = this.height + tray.height;
-			        trayHider.yTo = this.height - tray.height + 100;
-            		positionChange = - 100;
-			       	trayHider.play();
-			       	trace("onAppMouseOver: "+positionChange);
-//            	}
-            }       
-            
             private function onVideoPlayHeadUpdate():void {
             	videoPlayProgress.width  = video.playheadTime/video.totalTime*videoProgress.width;
 				videoTime.x = videoProgress.x + video.playheadTime/video.totalTime*videoProgress.width - videoTime.width/2;
             }
-            
             private function onButtonMouseOver(e:Event):void {
             	e.currentTarget.setStyle('backgroundAlpha', 1);
             	e.currentTarget.getChildren()[0].alpha = 1;         	
@@ -206,8 +158,6 @@
             }
 		]]>
 	</mx:Script>	
-	
-	<mx:Move id="trayHider" target="{tray}"/>
 	
 	<mx:Box id="background" backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" width="100%" height="100%" verticalCenter="0" horizontalCenter="0"/>
 	<mx:Label id="loading" text="Loading..." color="{(StyleManager.getColorName(props.get('loadingColor')) as Number)}" />
@@ -227,11 +177,11 @@
 	</mx:Box>
 
 	<!-- Tray -->
-	<mx:Canvas id="tray" bottom="{positionChange}" left="0" right="0" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="true" horizontalCenter="0">
+	<mx:Canvas id="tray" y="{Application.application.height-tray.height+playListBox.height}" left="0" right="0" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="true" horizontalCenter="0">
 		<mx:VBox verticalGap="0">
 			<mx:VBox id="descriptions" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontAntiAliasType="advanced" fontSharpness="-300" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" visible="{(props.get('showDescriptions') as Boolean)}" paddingLeft="2" paddingRight="2" width="{tray.width}">
 				<!-- Title and Words -->
-				<mx:Box id="descBg" horizontalCenter="0" verticalCenter="0" verticalGap="0" backgroundColor="0x000000" backgroundAlpha="{(props.get('trayAlpha') as Number)}" cornerRadius="2" borderStyle="solid" borderThickness="0" width="100%" paddingTop="6" paddingBottom="6" paddingLeft="6" paddingRight="6">
+				<mx:Box id="descBg" horizontalCenter="0" verticalCenter="0" verticalGap="0" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" cornerRadius="2" borderStyle="solid" borderThickness="0" width="100%" paddingTop="6" paddingBottom="6" paddingLeft="6" paddingRight="6">
 					<mx:Label id="trayTitle" fontSize="{(props.get('trayTitleFontSize') as Number)}" fontWeight="{props.get('trayTitleFontWeight')}" text="{activeElement.get('title')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayTitle.visible = (trayTitle.text.length>0);" width="{descBg.width - 15}"/>
 					<mx:Text id="trayContent" fontSize="{(props.get('trayContentFontSize') as Number)}" fontWeight="{props.get('trayContentFontWeight')}" text="{activeElement.get('content')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayContent.visible = (trayContent.text.length>0);" height="{(props.get('trayContentFontSize') as Number)*2.6}" width="{descBg.width - 15}"/>
 				</mx:Box>
@@ -271,12 +221,12 @@
 			    	<mx:HBox id="rightPanel" visible="true" bottom="2" top="2" right="2" horizontalGap="2" resize="recalcBindPositions()"> 
 			    		<!-- PlayListBtn -->
 			    		<mx:Canvas id="playlistBtn" width="32" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
-			    			visible="{showPlayList &amp;&amp; playListOut}" includeInLayout="{showPlayList &amp;&amp; playListOut}" 
+			    			visible="{enablePlayList &amp;&amp; showPlayList}" includeInLayout="{enablePlayList &amp;&amp; showPlayList}" 
 			    			click="togglePlayList()">
 			    			<mx:Image source="@Embed(source='assets/buttons/expand-off.swf')" alpha="0.7"/>
 						</mx:Canvas>
 			    		<mx:Canvas id="playlistBtnOn" width="32" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
-			    			visible="{showPlayList &amp;&amp; !playListOut}" includeInLayout="{showPlayList &amp;&amp; !playListOut}" 
+			    			visible="{enablePlayList &amp;&amp; !showPlayList}" includeInLayout="{enablePlayList &amp;&amp; !showPlayList}" 
 			    			click="togglePlayList()">
 			    			<mx:Image source="@Embed(source='assets/buttons/expand-on.swf')" alpha="0.7"/>
 						</mx:Canvas>
@@ -329,14 +279,15 @@
 			    			click="embedPanel.visible=!embedPanel.visible;">
 			    			<mx:Image source="@Embed(source='assets/buttons/share.swf')" alpha="0.7"/>
 						</mx:Canvas>
-
 					</mx:HBox>
 				</mx:Canvas>
 			</mx:HBox>
 			
 			<!-- PlayList -->
-			<mx:HBox height="100" width="{tray.width}" id="playListBox"><mx:Canvas id="playListHolder" bottom="0"/></mx:HBox>					
+			<mx:Canvas id="playListBox" height="100" width="{tray.width}"><mx:Canvas id="playListHolder" bottom="0"/></mx:Canvas>					
 		</mx:VBox>	
 	</mx:Canvas>
 	<com:EmbedPanel id="embedPanel" visible="false" includeInLayout="false" verticalCenter="0" horizontalCenter="0" width="100%" height="100%" backgroundColor="0x000000" backgroundAlpha="{(props.get('trayAlpha') as Number)}"/>
+	
+	<mx:Move id="trayHider" duration="1500" target="{tray}"/>
 </mx:Application>
