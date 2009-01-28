@@ -42,11 +42,11 @@
 			public function build():void {
 				if(context && context.photos && context.photos.length>0) {
 					if(context.photos.length>1) createPlayList();
-					prepareTimers();
 					video.mx_internal::videoPlayer.smoothing = true;
 					setActiveElement(0);
 					loading.visible=false;
 					infoShow();
+					prepareTimers();
 				} else {
 					displayError('Nothing to show...');
 				}
@@ -118,11 +118,8 @@
             	// INFORMATION BOX WITH TITLE AND DESCRIPTION
             	// Hide when the timer completes
 				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void{infoHide();});
-				// Reset timer when the mouse moves in the application
-				Application.application.addEventListener(MouseEvent.MOUSE_MOVE, function():void {infoTimer.reset();});
             }             
             private function infoHide():void {
-				infoTimer.stop();
 				descriptions.visible = false;
             }
             private function infoShow(timeout:Boolean=true):void {
