@@ -3,27 +3,26 @@ import mx.utils.URLUtil;
 [Bindable] public var props:HashCollection = new HashCollection()
 public var propDefaults:Object = {
 	backgroundColor: 'black',
-	loadingColor: 'white',
 	trayBackgroundColor: 'black',
 	trayTextColor: 'white',
 	trayFont: 'Helvetica, Arial, sans-serif',
 	trayTitleFontSize: parseFloat('13'),
 	trayTitleFontWeight: 'bold',
-	trayTitleTextTranform: 'none',
 	trayContentFontSize: parseFloat('11'),
 	trayContentFontWeight: 'normal',
-	trayContentTextTranform: 'none',
 	trayAlpha: parseFloat('0.8'),
 	showTray: true,
 	showDescriptions: true,
-	autoPlay: false,
 	logoSource: 'no logo',
 	showLogo: true,
 	logoPosition: 'top right',
 	logoAlpha: parseFloat('0.6'),
 	logoWidth: parseFloat('80'),
 	logoHeight: parseFloat('40'),
-	logoGrayScale: true
+	
+	autoPlay: true,
+	loop: true,
+	playHD: false
 }
 private function initProperties(settings:Object):void {
 	// Load defaults
@@ -45,8 +44,6 @@ private function initProperties(settings:Object):void {
   	    	}
   	    }
 	}
-
-
 	// Read from FlashVars
 	for (name in propDefaults) {
 	  	if(typeof(Application.application.parameters[name])!='undefined') {
@@ -63,7 +60,6 @@ private function initProperties(settings:Object):void {
 	}
 
 	// Determine a JSON source
-//	var domain:String = defaultDomain;
 	var domain:String = URLUtil.getServerName(Application.application.url);
 	if(domain=='localhost') domain=defaultDomain;
 	props.put('domain', domain);
@@ -83,6 +79,8 @@ private function initProperties(settings:Object):void {
 		jsonSource += '&tag=' + encodeURI(Application.application.parameters.tag); 
 	} else if (defaultPhotoId.length) {
 		jsonSource += '&photo_id=' + encodeURI(defaultPhotoId); 
+	} else if (defaultAlbumId.length) {
+		jsonSource += '&album_id=' + encodeURI(defaultAlbumId); 
 	} 		 
 	props.put('jsonSource', jsonSource);
 
@@ -103,6 +101,9 @@ private function initProperties(settings:Object):void {
 	var pos:String = props.get('logoPosition').toString();
 	props.put('logoAlign', (new RegExp('left').test(pos) ? 'left' : 'right'));
 	props.put('logoVAlign', (new RegExp('top').test(pos) ? 'top' : 'bottom'));
+	
+	// Should we start by playing HD? 
+	if(props.get('playHD')) playHD = true;
 }
 
 

@@ -22,11 +22,13 @@ private function resetActiveElement():void {
   	activeElement.put('aspectRatio', new Number(1));
 }
 
-private function setActiveElement(i:int, startPlaying:Boolean=false):void {
-	trace("setActiveElement");
-	if (!context || !context.photos || !context.photos[i]) return;
+private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
+	trace("setActiveElement " + i);
+	if (!context || !context.photos || !context.photos[i]) return(false);
 	numElements = context.photos.length;
 	currentElementIndex = i;
+	trace("numElements " + numElements);
+	trace("currentElementIndex " + currentElementIndex);
 	var o:Object = context.photos[i];
   	var video_p:Boolean = new Boolean(parseInt(o.video_p)) && new Boolean(parseInt(o.video_encoded_p));
   	activeElement.put('video_p', video_p);
@@ -58,11 +60,6 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):void {
   	activeElement.put('photoHeight', new Number(o.large_height));
   	activeElement.put('aspectRatio', parseInt(o.large_width) / parseInt(o.large_height));
  
- 	if(props.get('trayTitleTextTranform')=='uppercase') o.title = o.title.toUpperCase();
-	if(props.get('trayTitleTextTranform')=='lowercase') o.title = o.title.toLowerCase();
-	if(props.get('trayContentTextTranform')=='uppercase') o.content = o.content.toUpperCase();
-	if(props.get('trayContentTextTranform')=='lowercase') o.content = o.content.toLowerCase();
-	
  	if(video_p) {
  		image.source = null;
   		showVideoElement();
@@ -70,6 +67,10 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):void {
   	} else {
   		showImageElement();
   	}
+
+	// We want the tray and possible the info box to show up when a new element starts playing
+	infoShow();
+	trayShow();
 
 	var swfUrl:String = Application.application.loaderInfo.url;
 	var urlStart:Number = swfUrl.indexOf("://")+3;
@@ -80,6 +81,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):void {
 	embedPanel.rssLink = "http://"+domain+"/rss/";
 	embedPanel.mailLink = "http://"+domain+"/send?popup_p=1&photo_id="+o.photo_id;
 	
+	return(true);
 } 	
 
 private function createItemsArray() : Array {
@@ -100,8 +102,8 @@ private function createItemsArray() : Array {
 	return itemsArray;
 }
 
-private function previousElement():void {if(video.playing) video.stop(); setActiveElement(currentElementIndex-1);}
-private function nextElement():void {if(video.playing) video.stop(); setActiveElement(currentElementIndex+1);}
+private function previousElement():Boolean {if(video.playing) video.stop(); return(setActiveElement(currentElementIndex-1));}
+private function nextElement():Boolean {if(video.playing) video.stop(); return(setActiveElement(currentElementIndex+1));}
 private function setElementByID(id:Number):void {
 	if(video.playing) video.stop();
 	setActiveElement(id);
