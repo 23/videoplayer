@@ -68,7 +68,7 @@
 
 		]]>
 	</mx:Script>
-	<mx:VBox id="embedScreen" width="360" backgroundColor="black" 
+	<mx:VBox id="embedScreen" width="360" backgroundColor="black"
 		horizontalCenter="0" verticalCenter="0" verticalGap="5" horizontalScrollPolicy="off" verticalScrollPolicy="off" paddingTop="10" paddingRight="10" paddingBottom="10" paddingLeft="10" borderStyle="solid" borderThickness="0" cornerRadius="2">
 
 		<!-- Title and close section -->		
@@ -82,7 +82,7 @@
 			<mx:Image id="embedLogo" source="@Embed('assets/buttons/embed.swf')"/>
 			<mx:Label text="Embed:" fontSize="12" fontWeight="bold" color="white"/>
 		</mx:HBox>
-		<mx:TextArea id="embedText" height="30" width="{embedScreen.width-20}" backgroundColor="white" color="#333" fontSize="10" fontWeight="bold" fontFamily="Helvetica, Arial, sans-serif, sans-serif;" borderStyle="solid" borderThickness="0" cornerRadius="2"/>
+		<mx:TextArea id="embedText" height="30" width="{embedScreen.width-20}" click="selectEmbedText();" backgroundColor="white" color="#333" fontSize="10" fontWeight="bold" fontFamily="Helvetica, Arial, sans-serif, sans-serif;" borderStyle="solid" borderThickness="0" cornerRadius="2"/>
 		<mx:Canvas id="copyBtn" click="System.setClipboard(embedText.text);"
 			backgroundColor="#666666" borderStyle="solid" borderThickness="0" cornerRadius="2" useHandCursor="true" buttonMode="true" mouseDown="copyBtn.setStyle('backgroundColor', '#777777');"  mouseUp="copyBtn.setStyle('backgroundColor', '#666666');">
 			<mx:Label text="Copy" color="white" fontFamily="Helvetica, Arial, sans-serif" fontSize="11" fontWeight="bold" paddingTop="3" paddingRight="10" paddingBottom="1" paddingLeft="10"/>
