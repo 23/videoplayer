@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="load();" backgroundColor="black" xmlns:com="com.*" width="100%" height="100%"  preloader="Preloader" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="init();" backgroundColor="black" xmlns:com="com.*" width="100%" height="100%"  preloader="Preloader" verticalScrollPolicy="off" horizontalScrollPolicy="off">
  	<mx:Script source="Utility.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
  	<mx:Script source="AppProperties.as"></mx:Script>
@@ -15,6 +15,7 @@
 			import flash.display.StageDisplayState;
 			import com.philemonworks.flex.util.HashCollection;
 			import mx.core.mx_internal;
+			import flash.external.ExternalInterface;
 			
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
@@ -29,8 +30,15 @@
 			[Bindable] private var enablePlayList: Boolean = false;		
 			[Bindable] private var showPlayList: Boolean = false;
 			
-			private var timersLoaded:Boolean = false;
-						
+			public function unload():void {
+				// This function is triggered via ExternalInterface and some JavaScript because Flex is useless.
+				if(video.playing) reportPlayTime(video.playheadTime)
+			}
+			public function init():void {
+				prepareTimers();
+				if (ExternalInterface.available) ExternalInterface.addCallback('unload', unload);
+				load();
+			}
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
 				if(domain=='localhost') domain=defaultDomain;
@@ -42,15 +50,18 @@
 			}
 			public function build():void {
 				if(!context || !context.photos || context.photos.length==0) displayError('Nothing to show...');
-				
 				if(context.photos.length>1) createPlayList();
 				video.mx_internal::videoPlayer.smoothing = true;
-				prepareTimers();
 				setActiveElement(0);
 			}
 			
 			private function doStateChange(evt:VideoEvent):void {
                 switch (evt.currentTarget.state) {
+                	case VideoEvent.PAUSED:
+                	case VideoEvent.STOPPED:
+                	case VideoEvent.COMPLETE:
+                		reportPlayTime(video.playheadTime);
+                		break;
                     case VideoEvent.CONNECTION_ERROR:
                         displayError('Unable to connect to video');
                         break;
@@ -103,8 +114,6 @@
 			private var trayTimer:Timer = new Timer(10000,1);
 			private var infoTimer:Timer = new Timer(5000,1);
             private function prepareTimers():void {
-            	if(timersLoaded) return;
-            	
             	// TRAY AND POSSIBLY PLAYLIST
             	// Hide when the timer completes
 				trayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void {trayHide();});
@@ -114,8 +123,6 @@
             	// INFORMATION BOX WITH TITLE AND DESCRIPTION
             	// Hide when the timer completes
 				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void{infoHide();});
-				
-				timersLoaded = true;
             }             
             private function infoHide():void {
 				descriptions.visible = false;
