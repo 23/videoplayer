@@ -72,15 +72,6 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
 	infoShow();
 	trayShow();
 
-	var swfUrl:String = Application.application.loaderInfo.url;
-	var urlStart:Number = swfUrl.indexOf("://")+3;
-	var urlEnd:Number = swfUrl.indexOf("/", urlStart);
-	var domain:String = swfUrl.substring(urlStart, urlEnd);		
-  	embedPanel.embedTextValue = (Application.application.parameters.album_id == undefined) ? "<embed width='"+Application.application.width+"' height='"+Application.application.height+"' src='"+swfUrl+"' allowfullscreen='true' allowscriptaccess='always' flashvars='photo_id="+o.photo_id+"'/>" : "<embed width='"+Application.application.width+"' height='"+Application.application.height+"' src='"+swfUrl+"' allowfullscreen='true' allowscriptaccess='always' flashvars='album_id="+Application.application.parameters.album_id+"'/>";
-	embedPanel.podcastLink = "itpc://"+domain+"/podcast/";
-	embedPanel.rssLink = "http://"+domain+"/rss/";
-	embedPanel.mailLink = "http://"+domain+"/send?popup_p=1&photo_id="+o.photo_id;
-	
 	return(true);
 } 	
 

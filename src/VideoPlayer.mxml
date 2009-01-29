@@ -17,10 +17,10 @@
 			import mx.core.mx_internal;
 			
 			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = 'reference.dev.visualtube.net';
+			private var defaultDomain:String = 'blog.23visual.com';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
-			private var defaultAlbumId:String = '17542';
+			private var defaultAlbumId:String = '';
 
 			private var appAspectRatio:Number = 1;
 			private var context:Object = {};
@@ -253,12 +253,12 @@
 
 						<!-- Mute and Unmute -->
 			    		<mx:Canvas id="muteImage" width="32" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
-			    			visible="{video.volume>0}" includeInLayout="{video.volume>0}"
+			    			visible="{videoControls.visible &amp;&amp; video.volume>0}" includeInLayout="{videoControls.visible &amp;&amp; video.volume>0}"
 			    			click="video.volume=0">
 			    			<mx:Image source="@Embed(source='assets/buttons/mute-off.swf')" alpha="0.7"/>
 						</mx:Canvas>
 			    		<mx:Canvas id="unmuteImage" width="32" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
-			    			visible="{video.volume==0}" includeInLayout="{video.volume==0}"
+			    			visible="{videoControls.visible &amp;&amp; video.volume==0}" includeInLayout="{videoControls.visible &amp;&amp; video.volume==0}"
 			    			click="video.volume=1">
 			    			<mx:Image source="@Embed(source='assets/buttons/mute-on.swf')" alpha="0.7"/>
 						</mx:Canvas>

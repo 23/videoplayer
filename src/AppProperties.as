@@ -25,6 +25,9 @@ public var propDefaults:Object = {
 	playHD: false
 }
 private function initProperties(settings:Object):void {
+	var loadParameters:Array = new Array();
+	var loadSettings:Array = new Array();
+
 	// Load defaults
 	for (name in propDefaults) {
 		props.put(name, propDefaults[name]);
@@ -47,6 +50,7 @@ private function initProperties(settings:Object):void {
 	// Read from FlashVars
 	for (name in propDefaults) {
 	  	if(typeof(Application.application.parameters[name])!='undefined') {
+	  		if(name!='showDescriptions') loadSettings.push(name + '=' + encodeURI(Application.application.parameters[name]));
 	  		if (typeof propDefaults[name]=='boolean') {
 			 	props.put(name, new Boolean(parseFloat(Application.application.parameters[name])));
 		 	} else {	
@@ -59,30 +63,33 @@ private function initProperties(settings:Object):void {
 	  	}
 	}
 
-	// Determine a JSON source
+	// Determine a load parameters
 	var domain:String = URLUtil.getServerName(Application.application.url);
 	if(domain=='localhost') domain=defaultDomain;
 	props.put('domain', domain);
-	var jsonSource:String = 'http://' + domain + '/js/photos?raw';
-	if (Application.application.parameters.video_p) {
-		jsonSource += '&video_p=' + encodeURI(Application.application.parameters.video_p);
-	} 
-	if (Application.application.parameters.video_p) {
-		jsonSource += '&video_encoded_p=' + encodeURI(Application.application.parameters.video_encoded_p);
-	} 
+    var options:Array = ['photo_id', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p video_encoded_p'];
+    for (var i:int=0; i<options.length; i++) {
+		var opt:String = options[i];
+		if (Application.application.parameters[opt]) {
+			loadParameters.push(opt + '=' + encodeURI(Application.application.parameters[opt]));
+			loadSettings.push(opt + '=' + encodeURI(Application.application.parameters[opt]));
+		}
+    }
+	if (defaultPhotoId.length) loadParameters.push('photo_id=' + encodeURI(defaultPhotoId)); 
+	if (defaultAlbumId.length) loadParameters.push('album_id=' + encodeURI(defaultAlbumId)); 
 
-	if (Application.application.parameters.photo_id) {
-		jsonSource += '&photo_id=' + encodeURI(Application.application.parameters.photo_id); 
-	} else if (Application.application.parameters.album_id) {
-		jsonSource += '&album_id=' + encodeURI(Application.application.parameters.album_id); 
-	} else if (Application.application.parameters.tag) {
-		jsonSource += '&tag=' + encodeURI(Application.application.parameters.tag); 
-	} else if (defaultPhotoId.length) {
-		jsonSource += '&photo_id=' + encodeURI(defaultPhotoId); 
-	} else if (defaultAlbumId.length) {
-		jsonSource += '&album_id=' + encodeURI(defaultAlbumId); 
-	} 		 
+	// Use load parameters to build JSON source
+	var jsonSource:String = 'http://' + domain + '/js/photos?raw&' + loadParameters.join('&');
 	props.put('jsonSource', jsonSource);
+
+	var swfUrl:String = Application.application.loaderInfo.url;
+	var swfHeight:Number = 567;
+	var swfWidth:Number = 300;	
+	var flashVars:String = loadSettings.join('&');
+	embedPanel.embedTextValue = '<object width="' + swfWidth + '" height="' + swfHeight + '" style="width:' + swfWidth + 'px; height:' + swfHeight + 'px; " type="application/x-shockwave-flash" data="' + swfUrl + '"><param name="movie" value="' + swfUrl + '"></param><param name="FlashVars" value="' + flashVars + '"></param><param name="allowfullscreen" value="true"></param><param name="allowscriptaccess" value="always"></param></object>"';
+	embedPanel.podcastLink = "itpc://"+domain+"/podcast/?" + loadParameters.join('&');
+	embedPanel.rssLink = "http://"+domain+"/rss/?" + loadParameters.join('&');
+	embedPanel.mailLink = "http://"+domain+"/send?popup_p=1&" + loadParameters.join('&');
 
 	// Test logoSource
 	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') props.put('logoSource', 'http://' + domain + '/files/sitelogo.gif');
