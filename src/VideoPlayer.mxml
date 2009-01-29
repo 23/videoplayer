@@ -17,7 +17,7 @@
 			import mx.core.mx_internal;
 			
 			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = 'blog.23visual.com';
+			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';

@@ -83,8 +83,8 @@ private function initProperties(settings:Object):void {
 	props.put('jsonSource', jsonSource);
 
 	var swfUrl:String = Application.application.loaderInfo.url;
-	var swfHeight:Number = 567;
-	var swfWidth:Number = 300;	
+	var swfHeight:Number = Application.application.height;
+	var swfWidth:Number = Application.application.width;	
 	var flashVars:String = loadSettings.join('&');
 	embedPanel.embedTextValue = '<object width="' + swfWidth + '" height="' + swfHeight + '" style="width:' + swfWidth + 'px; height:' + swfHeight + 'px; " type="application/x-shockwave-flash" data="' + swfUrl + '"><param name="movie" value="' + swfUrl + '"></param><param name="FlashVars" value="' + flashVars + '"></param><param name="allowfullscreen" value="true"></param><param name="allowscriptaccess" value="always"></param></object>"';
 	embedPanel.podcastLink = "itpc://"+domain+"/podcast/?" + loadParameters.join('&');
