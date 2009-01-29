@@ -30,14 +30,14 @@
 			[Bindable] private var enablePlayList: Boolean = false;		
 			[Bindable] private var showPlayList: Boolean = false;
 			
-			public function unload():void {
-				// This function is triggered via ExternalInterface and some JavaScript because Flex is useless.
-				if(video.playing) reportPlayTime(video.playheadTime)
-			}
 			public function init():void {
 				prepareTimers();
 				if (ExternalInterface.available) ExternalInterface.addCallback('unload', unload);
 				load();
+			}
+			public function unload():void {
+				// This function is triggered via ExternalInterface and some JavaScript because Flex is useless.
+				if(video.playing) reportPlayTime(video.playheadTime)
 			}
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
@@ -140,7 +140,6 @@
             	if(props.get('loop')) load();
             }
 			private function onVideoStateChange(evt:VideoEvent):void {
-				trace('STATE: ' + evt.currentTarget.state);
                 switch (evt.currentTarget.state) {
                 	case VideoEvent.PAUSED:
                 	case VideoEvent.STOPPED:
@@ -215,7 +214,7 @@
 			    	</mx:HBox>					
 						
 					<!-- Elements for progress bar -->
-					<mx:Canvas id="progressBg" visible="{videoControls.visible}" click="seekVideoTo((progressBg.contentMouseX-5)/videoProgress.width*video.totalTime);" mouseOver="videoTime.visible=true" mouseOut="videoTime.visible=false" useHandCursor="true" buttonMode="true" mouseChildren="false" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+4}" right="{rightPanel.width+4}" height="{playImage.height}" top="2" cornerRadius="2" borderStyle="solid" borderThickness="0" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+					<mx:Canvas id="progressBg" visible="{videoControls.visible}" click="seekVideoTo((progressBg.contentMouseX-5)/videoProgress.width*video.totalTime);" mouseOver="videoTime.visible=true" mouseOut="videoTime.visible=false" useHandCursor="true" buttonMode="true" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" left="{videoControls.width+4}" right="{rightPanel.width+4}" height="{playImage.height}" top="2" cornerRadius="2" borderStyle="solid" borderThickness="0" horizontalScrollPolicy="off" verticalScrollPolicy="off">
 						<!-- VideoProgress -->
 						<mx:Canvas id="videoProgress" left="5" right="5" height="6" backgroundColor="0xCCCCCC" backgroundAlpha="0.6" bottom="{(progressBg.height-6)/2}">
 							<mx:Canvas id="videoBufferProgress" left="0" width="{video.bytesLoaded/video.bytesTotal*videoProgress.width}" height="6" backgroundColor="white" backgroundAlpha="0.2"></mx:Canvas>

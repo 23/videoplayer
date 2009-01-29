@@ -111,7 +111,6 @@ private function showImageElement():void {
 private function showVideoElement():void {
 	video.visible=false;
 	videoControls.visible=true;
-	//video.playheadTime = 0;
 	
 	image.source = activeElement.get('photoSource');
 	image.visible=true;
@@ -120,7 +119,6 @@ private function playVideoElement():void {
 	if(!activeElement.get('video_p')) return;
 	video.visible=true;
 	videoControls.visible=true;
-	//videoTime.x = videoProgress.x - videoTime.width/2;
 	image.visible=false;
 	video.play();
 }
