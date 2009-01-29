@@ -57,42 +57,52 @@
 					embedText.selectionEndIndex = embedText.text.length;
 				}
 			}
+
+			public function setEmbedWidth():void {
+				var w:int = parent.width*.8;
+				if(w<340) w=340;
+				if(w>500) w=500;
+				embedScreen.width = w;
+				trace('setEmbedWidth', w);
+			}
+
 		]]>
 	</mx:Script>
-	<mx:Canvas width="500" height="200" horizontalCenter="0" verticalCenter="0" id="embedScreen" backgroundColor="0x000000"  backgroundAlpha="0.8" horizontalScrollPolicy="off" verticalScrollPolicy="off" >
-		<!-- Close Button -->
-		<mx:Image id="closeBtn" source="@Embed('assets/newSkin/closeBtn.gif')" top="7" right="10" click="{this.visible=false}"/>
-		
-		<mx:Label text="Share this video" fontSize="16" fontWeight="bold" color="0xFFFFFF" top="2" left="10"  fontFamily="Arial"/>
-		
-		<mx:Image id="embedLogo" source="@Embed('assets/newSkin/shareIcon.gif')" top="30" left="10"/>
-		
-		<mx:Label text="Embed:" fontSize="12" fontWeight="bold" color="0xFFFFFF" top="30" left="34"/>
-		
-		<mx:TextArea id="embedText" top="55" left="10" right="10" backgroundColor="0xFFFFFF" color="0x000000" fontSize="10"  height="{(downLabel.y - (embedLogo.y + embedLogo.height+7))}" fontFamily="Arial"/>
+	<mx:VBox id="embedScreen" width="360" backgroundColor="black" 
+		horizontalCenter="0" verticalCenter="0" verticalGap="5" horizontalScrollPolicy="off" verticalScrollPolicy="off" paddingTop="10" paddingRight="10" paddingBottom="10" paddingLeft="10" borderStyle="solid" borderThickness="0" cornerRadius="2">
 
-		<mx:Label id="downLabel" text="You can also..." fontSize="12" fontWeight="bold" left="10" y="{downPanel.y - 25}" color="0xFFFFFF"  fontFamily="Arial"/>
-		
-		<mx:HBox id="downPanel" bottom="10" width="{embedScreen.width}" left="10" horizontalScrollPolicy="off">
-			<mx:VBox left="3"   id="podcastBox"  horizontalScrollPolicy="off" verticalScrollPolicy="off">
-				<mx:VBox verticalAlign="middle" horizontalAlign="center" mouseOver="{podcastBtn.alpha=1}" mouseOut="{podcastBtn.alpha = 0.9}" click="{podcastThis()}">
-					<mx:Image id="podcastBtn" source="@Embed('assets/newSkin/podcastBtn.gif')" alpha="0.8"/>
-					<mx:Label id="podcastLabel" text="Podcast this program" color="0xFFFFFF"  fontFamily="Arial" paddingTop="1"/>
-				</mx:VBox>
-			</mx:VBox>
-			<mx:VBox  id="rssBox"  horizontalScrollPolicy="off" verticalScrollPolicy="off">
-				<mx:VBox  verticalAlign="middle" horizontalAlign="center"  mouseOver="{rssBtn.alpha=1}" mouseOut="{rssBtn.alpha = 0.9}" click="{getRss()}">
-					<mx:Image id="rssBtn" source="@Embed('assets/newSkin/rssBtn.gif')" alpha="0.8"/>
-					<mx:Label id="rssLabel" text="Get this program on RSS" color="0xFFFFFF" fontFamily="Arial"/>		
-				</mx:VBox>
-			</mx:VBox>
-			<mx:VBox right="3"  id="mailBox" horizontalScrollPolicy="off" verticalScrollPolicy="off">
-				<mx:VBox  verticalAlign="middle" horizontalAlign="center" mouseOver="{mailBtn.alpha=1}" mouseOut="{mailBtn.alpha = 0.9}" click="{sendMail()}" >
-					<mx:Image id="mailBtn" source="@Embed('assets/newSkin/mailBtn.gif')" alpha="0.8"/>
-					<mx:Label id="mailLabel" text="Send this video" color="0xFFFFFF" fontFamily="Arial" paddingTop="2"/>				
-				</mx:VBox>
-			</mx:VBox>
+		<!-- Title and close section -->		
+		<mx:Canvas height="25" width="{embedScreen.width-20}">
+			<mx:Image top="0" right="0" source="@Embed('assets/buttons/close.swf')" click="{this.visible=false}"/>
+			<mx:Label top="0" left="0" text="Share this video" fontSize="16" fontAntiAliasType="advanced" fontWeight="bold" fontThickness="150" color="white" fontFamily="Helvetica, Arial, sans-serif"/>
+		</mx:Canvas>
+
+		<!-- Embed section -->		
+		<mx:HBox horizontalGap="5" paddingTop="10">
+			<mx:Image id="embedLogo" source="@Embed('assets/buttons/embed.swf')"/>
+			<mx:Label text="Embed:" fontSize="12" fontWeight="bold" color="white"/>
 		</mx:HBox>
+		<mx:TextArea id="embedText" height="30" width="{embedScreen.width-20}" backgroundColor="white" color="#333" fontSize="10" fontWeight="bold" fontFamily="Helvetica, Arial, sans-serif, sans-serif;" borderStyle="solid" borderThickness="0" cornerRadius="2"/>
+		<mx:Canvas id="copyBtn" click="System.setClipboard(embedText.text);"
+			backgroundColor="#666666" borderStyle="solid" borderThickness="0" cornerRadius="2" useHandCursor="true" buttonMode="true" mouseDown="copyBtn.setStyle('backgroundColor', '#777777');"  mouseUp="copyBtn.setStyle('backgroundColor', '#666666');">
+			<mx:Label text="Copy" color="white" fontFamily="Helvetica, Arial, sans-serif" fontSize="11" fontWeight="bold" paddingTop="3" paddingRight="10" paddingBottom="1" paddingLeft="10"/>
+		</mx:Canvas>
 		
-	</mx:Canvas>
+		<!-- Share section -->		
+		<mx:Label id="downLabel" text="You can also..." fontSize="12" fontWeight="bold" color="white" fontFamily="Helvetica, Arial, sans-serif" paddingTop="20"/>
+		<mx:HBox id="downPanel">
+			<mx:Canvas id="podcastBox" width="{embedScreen.width*0.3}" height="54" alpha="0.8" mouseOver="{podcastBox.alpha=1}" mouseOut="{podcastBox.alpha = 0.8}" click="{podcastThis()}" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+				<mx:Image horizontalCenter="0" top="0" source="@Embed('assets/buttons/podcast.swf')"/>
+				<mx:Label horizontalCenter="0" bottom="0" text="Podcast this program" color="white" fontFamily="Helvetica, Arial, sans-serif"/>
+			</mx:Canvas>
+			<mx:Canvas id="rssBox" width="{embedScreen.width*0.3}" height="54" alpha="0.8" mouseOver="{rssBox.alpha=1}" mouseOut="{rssBox.alpha = 0.8}" click="{getRss()}" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+				<mx:Image horizontalCenter="0" top="0" source="@Embed('assets/buttons/rss.swf')"/>
+				<mx:Label horizontalCenter="0" bottom="0" text="Subscribe via RSS" color="white" fontFamily="Helvetica, Arial, sans-serif"/>
+			</mx:Canvas>
+			<mx:Canvas id="mailBox" width="{embedScreen.width*0.3}" height="54" alpha="0.8" mouseOver="{mailBox.alpha=1}" mouseOut="{mailBox.alpha = 0.8}" click="{sendMail()}" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+				<mx:Image horizontalCenter="0" top="0" source="@Embed('assets/buttons/mail.swf')"/>
+				<mx:Label horizontalCenter="0" bottom="0" text="Mail this program" color="white" fontFamily="Helvetica, Arial, sans-serif"/>
+			</mx:Canvas>
+		</mx:HBox>
+	</mx:VBox>
 </mx:Canvas>

@@ -16,12 +16,12 @@ public var propDefaults:Object = {
 	logoSource: 'no logo',
 	showLogo: true,
 	logoPosition: 'top right',
-	logoAlpha: parseFloat('0.6'),
+	logoAlpha: parseFloat('0.7'),
 	logoWidth: parseFloat('80'),
 	logoHeight: parseFloat('40'),
-	
-	autoPlay: true,
-	loop: true,
+
+	autoPlay: false,
+	loop: false,
 	playHD: false
 }
 private function initProperties(settings:Object):void {
@@ -82,6 +82,7 @@ private function initProperties(settings:Object):void {
 	var jsonSource:String = 'http://' + domain + '/js/photos?raw&' + loadParameters.join('&');
 	props.put('jsonSource', jsonSource);
 
+	// Prepare the embed/share box with some goodies
 	var swfUrl:String = Application.application.loaderInfo.url;
 	var swfHeight:Number = Application.application.height;
 	var swfWidth:Number = Application.application.width;	
@@ -102,7 +103,6 @@ private function initProperties(settings:Object):void {
 		props.put('logoSource', ''); props.put('showLogo', false);
 	});
 	logoLoader.load(logoRequest);
-
 
 	// Logo position
 	var pos:String = props.get('logoPosition').toString();

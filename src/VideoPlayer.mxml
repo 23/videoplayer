@@ -290,7 +290,7 @@
 			</mx:Canvas>					
 		</mx:VBox>	
 	</mx:Canvas>
-	<com:EmbedPanel id="embedPanel" visible="false" includeInLayout="false" verticalCenter="0" horizontalCenter="0" width="100%" height="100%" backgroundColor="0x000000" backgroundAlpha="0.8"/>
+	<com:EmbedPanel id="embedPanel" visible="false" includeInLayout="false" verticalCenter="0" horizontalCenter="0" width="100%" height="100%" backgroundColor="black" backgroundAlpha="0.3" show="embedPanel.setEmbedWidth()"/>
 	
 	<mx:Move id="trayHider" duration="1500" target="{tray}"/>
 </mx:Application>
