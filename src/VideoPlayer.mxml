@@ -55,19 +55,6 @@
 				setActiveElement(0);
 			}
 			
-			private function doStateChange(evt:VideoEvent):void {
-                switch (evt.currentTarget.state) {
-                	case VideoEvent.PAUSED:
-                	case VideoEvent.STOPPED:
-                	case VideoEvent.COMPLETE:
-                		reportPlayTime(video.playheadTime);
-                		break;
-                    case VideoEvent.CONNECTION_ERROR:
-                        displayError('Unable to connect to video');
-                        break;
-                }
-            }
-            
             private function createPlayList():void  {
 				enablePlayList = true;
 				playListHolder.removeAllChildren(); // if we've done this before, clean up after ourselves.
@@ -152,6 +139,19 @@
             private function onPlayListDone():void {
             	if(props.get('loop')) load();
             }
+			private function onVideoStateChange(evt:VideoEvent):void {
+				trace('STATE: ' + evt.currentTarget.state);
+                switch (evt.currentTarget.state) {
+                	case VideoEvent.PAUSED:
+                	case VideoEvent.STOPPED:
+                	case VideoEvent.COMPLETE:
+                		reportPlayTime(video.playheadTime);
+                		break;
+                    case VideoEvent.CONNECTION_ERROR:
+                        displayError('Unable to connect to video');
+                        break;
+                }
+            }
             private function onVideoComplete():void {
             	if(props.get('loop') || props.get('autoPlay')) {
             		var more:Boolean = nextElement();
@@ -159,8 +159,10 @@
             	}
             }
             private function seekVideoTo(time:int):void {
-            	if(!video.playing) playVideoElement();
+            	if(!video.playing) playVideoElement();            	
             	if(!video.totalTime || time>video.totalTime) return;
+            	var approxBufferTime:Number = video.totalTime * (video.bytesLoaded/video.bytesTotal);
+            	if(time>approxBufferTime) return;
             	if(video.playing) video.playheadTime = time;
             }
 		]]>
@@ -173,7 +175,7 @@
 	<mx:VideoDisplay id="video" source="{activeElement.get('videoSource')}" autoRewind="false"  maintainAspectRatio="false"  autoPlay="false" volume="1" horizontalCenter="0" verticalCenter="0" 
 		width="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : Application.application.width)}"
 		height="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? Application.application.height : Application.application.width/(activeElement.get('aspectRatio') as Number))}"
-		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" stateChange="doStateChange(event);"
+		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" stateChange="onVideoStateChange(event);"
 		playheadUpdate="{onVideoPlayHeadUpdate()}"
 		complete="{onVideoComplete();}"
 		/>
