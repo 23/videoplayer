@@ -16,6 +16,7 @@
 			import com.philemonworks.flex.util.HashCollection;
 			import mx.core.mx_internal;
 			import flash.external.ExternalInterface;
+			import com.SmoothImage;
 			
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
@@ -178,7 +179,7 @@
 		playheadUpdate="{onVideoPlayHeadUpdate()}"
 		complete="{onVideoComplete();}"
 		/>
-	<mx:Image id="image" source="{activeElement.get('photoSource')}" width="{video.width}" height="{video.height}" horizontalCenter="0" verticalCenter="0"	click="{playListHide(); playVideoElement()}" />
+	<com:SmoothImage id="image" source="{activeElement.get('photoSource')}" width="{video.width}" height="{video.height}" horizontalCenter="0" verticalCenter="0"	click="{playListHide(); playVideoElement()}" />
 
 	<!-- Icon/Logo -->
 	<mx:Box id="logo" visible="{(props.get('showLogo') as Boolean)}" top="15" right="15" left="15" bottom="15" horizontalAlign="{props.get('logoAlign')}" verticalAlign="{props.get('logoVAlign')}" horizontalCenter="0" verticalCenter="0">

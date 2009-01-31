@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Image xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import flash.display.Bitmap;
+			override protected function updateDisplayList(unscaledWidth:Number,unscaledHeight:Number):void{
+				super.updateDisplayList(unscaledWidth, unscaledHeight);
+				if(content is Bitmap){
+					var bmp:Bitmap = Bitmap(content);
+					if(bmp && bmp.smoothing == false){
+						bmp.smoothing = true;
+					}
+				}
+			}
+		]]>
+	</mx:Script>
+</mx:Image>
