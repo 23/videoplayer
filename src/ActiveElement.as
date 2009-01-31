@@ -48,12 +48,10 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
 	// Video source, including referer, depending on flash version and HD context
 	var videoSource:String = 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined' ? o.video_medium_download : o.video_small_download);
 	if (hasHD && playHD) videoSource = 'http://' + props.get('domain') + o.video_hd_download;
-  	videoSource += '?_referer='+encodeURIComponent(referer());
   	activeElement.put('videoSource', videoSource);
   	
   	// Photo source with referer
   	var photoSource:String = 'http://' + props.get('domain') + o.large_download;
-  	photoSource += '?_referer='+encodeURIComponent(referer());
   	activeElement.put('photoSource', photoSource);
 
   	activeElement.put('photoWidth', new Number(o.large_width));
