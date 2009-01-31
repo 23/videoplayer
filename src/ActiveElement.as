@@ -53,10 +53,6 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
   	// Photo source
   	activeElement.put('photoSource', 'http://' + props.get('domain') + o.large_download);
 
-  	// Thumbnail source
-  	var thumbSource:String = 'http://' + props.get('domain') + o.large_download;
-  	activeElement.put('photoSource', photoSource);
-
   	activeElement.put('photoWidth', new Number(o.large_width));
   	activeElement.put('photoHeight', new Number(o.large_height));
   	activeElement.put('aspectRatio', parseInt(o.large_width) / parseInt(o.large_height));
@@ -82,7 +78,7 @@ private function createItemsArray() : Array {
 		var o:Object = context.photos[i];
 		var item : Object = new Object();
 		item.itemID = i;		
-		item.photoSource = 'http://' + props.get('domain') + o.large_download;
+		item.photoSource = 'http://' + props.get('domain') + o.small_download;
 		item.videoSource = 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined' ? o.video_medium_download : o.video_small_download);
 		item.photoWidth = new Number(o.large_width);
 		item.photoHeight = new Number(o.large_height);
