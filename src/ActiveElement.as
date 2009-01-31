@@ -45,13 +45,16 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
 	var hasHD:Boolean = (h264()&&typeof(o.video_hd_download)!='undefined'&&o.video_hd_download.length>0);
 	activeElement.put('hasHD', hasHD);
 
-	// Video source, including referer, depending on flash version and HD context
+	// Video source depending on flash version and HD context
 	var videoSource:String = 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined' ? o.video_medium_download : o.video_small_download);
 	if (hasHD && playHD) videoSource = 'http://' + props.get('domain') + o.video_hd_download;
   	activeElement.put('videoSource', videoSource);
   	
-  	// Photo source with referer
-  	var photoSource:String = 'http://' + props.get('domain') + o.large_download;
+  	// Photo source
+  	activeElement.put('photoSource', 'http://' + props.get('domain') + o.large_download);
+
+  	// Thumbnail source
+  	var thumbSource:String = 'http://' + props.get('domain') + o.large_download;
   	activeElement.put('photoSource', photoSource);
 
   	activeElement.put('photoWidth', new Number(o.large_width));
