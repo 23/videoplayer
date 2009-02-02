@@ -165,6 +165,11 @@
             	if(time>approxBufferTime) return;
             	if(video.playing) video.playheadTime = time;
             }
+            private function onPlayListResize():void {
+            	var c:Array = playListHolder.getChildren();
+            	if (c.length) c[0].width = playListContainer.width;
+            }
+            
 		]]>
 	</mx:Script>	
 	
@@ -295,7 +300,7 @@
 			
 			<!-- PlayList -->
 			<mx:Canvas id="playListContainer" height="100" width="{tray.width}" backgroundColor="black" borderColor="black" borderSides="top" borderStyle="solid" borderThickness="5">
-				<mx:Canvas id="playListHolder" bottom="0"/>
+				<mx:Canvas id="playListHolder" bottom="0" width="{tray.width}" verticalScrollPolicy="off" horizontalScrollPolicy="off" resize="onPlayListResize()"/>
 			</mx:Canvas>					
 		</mx:VBox>	
 	</mx:Canvas>
