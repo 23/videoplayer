@@ -264,12 +264,12 @@
 			    		<mx:Canvas id="muteImage" width="32" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{videoControls.visible &amp;&amp; video.volume>0}" includeInLayout="{videoControls.visible &amp;&amp; video.volume>0}"
 			    			click="video.volume=0">
-			    			<mx:Image source="@Embed(source='assets/buttons/mute-off.swf')" alpha="0.7"/>
+			    			<mx:Image source="@Embed(source='assets/buttons/mute-on.swf')" alpha="0.7"/>
 						</mx:Canvas>
 			    		<mx:Canvas id="unmuteImage" width="32" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 			    			visible="{videoControls.visible &amp;&amp; video.volume==0}" includeInLayout="{videoControls.visible &amp;&amp; video.volume==0}"
 			    			click="video.volume=1">
-			    			<mx:Image source="@Embed(source='assets/buttons/mute-on.swf')" alpha="0.7"/>
+			    			<mx:Image source="@Embed(source='assets/buttons/mute-off.swf')" alpha="0.7"/>
 						</mx:Canvas>
 
 						<!-- Fullscreen -->
