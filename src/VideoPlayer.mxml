@@ -33,7 +33,9 @@
 			
 			public function init():void {
 				prepareTimers();
-				if (ExternalInterface.available) ExternalInterface.addCallback('unload', unload);
+				try {
+					if (ExternalInterface.available) ExternalInterface.addCallback('unload', unload);
+		        } catch (e:SecurityError) {} catch(e:Error) {}
 				load();
 			}
 			public function unload():void {
@@ -177,7 +179,7 @@
 	<mx:Label id="errorContainer" color="white"/>
 	
 	<!-- Image and Video -->
-	<mx:VideoDisplay id="video" source="{activeElement.get('videoSource')}" autoRewind="false"  maintainAspectRatio="false"  autoPlay="false" volume="1" horizontalCenter="0" verticalCenter="0" 
+	<mx:VideoDisplay id="video" source="{activeElement.get('videoSource')}" autoRewind="false"  maintainAspectRatio="false"  autoPlay="false" volume="1" horizontalCenter="0" verticalCenter="0" bufferTime="2"
 		width="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : Application.application.width)}"
 		height="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? Application.application.height : Application.application.width/(activeElement.get('aspectRatio') as Number))}"
 		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" stateChange="onVideoStateChange(event);"
