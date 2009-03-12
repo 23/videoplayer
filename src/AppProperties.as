@@ -16,6 +16,7 @@ public var propDefaults:Object = {
 	logoSource: 'no logo',
 	showLogo: true,
 	showShare: true,
+	browseMode: false,
 	logoPosition: 'top right',
 	logoAlpha: parseFloat('0.7'),
 	logoWidth: parseFloat('80'),

@@ -53,7 +53,13 @@
 			}
 			public function build():void {
 				if(!context || !context.photos || context.photos.length==0) displayError('Nothing to show...');
-				if(context.photos.length>1) createPlayList();
+				if(context.photos.length>1) {
+					createPlayList();
+					if(props.get('browseMode')) {
+						showPlayList = true;
+						trayShow(true, 0);
+					}
+				}
 				video.mx_internal::videoPlayer.smoothing = true;
 				setActiveElement(0);
 			}
@@ -78,13 +84,13 @@
 				showPlayList = false;
 				trayShow(true);
             }
-            private function trayShow(forceAnimation:Boolean=false):void {
+            private function trayShow(forceAnimation:Boolean=false, animationTime:int=600):void {
             	if(!props.get('showTray')) {tray.visible=false; return;}
             	trayTimer.reset(); trayTimer.start();
             	if(!tray.visible || forceAnimation) {
 	            	tray.visible = true;
             		trayHider.end();
-            		trayHider.duration = 600;
+            		trayHider.duration = animationTime;
 				  	trayHider.yFrom = tray.y; // from current position
 			        trayHider.yTo = Application.application.height - tray.height + (showPlayList ? 0 : playListContainer.height); // ... to just inside, depending on context
 			       	trayHider.play();
