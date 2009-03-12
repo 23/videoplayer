@@ -34,7 +34,7 @@
 			public function init():void {
 				prepareTimers();
 				try {
-					if (ExternalInterface.available) ExternalInterface.addCallback('unload', unload);
+					//if (ExternalInterface.available) ExternalInterface.addCallback('unload', unload);
 		        } catch (e:SecurityError) {} catch(e:Error) {}
 				load();
 			}
@@ -292,8 +292,8 @@
 						</mx:Canvas>
 
 						<!-- FeedPanel -->
-			    		<mx:Canvas id="feedpanelBtn" includeInLayout="{feedpanelBtn.visible}" width="32" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
-			    			click="embedPanel.visible=!embedPanel.visible;">
+			    		<mx:Canvas id="feedpanelBtn" visible="{(props.get('showShare') as Boolean)}" includeInLayout="{feedpanelBtn.visible}" width="32" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
+			    			click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible;">
 			    			<mx:Image source="@Embed(source='assets/buttons/share.swf')" alpha="0.7"/>
 						</mx:Canvas>
 					</mx:HBox>
