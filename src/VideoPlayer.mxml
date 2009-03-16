@@ -17,14 +17,14 @@
 			import mx.core.mx_internal;
 			import flash.external.ExternalInterface;
 			import com.SmoothImage;
+			import com.adobe.serialization.json.JSONParseError;
 			
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
-			private var defaultPhotoId:String = '';
+			private var defaultPhotoId:String = '21308';
 			private var defaultAlbumId:String = '';
 
-			private var appAspectRatio:Number = 1;
 			private var context:Object = {};
 			
 			private var playList: PlayList;
@@ -52,7 +52,7 @@
 				});
 			}
 			public function build():void {
-				if(!context || !context.photos || context.photos.length==0) displayError('Nothing to show...');
+				if(!context || !context.photos || context.photos.length==0) {displayError('Empty video stream...'); return;}
 				if(context.photos.length>1) {
 					createPlayList();
 					if(props.get('browseMode')) {
