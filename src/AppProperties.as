@@ -37,7 +37,7 @@ private function initProperties(settings:Object):void {
 
 	// Load settings from /js/video-settings?raw
 	for (name in settings) {
-		if (!propDefaults[name] || propDefaults[name].toString().length==0) continue;
+		if (typeof(propDefaults[name])=='undefined') continue;
 		// We enforce the same data type as the value in propDefaults
   		if (typeof propDefaults[name]=='boolean') {
 		 	props.put(name, new Boolean(parseFloat(settings[name])));

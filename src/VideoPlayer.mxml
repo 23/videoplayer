@@ -45,7 +45,9 @@
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
 				if(domain=='localhost') domain=defaultDomain;
-				doJSON('http://' + domain + '/js/video-settings?raw', function(o:Object):void{
+				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf$').exec(Application.application.url);			   
+				var settings_endpoint:String = 'http://' + domain + '/js/video-settings?raw' + (testCustomPlayer && testCustomPlayer.length>1 ? '&player_id=' + testCustomPlayer[1] : '');
+				doJSON(settings_endpoint, function(o:Object):void{
 					initProperties(o.settings);
 					initActiveElement();
 					doJSON((props.get('jsonSource') as String), function(o:Object):void{context=o; build();});
