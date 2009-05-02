@@ -1,16 +1,20 @@
 import flash.utils.Timer;
 
+import mx.events.VideoEvent;
+
 public function showIdentityVideo(url:String, callback:Function):void {
 	videoControls.visible = video.visible = false;
 	identityVideo.visible = true;
 	identityVideo.source = url;
 	identityVideo.play();
-	identityVideo.addEventListener(VideoEvent.COMPLETE, function():void {
+	var onComplete:Function = function():void {
 			if(!identityVideo.visible) return;
 			identityVideo.visible = false;
 			videoControls.visible = video.visible = true;
+			identityVideo.removeEventListener(VideoEvent.COMPLETE, onComplete);
 			callback();
-		});
+		}
+	identityVideo.addEventListener(VideoEvent.COMPLETE, onComplete);
 }
 
 public function showIdentityPhoto(url:String, callback:Function):void {

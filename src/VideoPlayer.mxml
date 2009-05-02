@@ -23,7 +23,7 @@
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
-			private var defaultPhotoId:String = '';
+			private var defaultPhotoId:String = '29686';
 			private var defaultAlbumId:String = '';
 
 			private var context:Object = {};
@@ -229,7 +229,7 @@
 	<com:SmoothImage id="image" source="{activeElement.get('photoSource')}" width="{video.width}" height="{video.height}" horizontalCenter="0" verticalCenter="0"	click="{playListHide(); playVideoElement()}" />
  
  	 <!-- Big Play -->
-	<mx:Canvas id="bigPlayImage" width="54" height="50" verticalCenter="0" horizontalCenter="0" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="4" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
+	<mx:Canvas id="bigPlayImage" buttonMode="true" width="54" height="50" verticalCenter="0" horizontalCenter="0" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="4" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
 		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; !video.playing &amp;&amp; !identityVideo.playing)}" includeInLayout="{bigPlayImage.visible}"   
 		click="playVideoElement()">
 		<mx:Image source="@Embed(source='assets/buttons/play.swf')" width="22" height="22" alpha="0.7"/>
