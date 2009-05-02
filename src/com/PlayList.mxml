@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="createPlayList()">
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" resize="this.parent.height=this.height;" creationComplete="createPlayList()">
 	<mx:Script>
 		<![CDATA[
 			import mx.effects.Move;
-			import com.philemonworks.PlayListItem;
+			import com.PlayListItem;
 			
 			private var _items : Array;
 			
+			public function set headline(value:String):void {playlistHeadline.text = value;}
+
 			public function set itemArray(value : Array) : void
 			{
 				_items = value;
@@ -78,10 +80,16 @@
 			
 		]]>
 	</mx:Script>
-	<mx:Move id="mover" target="{playListBox}"/>
-	<mx:Canvas id="previousBtn" click="{scrollBack()}" width="25" backgroundImage="@Embed('assets/buttons/previous.swf')" top="0" left="0" bottom="0" alpha="0.7" mouseOver="previousBtn.alpha=1;" mouseOut="previousBtn.alpha=0.7;"/>
-	<mx:Canvas verticalCenter="0" verticalScrollPolicy="off" horizontalScrollPolicy="off" left="{previousBtn.width+5}" right="{nextBtn.width+5}" id="playListCanvas">
-		<mx:HBox id="playListBox" verticalScrollPolicy="off" verticalCenter="0"/>
+	<mx:Label id="playlistHeadline" paddingTop="15" paddingLeft="25" text="" visible="{playlistHeadline.text.length>0}" includeInLayout="{playlistHeadline.visible}" 
+		fontAntiAliasType="advanced" fontSharpness="-300" fontFamily="{this.parentApplication.props.get('trayFont')}" color="{(StyleManager.getColorName(this.parentApplication.props.get('trayTextColor')) as Number)}" 
+		fontSize="{(this.parentApplication.props.get('trayTitleFontSize') as Number)}" fontWeight="{this.parentApplication.props.get('trayTitleFontWeight')}" truncateToFit="true"/>
+	
+	<mx:Canvas width="100%" height="100">
+		<mx:Canvas id="previousBtn" click="{scrollBack()}" width="25" backgroundImage="@Embed('assets/buttons/previous.swf')" top="0" left="0" bottom="0" alpha="0.7" mouseOver="previousBtn.alpha=1;" mouseOut="previousBtn.alpha=0.7;"/>
+		<mx:Canvas verticalCenter="0" verticalScrollPolicy="off" horizontalScrollPolicy="off" left="{previousBtn.width+5}" right="{nextBtn.width+5}" id="playListCanvas">
+			<mx:HBox id="playListBox" verticalScrollPolicy="off" verticalCenter="0"/>
+		</mx:Canvas>
+		<mx:Canvas id="nextBtn" click="{scrollForward()}" width="25" backgroundImage="@Embed('assets/buttons/next.swf')" top="0" right="0" bottom="0" alpha="0.7" mouseOver="nextBtn.alpha=1;" mouseOut="nextBtn.alpha=0.7;"/>
 	</mx:Canvas>
-	<mx:Canvas id="nextBtn" click="{scrollForward()}" width="25" backgroundImage="@Embed('assets/buttons/next.swf')" top="0" right="0" bottom="0" alpha="0.7" mouseOver="nextBtn.alpha=1;" mouseOut="nextBtn.alpha=0.7;"/>
-</mx:Canvas>
+	<mx:Move id="mover" target="{playListBox}"/>
+</mx:VBox>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			private var _onClose:Function = function():void {};
+			[Bindable] private var _showShare:Boolean = false; 
+			public function set title(value: String):void {textPanelTitle.text = value;}
+			public function set showShare(value:Boolean):void {_showShare=value;}
+			public function set text(value: String):void {textPanelText.htmlText = value;}
+			public function set onClose(value:Function):void {_onClose = value;}
+		]]>
+	</mx:Script>
+	<mx:VBox id="textPanelScreen" width="70%" maxWidth="500" backgroundColor="black" borderThickness="0" cornerRadius="2"
+		horizontalCenter="0" verticalCenter="0" verticalGap="5" horizontalScrollPolicy="off" verticalScrollPolicy="off" 
+		paddingTop="10" paddingRight="10" paddingBottom="10" paddingLeft="10" borderStyle="solid" >
+
+		<!-- Title and close section -->		
+		<mx:Canvas height="25" width="{textPanelScreen.width-20}">
+			<mx:Image top="0" right="0" source="@Embed('assets/buttons/close.swf')" click="{_onClose(); this.visible=false}"/>
+			<mx:Label id="textPanelTitle" truncateToFit="true" top="0" left="0" fontSize="16" fontAntiAliasType="advanced" fontWeight="bold" fontThickness="150" color="white" fontFamily="Helvetica, Arial, sans-serif"/>
+		</mx:Canvas>
+
+		<mx:TextArea id="textPanelText" top="20" right="10" width="100%" backgroundColor="black" color="white" editable="false" borderThickness="0"/>
+
+		<mx:HBox id="textPanelShareLink" buttonMode="true" paddingTop="20" click="{_onClose(); this.visible=false; this.parentApplication.embedPanel.visible=true;}" visible="{_showShare}" includeInLayout="{_showShare}">
+			<mx:Image source="@Embed(source='assets/buttons/share.swf')"/>
+			<mx:Label paddingLeft="5" paddingTop="5" text="Share this video" color="white" fontWeight="bold" fontSize="10"/>
+		</mx:HBox>
+
+	</mx:VBox>
+</mx:Canvas>

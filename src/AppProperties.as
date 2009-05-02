@@ -14,6 +14,7 @@ public var propDefaults:Object = {
 	showTray: true,
 	showDescriptions: true,
 	logoSource: 'no logo',
+	showBigPlay: true,
 	showLogo: true,
 	showShare: true,
 	browseMode: false,
@@ -21,6 +22,8 @@ public var propDefaults:Object = {
 	logoAlpha: parseFloat('0.7'),
 	logoWidth: parseFloat('80'),
 	logoHeight: parseFloat('40'),
+	recommendationHeadline: 'Also have a look at...',
+	recommendationMethod: 'channel-popular',
 
 	autoPlay: false,
 	loop: false,
@@ -83,7 +86,7 @@ private function initProperties(settings:Object):void {
 	// Use load parameters to build JSON source
 	var jsonSource:String = 'http://' + domain + '/js/photos?raw&' + loadParameters.join('&');
 	props.put('jsonSource', jsonSource);
-
+	
 	// Prepare the embed/share box with some goodies
 	var swfUrl:String = Application.application.loaderInfo.url;
 	var swfHeight:Number = Application.application.height;
@@ -115,4 +118,29 @@ private function initProperties(settings:Object):void {
 	if(props.get('playHD')) playHD = true;
 }
 
-
+private function getRecommendationSource():String {
+	var domain:String = new String(props.get('domain'));
+	if(!context || !context.photos) return('http://' + domain + '/js/photos?raw&size=20');
+	
+	if(context.photos.length==1) {
+		// There's only one video to play, we'll need to construct recommendation in another fashion.
+		var recommendationSource:String;
+		var method:String = new String(props.get('recommendationMethod'));
+		switch (method) {
+			case 'site-new':
+			case 'channel-new':
+				recommendationSource = 'http://' + domain + '/js/photos?raw&size=20&orderby=uploaded&order=desc';
+				break;
+			case 'site-popular':
+			case 'channel-popular':
+			case 'similar':
+			default:
+				recommendationSource = 'http://' + domain + '/js/photos?raw&size=20&orderby=rank&order=desc';
+				break;
+		}
+		if (context.photos[0].album_id!='' && (method=='channel-new' || method=='channel-popular')) recommendationSource += '&album_id=' + context.photos[0].album_id;
+		return(recommendationSource);
+	} else {
+		return(new String(props.get('jsonSource')));
+	}
+}

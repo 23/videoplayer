@@ -57,18 +57,9 @@
 					embedText.selectionEndIndex = embedText.text.length;
 				}
 			}
-
-			public function setEmbedWidth():void {
-				var w:int = parent.width*.8;
-				if(w<340) w=340;
-				if(w>500) w=500;
-				embedScreen.width = w;
-				trace('setEmbedWidth', w);
-			}
-
 		]]>
 	</mx:Script>
-	<mx:VBox id="embedScreen" width="360" backgroundColor="black"
+	<mx:VBox id="embedScreen" backgroundColor="black" width="80%" maxWidth="500" minWidth="340"
 		horizontalCenter="0" verticalCenter="0" verticalGap="5" horizontalScrollPolicy="off" verticalScrollPolicy="off" paddingTop="10" paddingRight="10" paddingBottom="10" paddingLeft="10" borderStyle="solid" borderThickness="0" cornerRadius="2">
 
 		<!-- Title and close section -->		
