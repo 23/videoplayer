@@ -23,7 +23,7 @@
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
-			private var defaultPhotoId:String = '29686';
+			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
 
 			private var context:Object = {};
@@ -206,6 +206,7 @@
             }
             private function onTrayResize():void {
             	if(tray.visible) trayShow(true,0); // if the tray is displayed and changes size, force a replacement
+            	resizeProgressBar();
             }
             private function resizeProgressBar():void {
             	var x:int = progressBg.x = (videoControls.visible ? videoControls.width : 0) + 4; 
@@ -247,7 +248,7 @@
 	</mx:Box>
 
 	<!-- Tray -->
-	<mx:Canvas id="tray" y="{Application.application.height-tray.height+playListHolder.height}" left="0" right="0" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="{(props.get('showTray') as Boolean)}" resize="onTrayResize();" horizontalCenter="0">
+	<mx:Canvas id="tray" y="{Application.application.height-tray.height+playListHolder.height}" x="0" width="{Application.application.width}" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="{(props.get('showTray') as Boolean)}" resize="onTrayResize();" horizontalCenter="0">
 		<mx:VBox verticalGap="0">
 			<mx:VBox id="descriptions" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontAntiAliasType="advanced" fontSharpness="-300" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" paddingLeft="2" paddingRight="2" width="{tray.width}">
 				<!-- Title and Words -->
@@ -282,7 +283,7 @@
 						</mx:Canvas>					
 						<!-- videoTime -->
 						<mx:HBox id="videoTime" visible="false" y="{(progressBg.height-videoTime.height)/2}" backgroundColor="0xFFFFFF" cornerRadius="2" borderStyle="solid" borderColor="0xFFFFFF">
-							<mx:Label selectable="false" fontGridFitType="none" fontAntiAliasType="advanced" fontSharpness="-100" text="{formatTime(video.playheadTime)}" fontFamily="Arial" fontWeight="bold" fontSize="8" height="13" color="0x000000"/>
+								<mx:Label selectable="false" fontGridFitType="none" fontAntiAliasType="advanced" fontSharpness="-100" text="{formatTime(video.playheadTime)}" fontFamily="Arial" fontWeight="bold" fontSize="8" height="13" color="0x000000"/>
 						</mx:HBox>
 					</mx:Canvas>					
 
