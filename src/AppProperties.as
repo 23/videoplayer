@@ -17,6 +17,7 @@ public var propDefaults:Object = {
 	showBigPlay: true,
 	showLogo: true,
 	showShare: true,
+	showBrowse: true,
 	browseMode: false,
 	logoPosition: 'top right',
 	logoAlpha: parseFloat('0.7'),

@@ -60,7 +60,7 @@
 				video.mx_internal::videoPlayer.smoothing = true;
 				setActiveElement(0);
 				
-				if (props.get('showTray')) {
+				if (props.get('showTray') && props.get('showBrowse')) {
 					// Generate the recommendation playlist
 					var recommendationSource:String = getRecommendationSource();
 					if(recommendationSource==props.get('jsonSource')) {
@@ -95,6 +95,7 @@
 				}
             }
 			private function playListShow():void {
+				if (!props.get('showTray') || !props.get('showBrowse')) return;
 				showPlayList = true;
 				trayShow(true);
             }
