@@ -32,7 +32,8 @@
 			private var playList: PlayList;
 			[Bindable] private var enablePlayList: Boolean = false;		
 			[Bindable] private var showPlayList: Boolean = false;
-			
+			[Bindable] private var cleanVideoState:String = 'paused';
+
 			public function init():void {
 				prepareTimers();
 				try {
@@ -175,6 +176,13 @@
             	}
             }
 			private function onVideoStateChange(evt:VideoEvent):void {
+				if(evt.currentTarget.state==VideoEvent.PLAYING || evt.currentTarget.state==VideoEvent.SEEKING) {
+					cleanVideoState = 'playing';
+				} else if(evt.currentTarget.state==VideoEvent.LOADING || evt.currentTarget.state==VideoEvent.BUFFERING) {
+					cleanVideoState = 'buffering';
+				} else if(evt.currentTarget.state==VideoEvent.DISCONNECTED || evt.currentTarget.state==VideoEvent.COMPLETE || evt.currentTarget.state==VideoEvent.PAUSED || evt.currentTarget.state==VideoEvent.STOPPED) {
+					cleanVideoState = 'paused';
+				}
                 switch (evt.currentTarget.state) {
                 	case VideoEvent.PAUSED:
                 	case VideoEvent.STOPPED:
@@ -195,11 +203,11 @@
             	}
             }
             private function seekVideoTo(time:int):void {
-            	if(!video.playing) playVideoElement();            	
+            	if(cleanVideoState=='paused') playVideoElement();            	
             	if(!video.totalTime || time>video.totalTime) return;
             	var approxBufferTime:Number = video.totalTime * (video.bytesLoaded/video.bytesTotal);
             	if(time>approxBufferTime) return;
-            	if(video.playing) video.playheadTime = time;
+            	video.playheadTime = time;
             }
             private function onPlayListResize():void {
             	var c:Array = playListHolder.getChildren();
@@ -221,7 +229,7 @@
 	<mx:Label id="errorContainer" color="white"/>
 	
 	<!-- Image and Video -->
-	<mx:VideoDisplay id="video" autoRewind="false"  maintainAspectRatio="false"  autoPlay="false" volume="1" horizontalCenter="0" verticalCenter="0" bufferTime="2"
+	<mx:VideoDisplay id="video" autoRewind="false"  maintainAspectRatio="false"  autoPlay="false" volume="1" horizontalCenter="0" verticalCenter="0" bufferTime="5"
 		width="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : Application.application.width)}"
 		height="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? Application.application.height : Application.application.width/(activeElement.get('aspectRatio') as Number))}"
 		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" stateChange="onVideoStateChange(event);"
@@ -232,7 +240,7 @@
  
  	 <!-- Big Play -->
 	<mx:Canvas id="bigPlayImage" buttonMode="true" width="54" height="50" verticalCenter="0" horizontalCenter="0" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="4" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)"
-		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; !video.playing &amp;&amp; !identityVideo.playing)}" includeInLayout="{bigPlayImage.visible}"   
+		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" includeInLayout="{bigPlayImage.visible}"   
 		click="playVideoElement()">
 		<mx:Image source="@Embed(source='assets/buttons/play.swf')" width="22" height="22" alpha="0.7"/>
 	</mx:Canvas>
@@ -240,7 +248,7 @@
 
  	
 	<!-- Extra displays for identity video and photo -->
-	<mx:VideoDisplay id="identityVideo" visible="false" volume="1" horizontalCenter="0" verticalCenter="0" bufferTime="2" width="{video.width}" height="{video.height}"/>
+	<mx:VideoDisplay id="identityVideo" visible="false" volume="1" horizontalCenter="0" verticalCenter="0" bufferTime="4" width="{video.width}" height="{video.height}"/>
 	<com:SmoothImage id="identityPhoto" visible="false" horizontalCenter="0" verticalCenter="0" maxWidth="{Application.application.width}" maxHeight="{Application.application.height}" />
 
 	<!-- Icon/Logo -->
@@ -263,15 +271,19 @@
 				<mx:Canvas width="{tray.width}">
 					<!-- Play and Pause -->
 					<mx:HBox id="videoControls" bottom="2" top="2" left="2" width="{playImage.width}" resize="resizeProgressBar();">
-			    		<mx:Canvas id="playImage" includeInLayout="{playImage.visible}" width="30" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
-			    			visible="{(!video.playing &amp;&amp; !identityVideo.playing)}"  
+			    		<mx:Canvas id="playImage" width="30" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
+			    			visible="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}" includeInLayout="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}"  
 			    			click="playVideoElement()">
 			    			<mx:Image source="@Embed(source='assets/buttons/play.swf')" alpha="0.7"/>
 						</mx:Canvas>
-			    		<mx:Canvas id="pauseImage" includeInLayout="{pauseImage.visible}" width="30" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
-			    			visible="{(video.playing || identityVideo.playing)}"  
+			    		<mx:Canvas id="pauseImage" width="30" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" mouseOver="onButtonMouseOver(event)" mouseOut="onButtonMouseOut(event)" 
+			    			visible="{(cleanVideoState=='playing' &amp;&amp; !identityVideo.visible)}" includeInLayout="{(cleanVideoState=='playing' &amp;&amp; !identityVideo.visible)}"  
 			    			click="pauseVideoElement()">
 			    			<mx:Image source="@Embed(source='assets/buttons/pause.swf')" alpha="0.7"/>
+						</mx:Canvas>
+			    		<mx:Canvas id="bufferImage" width="30" height="28" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="{(props.get('trayAlpha') as Number)}" borderStyle="solid" borderThickness="0" cornerRadius="2" 
+			    			visible="{(cleanVideoState=='buffering' &amp;&amp; !identityVideo.visible)}" includeInLayout="{(cleanVideoState=='buffering' &amp;&amp; !identityVideo.visible)}">  
+			    			<mx:Image source="@Embed(source='assets/buttons/buffering.swf')" alpha="0.7"/>
 						</mx:Canvas>
 			    	</mx:HBox>					
 						
