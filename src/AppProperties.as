@@ -56,7 +56,7 @@ private function initProperties(settings:Object):void {
 	// Read from FlashVars
 	for (name in propDefaults) {
 	  	if(typeof(Application.application.parameters[name])!='undefined') {
-	  		if(name!='showDescriptions') loadSettings.push(name + '=' + encodeURI(Application.application.parameters[name]));
+	  		if(name!='showDescriptions' && name!='autoPlay') loadSettings.push(name + '=' + encodeURI(Application.application.parameters[name]));
 	  		if (typeof propDefaults[name]=='boolean') {
 			 	props.put(name, new Boolean(parseFloat(Application.application.parameters[name])));
 		 	} else {	
@@ -73,7 +73,7 @@ private function initProperties(settings:Object):void {
 	var domain:String = URLUtil.getServerName(Application.application.url);
 	if(domain=='localhost') domain=defaultDomain;
 	props.put('domain', domain);
-    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p video_encoded_p'];
+    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'video_encoded_p'];
     for (var i:int=0; i<options.length; i++) {
 		var opt:String = options[i];
 		if (Application.application.parameters[opt]) {
