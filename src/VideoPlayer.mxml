@@ -69,7 +69,9 @@
 						recommendations=context; createPlayList();
 					} else {
 						// The list consists of recommendations, we'll need to load them 
-						doJSON(recommendationSource, function(o:Object):void{recommendations=o; createPlayList();});
+						try {
+							doJSON(recommendationSource, function(o:Object):void{recommendations=o; createPlayList();});
+				        } catch(e:JSONParseError) {enablePlayList = false; props.put('showShare', false);}
 					}
 				}
 			}
