@@ -71,7 +71,7 @@ private function initProperties(settings:Object):void {
 
 	// Determine a load parameters
 	var domain:String = URLUtil.getServerName(Application.application.url);
-	if(domain=='localhost') domain=defaultDomain;
+	if(domain=='localhost' || domain=='') domain=defaultDomain;
 	props.put('domain', domain);
     var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'video_encoded_p'];
     for (var i:int=0; i<options.length; i++) {
