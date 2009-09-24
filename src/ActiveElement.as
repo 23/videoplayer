@@ -29,6 +29,7 @@ private function resetActiveElement():void {
 
 private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
 	if (!context || !context.photos || !context.photos[i]) return(false);
+	clearVideo();
 	identityVideo.visible = false;
 	identityVideo.close();
 	showBeforeIdentity = true;
@@ -102,7 +103,11 @@ private function createItemsArray(p:Object) : Array {
 	return itemsArray;
 }
 
-private function clearVideo():void {if(video.playing) {video.stop(); video.close();}}
+private function clearVideo():void {
+	video.source = null; video.visible = false;
+	image.source = null; image.visible = false;
+    if(video.playing) {video.stop(); video.close();}
+}
 private function previousElement():Boolean {clearVideo(); return(setActiveElement(currentElementIndex-1));}
 private function nextElement():Boolean {clearVideo(); return(setActiveElement(currentElementIndex+1));}
 private function setElementByID(id:Number):void {
@@ -128,9 +133,9 @@ private function showVideoElement():void {
 
 private function playVideoElement():void {
 	if(!activeElement.get('video_p')) return;
+	image.visible=false;
 	video.visible=true;
 	videoControls.visible=progressBg.visible=true;
-	image.visible=false;
 	video.source = new String(activeElement.get('videoSource'));
 	if(showBeforeIdentity) {
 		// We'll only do this once for every element, otherwise the preroll will start on every pause/play.
