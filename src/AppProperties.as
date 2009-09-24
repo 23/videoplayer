@@ -25,6 +25,7 @@ public var propDefaults:Object = {
 	logoHeight: parseFloat('40'),
 	recommendationHeadline: 'Also have a look at...',
 	recommendationMethod: 'channel-popular',
+	lowBandwidthThresholdKbps: parseFloat('0'),
 
 	autoPlay: false,
 	loop: false,
