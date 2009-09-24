@@ -254,7 +254,7 @@
 	<!-- Tray -->
 	<mx:Canvas id="tray" y="{Application.application.height-tray.height+playListHolder.height}" x="0" width="{Application.application.width}" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="{(props.get('showTray') as Boolean)}" resize="onTrayResize();" horizontalCenter="0">
 		<mx:VBox verticalGap="0">
-			<mx:VBox id="descriptions" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontAntiAliasType="advanced" fontSharpness="-300" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" paddingLeft="2" paddingRight="2" width="{tray.width}">
+			<mx:VBox id="descriptions" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" paddingLeft="2" paddingRight="2" width="{tray.width}">
 				<!-- Title and Words -->
 				<mx:Box id="descBg" horizontalCenter="0" verticalCenter="0" verticalGap="0" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" cornerRadius="2" borderStyle="solid" borderThickness="0" width="100%" paddingTop="6" paddingBottom="6" paddingLeft="6" paddingRight="6">
 					<mx:Label id="trayTitle" fontSize="{(props.get('trayTitleFontSize') as Number)}" fontWeight="{props.get('trayTitleFontWeight')}" text="{activeElement.get('title')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayTitle.visible = (trayTitle.text.length>0);" width="{descBg.width - 15}"/>

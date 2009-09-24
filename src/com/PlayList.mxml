@@ -81,7 +81,7 @@
 		]]>
 	</mx:Script>
 	<mx:Label id="playlistHeadline" paddingTop="15" paddingLeft="25" text="" visible="{playlistHeadline.text.length>0}" includeInLayout="{playlistHeadline.visible}" 
-		fontAntiAliasType="advanced" fontSharpness="-300" fontFamily="{this.parentApplication.props.get('trayFont')}" color="{(StyleManager.getColorName(this.parentApplication.props.get('trayTextColor')) as Number)}" 
+		fontFamily="{this.parentApplication.props.get('trayFont')}" color="{(StyleManager.getColorName(this.parentApplication.props.get('trayTextColor')) as Number)}" 
 		fontSize="{(this.parentApplication.props.get('trayTitleFontSize') as Number)}" fontWeight="{this.parentApplication.props.get('trayTitleFontWeight')}" truncateToFit="true"/>
 	
 	<mx:Canvas width="100%" height="100">
