@@ -258,7 +258,7 @@
 				<!-- Title and Words -->
 				<mx:Box id="descBg" horizontalCenter="0" verticalCenter="0" verticalGap="0" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" cornerRadius="2" borderStyle="solid" borderThickness="0" width="100%" paddingTop="6" paddingBottom="6" paddingLeft="6" paddingRight="6">
 					<mx:Label id="trayTitle" fontSize="{(props.get('trayTitleFontSize') as Number)}" fontWeight="{props.get('trayTitleFontWeight')}" text="{activeElement.get('title')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayTitle.visible = (trayTitle.text.length>0);" width="{descBg.width - 15}"/>
-					<mx:Text id="trayContent" fontSize="{(props.get('trayContentFontSize') as Number)}" fontWeight="{props.get('trayContentFontWeight')}" htmlText="{activeElement.get('content')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayContent.visible = (trayContent.text.length>0);" height="{(props.get('trayContentFontSize') as Number)*2.6}" width="{descBg.width - 15}"/>
+					<mx:Text id="trayContent" fontSize="{(props.get('trayContentFontSize') as Number)}" fontWeight="{props.get('trayContentFontWeight')}" htmlText="{activeElement.get('content')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayContent.visible = (trayContent.text.length>0);" height="{(props.get('trayContentFontSize') as Number)*3.2}" width="{descBg.width - 15}"/>
 				</mx:Box>
 			</mx:VBox>
 			
