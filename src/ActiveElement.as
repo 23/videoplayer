@@ -54,6 +54,8 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
 	activeElement.put('afterDownloadUrl', 'http://' + props.get('domain') + o.after_download_url); 
 	activeElement.put('afterText', o.after_text); 
 
+	activeElement.put('one', 'http://' + props.get('domain') + o.one); 
+
 	var hasHD:Boolean = (h264()&&typeof(o.video_hd_download)!='undefined'&&o.video_hd_download.length>0);
 	activeElement.put('hasHD', hasHD);
 
@@ -83,6 +85,11 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
 
 	return(true);
 } 	
+
+private function goToActiveElement():void {
+	var request:URLRequest = new URLRequest(new String(activeElement.get('one')));
+	navigateToURL(request);
+}
 
 private function createItemsArray(p:Object) : Array {
 	itemsArray = new Array();

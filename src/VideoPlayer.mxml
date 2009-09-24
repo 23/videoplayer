@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="init();" backgroundColor="black" xmlns:com="com.*" width="100%" height="100%"  preloader="preload.CustomPreloader" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" doubleClick="goToActiveElement();" doubleClickEnabled="true" creationComplete="init();" backgroundColor="black" xmlns:com="com.*" width="100%" height="100%"  preloader="preload.CustomPreloader" verticalScrollPolicy="off" horizontalScrollPolicy="off">
  	<mx:Script source="Utility.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
  	<mx:Script source="Identity.as"></mx:Script>
