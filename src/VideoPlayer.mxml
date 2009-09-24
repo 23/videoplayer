@@ -88,7 +88,11 @@
 				playList.addEventListener(PlayListEvent.SELECT_ITEM, function(evt:PlayListEvent):void {
 						// When clicking the recommendation playlist, we shift context -- it's no longer the initially selected video, but the playlist objects
 						context = recommendations;
-            			if(evt.itemID>=0) setElementByID(evt.itemID);
+            			if(evt.itemID>=0) {
+            				setElementByID(evt.itemID); 
+            				playListHide();
+            				playVideoElement();
+            			}
             		});
 				playListHolder.addChild(playList);
 				
