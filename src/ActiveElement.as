@@ -74,7 +74,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
  	if(video_p) {
  		image.source = null;
   		showVideoElement();
-  		if (props.get('autoPlay') || startPlaying) playVideoElement();
+  		if (props.get('autoPlay') || props.get('loop') || startPlaying) playVideoElement();
   	} else {
   		showImageElement();
   	}
