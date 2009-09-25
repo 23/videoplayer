@@ -48,8 +48,18 @@
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
 				if(domain=='localhost' || domain=='') domain=defaultDomain;
-				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(Application.application.url);			   
-				var settings_endpoint:String = 'http://' + domain + '/js/video-settings?raw' + (testCustomPlayer && testCustomPlayer.length>1 ? '&player_id=' + testCustomPlayer[1] : '');
+				
+				// Are we using a specific player, or just the default? (if so, we want to specify the player id to get the correct video settings)
+				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(Application.application.url);
+				
+				// Mash up embed parameters, including .swf?..., Flashvars, width and height to get a good embed code   
+				var a:Array = []; var v:String;
+				for (v in Application.application.parameters) {a.push(encodeURIComponent(v) + '=' + encodeURIComponent(Application.application.parameters[v]));}
+				a.push('width=' + encodeURIComponent(Application.application.height));
+				a.push('height=' + encodeURIComponent(Application.application.height));
+				
+				// Get settings for this player from 23 Video
+				var settings_endpoint:String = 'http://' + domain + '/js/video-settings?raw&parameters=' + encodeURIComponent(a.join('&')) + (testCustomPlayer && testCustomPlayer.length>1 ? '&player_id=' + testCustomPlayer[1] : '');
 				doJSON(settings_endpoint, function(o:Object):void{
 					initProperties(o.settings);
 					initActiveElement();

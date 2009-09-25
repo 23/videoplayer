@@ -11,9 +11,8 @@
 			private var _rrsLink:String;
 			private var _mailLink:String;
 			
-			private var domain:String;				
-
 			public function set mailLink(value: String):void {
+				mailBox.visible = (value.length>0);
 				_mailLink = value;
 			}
 			
@@ -23,29 +22,27 @@
 			}
 			
 			public function set podcastLink(value:String):void {
+				podcastBox.visible = (value.length>0);
 				_podcastLink = value;
 			}
 			
 			public function set rssLink(value:String):void {
+				rssBox.visible = (value.length>0);
 				_rrsLink = value;
-				domain = _rrsLink.substring((_rrsLink.indexOf("://")+3),(_rrsLink.indexOf("/", _rrsLink.indexOf("://")+3)));
 			}
 			
 			private function getRss():void {
-				trace("getRSS click");
 				var request : URLRequest = new URLRequest(_rrsLink);
 				navigateToURL(request,"_blank");
 			}
 			
 			
 			private function podcastThis():void {
-				trace("podcast click");
 				var request : URLRequest = new URLRequest(_podcastLink);
 				navigateToURL(request,"_blank");
 			}
 			
 			private function sendMail():void {
-				trace("send mail click");
 				var request : URLRequest = new URLRequest(_mailLink);
 				navigateToURL(request,"_blank");
 			}

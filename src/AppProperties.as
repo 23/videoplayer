@@ -26,6 +26,11 @@ public var propDefaults:Object = {
 	recommendationHeadline: 'Also have a look at...',
 	recommendationMethod: 'channel-popular',
 	lowBandwidthThresholdKbps: parseFloat('0'),
+	
+	rssLink: '',
+	podcastLink: '',
+	embedCode: '',
+	socialSharing: true,
 
 	autoPlay: false,
 	loop: false,
@@ -90,14 +95,10 @@ private function initProperties(settings:Object):void {
 	props.put('jsonSource', jsonSource);
 	
 	// Prepare the embed/share box with some goodies
-	var swfUrl:String = Application.application.loaderInfo.url;
-	var swfHeight:Number = Application.application.height;
-	var swfWidth:Number = Application.application.width;	
-	var flashVars:String = loadSettings.join('&');
-	embedPanel.embedTextValue = '<object width="' + swfWidth + '" height="' + swfHeight + '" style="width:' + swfWidth + 'px; height:' + swfHeight + 'px; " type="application/x-shockwave-flash" data="' + swfUrl + '"><param name="movie" value="' + swfUrl + '"></param><param name="FlashVars" value="' + flashVars + '"></param><param name="allowfullscreen" value="true"></param><param name="allowscriptaccess" value="always"></param></object>"';
-	embedPanel.podcastLink = "itpc://"+domain+"/podcast/?" + loadParameters.join('&');
-	embedPanel.rssLink = "http://"+domain+"/rss/?" + loadParameters.join('&');
-	embedPanel.mailLink = "http://"+domain+"/send?popup_p=1&" + loadParameters.join('&');
+	embedPanel.embedTextValue = new String(props.get('embedCode'));
+	embedPanel.podcastLink = "http://"+domain+new String(props.get('podcastLink'));
+	embedPanel.rssLink = "http://"+domain+new String(props.get('rssLink'));
+	embedPanel.mailLink = (props.get('socialSharing') ? "http://"+domain+"/send?popup_p=1&" + loadParameters.join('&') : '');
 
 	// Test logoSource
 	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') props.put('logoSource', 'http://' + domain + '/files/sitelogo.gif');
