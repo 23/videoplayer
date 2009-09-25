@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>                                                                                                                                    
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	horizontalScrollPolicy="off" 
+	verticalScrollPolicy="off"
+	useHandCursor="true" 
+	buttonMode="true" 
+	height="28"
+	top="2" 
+	cornerRadius="2" 
+	borderStyle="solid" 
+	borderThickness="0" 
+	backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+	backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+	mouseOver="videoTime.visible=true" 
+	mouseOut="videoTime.visible=false" 
+	click="seekVideoTo((this.contentMouseX-5)/videoProgress.width*_targetVideo.totalTime);" 
+	>
+	
+	<mx:Metadata>
+	    [Event(name="seek", type="com.MyEvent")]
+	</mx:Metadata>
+
+	<!-- VideoProgress -->
+	<mx:Canvas id="videoProgress" 
+		top="11" 
+		left="10" 
+		right="10" 
+		height="6" 
+		backgroundColor="0xCCCCCC" 
+		backgroundAlpha="0.6">
+		<mx:Canvas id="videoBufferProgress" 
+			left="0" 
+			height="6" 
+			backgroundColor="white" 
+			backgroundAlpha="0.2" 
+			/>
+		<mx:Canvas id="videoPlayProgress" 
+			left="0" 
+			height="6" 
+			backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+			backgroundAlpha="0.6" 
+			/>
+	</mx:Canvas>					
+
+	<!-- videoTime -->
+	<mx:HBox id="videoTime" 
+		visible="false" 
+		y="{(this.height-videoTime.height)/2}" 
+		backgroundColor="0xFFFFFF" 
+		cornerRadius="2" 
+		borderStyle="solid" 
+		borderColor="white"
+		>
+		<mx:Label id="videoTimeLabel" 
+			selectable="false" 
+			fontFamily="Helvetica, Arial" 
+			fontSize="9" 
+			height="12" 
+			color="black"
+			/>
+	</mx:HBox>
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.events.VideoEvent;
+			import mx.controls.VideoDisplay;
+
+			// Import props hash array from main application 
+			import mx.core.Application;
+			import com.philemonworks.flex.util.HashCollection;
+			[bindable] private var props:HashCollection = mx.core.Application.application.props;
+			
+			// Component-specific functions and event-handlers
+			private function formatTime(time:int):String {return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());}
+            private function seekVideoTo(time:int):void {
+            	if(!_targetVideo) return;
+            	if(!_targetVideo.totalTime || time>_targetVideo.totalTime) return;
+            	var approxBufferTime:Number = _targetVideo.totalTime * (_targetVideo.bytesLoaded/_targetVideo.bytesTotal);
+            	if(time>approxBufferTime) return;
+            	_targetVideo.playheadTime = time;
+            	if(!_targetVideo.playing) _targetVideo.play();            	
+            }
+            private function updateBuffer(e:Event):void {
+            	if(!_targetVideo) return;
+            	videoBufferProgress.width = _targetVideo.bytesLoaded/_targetVideo.bytesTotal*videoProgress.width;
+            }
+            private function updatePlay(e:Event):void {
+            	if(!_targetVideo) return;
+            	videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*videoProgress.width;
+				videoTime.x = videoProgress.x + _targetVideo.playheadTime/_targetVideo.totalTime*videoProgress.width - videoTime.width/2;
+				videoTimeLabel.text = formatTime(_targetVideo.playheadTime);
+            }
+            
+			// Which video display are we binding to? (and attach to events)
+			private var _targetVideo:VideoDisplay;
+			public function set targetVideo(v:VideoDisplay):void {
+				_targetVideo = v;
+				v.addEventListener(VideoEvent.PLAYHEAD_UPDATE, updatePlay);
+				v.addEventListener(ProgressEvent.PROGRESS, updateBuffer);
+			}
+			public function get targetVideo():VideoDisplay {return(_targetVideo);}
+		]]>
+	</mx:Script>	
+</mx:Canvas>

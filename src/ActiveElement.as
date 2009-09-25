@@ -126,13 +126,13 @@ private function showImageElement():void {
 	clearVideo(); 
 	
 	video.visible=false;
-	videoControls.visible=progressBg.visible=false;
+	videoControls.visible=progress.visible=false;
 	
 	image.visible=true;
 }
 private function showVideoElement():void {
 	video.visible=false;
-	videoControls.visible=progressBg.visible=true;
+	videoControls.visible=progress.visible=true;
 	
 	image.source = activeElement.get('photoSource');
 	image.visible=true;
@@ -142,7 +142,7 @@ private function playVideoElement():void {
 	if(!activeElement.get('video_p')) return;
 	image.visible=false;
 	video.visible=true;
-	videoControls.visible=progressBg.visible=true;
+	videoControls.visible=progress.visible=true;
 	video.source = new String(activeElement.get('videoSource'));
 	if(showBeforeIdentity) {
 		// We'll only do this once for every element, otherwise the preroll will start on every pause/play.

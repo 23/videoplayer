@@ -6,7 +6,6 @@ import mx.utils.UIDUtil;
 public var uuid:String = UIDUtil.createUID();
 
 public function displayError(text:String):void {logo.visible=false; video.visible=false; image.visible=false; tray.visible=false; errorContainer.visible=true; errorContainer.text=text;}
-public function formatTime(time:int):String {return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());}
 
 public function lowBandwidth():Boolean {
 	return(preload.CustomPreloader.kbps < props.get('lowBandwidthThresholdKbps'));

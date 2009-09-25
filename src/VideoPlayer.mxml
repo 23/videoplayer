@@ -8,7 +8,6 @@
  	<mx:Script source="doJSON.as"></mx:Script>
 	<mx:Script>
 		<![CDATA[
-			import mx.events.EffectEvent;
 			import com.PlayListEvent;
 			import com.PlayList;
 			import mx.events.VideoEvent;
@@ -159,10 +158,6 @@
 				if(descriptions.visible) infoHide();
 				else infoShow(false); // no timeout, since this a manual action
             }
-            private function onVideoPlayHeadUpdate():void {
-            	videoPlayProgress.width  = video.playheadTime/video.totalTime*videoProgress.width;
-				videoTime.x = videoProgress.x + video.playheadTime/video.totalTime*videoProgress.width - videoTime.width/2;
-            }
             private function onPlayListDone():void {
             	if(props.get('loop')) { 
             		load();
@@ -200,13 +195,6 @@
             		onPlayListDone();
             	}
             }
-            private function seekVideoTo(time:int):void {
-            	if(cleanVideoState=='paused') playVideoElement();            	
-            	if(!video.totalTime || time>video.totalTime) return;
-            	var approxBufferTime:Number = video.totalTime * (video.bytesLoaded/video.bytesTotal);
-            	if(time>approxBufferTime) return;
-            	video.playheadTime = time;
-            }
             private function onPlayListResize():void {
             	var c:Array = playListHolder.getChildren();
             	if (c.length) c[0].width = playListContainer.width;
@@ -216,8 +204,8 @@
             	resizeProgressBar();
             }
             private function resizeProgressBar():void {
-            	var x:int = progressBg.x = (videoControls.visible ? videoControls.width : 0) + 4; 
-            	progressBg.width = tray.width - (rightPanel.width + 4) - x; 
+            	var x:int = progress.x = (videoControls.visible ? videoControls.width : 0) + 4; 
+            	progress.width = tray.width - (rightPanel.width + 4) - x; 
             }
            
 		]]>
@@ -231,7 +219,6 @@
 		width="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : Application.application.width)}"
 		height="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? Application.application.height : Application.application.width/(activeElement.get('aspectRatio') as Number))}"
 		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" stateChange="onVideoStateChange(event);"
-		playheadUpdate="{onVideoPlayHeadUpdate()}"
 		complete="onVideoComplete();"
 		/>
 	<com:SmoothImage id="image" source="{activeElement.get('photoSource')}" width="{video.width}" height="{video.height}" horizontalCenter="0" verticalCenter="0"	click="{playListHide(); playVideoElement()}" />
@@ -289,18 +276,10 @@
 			    			/>  
 			    	</mx:HBox>					
 						
-					<!-- Elements for progress bar -->
-					<mx:Canvas id="progressBg" visible="true" click="if(video.visible) seekVideoTo((progressBg.contentMouseX-5)/videoProgress.width*video.totalTime);" mouseOver="if(video.visible) videoTime.visible=true" mouseOut="videoTime.visible=false" useHandCursor="true" buttonMode="true" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" height="{playImage.height}" top="2" cornerRadius="2" borderStyle="solid" borderThickness="0" horizontalScrollPolicy="off" verticalScrollPolicy="off">
-						<!-- VideoProgress -->
-						<mx:Canvas id="videoProgress" left="5" right="5" height="6" backgroundColor="0xCCCCCC" backgroundAlpha="0.6" bottom="{(progressBg.height-6)/2}">
-							<mx:Canvas id="videoBufferProgress" left="0" width="{video.bytesLoaded/video.bytesTotal*videoProgress.width}" height="6" backgroundColor="white" backgroundAlpha="0.2" visible="{video.visible}"></mx:Canvas>
-							<mx:Canvas id="videoPlayProgress" left="0" height="6" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  backgroundAlpha="0.6" visible="{video.visible}"></mx:Canvas>
-						</mx:Canvas>					
-						<!-- videoTime -->
-						<mx:HBox id="videoTime" visible="false" y="{(progressBg.height-videoTime.height)/2}" backgroundColor="0xFFFFFF" cornerRadius="2" borderStyle="solid" borderColor="0xFFFFFF">
-							<mx:Label selectable="false" fontGridFitType="none" fontAntiAliasType="advanced" fontSharpness="-100" text="{formatTime(video.playheadTime)}" fontFamily="Arial" fontWeight="bold" fontSize="8" height="13" color="0x000000"/>
-						</mx:HBox>
-					</mx:Canvas>					
+					<!-- Progress bar -->
+					<com:PlayerProgress id="progress"
+						targetVideo="{video}"
+						visible="{video.visible}" />
 
 					<!-- Right Panel -->
 			    	<mx:HBox id="rightPanel" visible="true" bottom="2" top="2" right="2" horizontalGap="2" resize="resizeProgressBar();"> 
