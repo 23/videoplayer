@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" doubleClick="goToActiveElement();" doubleClickEnabled="true" creationComplete="init();" keyDown="trayShow()" backgroundColor="black" xmlns:com="com.*" width="100%" height="100%"  preloader="preload.CustomPreloader" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+<mx:Application 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:com="com.*" 
+	layout="absolute" 
+	verticalScrollPolicy="off" 
+	horizontalScrollPolicy="off"
+	preloader="preload.CustomPreloader" 
+	backgroundColor="black" 
+	width="100%" 
+	height="100%" 
+	doubleClickEnabled="true" 
+	doubleClick="goToActiveElement();" 
+	creationComplete="init();" 
+	keyDown="trayShow()" 
+	>
  	<mx:Script source="Utility.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
  	<mx:Script source="Identity.as"></mx:Script>
@@ -207,21 +221,44 @@
             	var x:int = progress.x = (videoControls.visible ? videoControls.width : 0) + 4; 
             	progress.width = tray.width - (rightPanel.width + 4) - x; 
             }
-           
 		]]>
 	</mx:Script>	
 	
-	<mx:Box id="background" backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" width="100%" height="100%" verticalCenter="0" horizontalCenter="0"/>
-	<mx:Label id="errorContainer" color="white"/>
+	<!-- Simple element to provide a backdrop when everything else fails -->
+	<mx:Box id="background" 
+		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" 
+		width="100%" 
+		height="100%" 
+		verticalCenter="0" 
+		horizontalCenter="0"
+		/>
+	<mx:Label id="errorContainer" 
+		color="white"
+		/>
 	
 	<!-- Image and Video -->
-	<mx:VideoDisplay id="video" autoRewind="false"  maintainAspectRatio="false"  autoPlay="false" volume="1" horizontalCenter="0" verticalCenter="0" bufferTime="5"
+	<mx:VideoDisplay id="video" 
+		autoRewind="false"  
+		maintainAspectRatio="false"  
+		autoPlay="false" 
+		volume="1" 
+		horizontalCenter="0" 
+		verticalCenter="0" 
+		bufferTime="5"
 		width="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : Application.application.width)}"
 		height="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? Application.application.height : Application.application.width/(activeElement.get('aspectRatio') as Number))}"
-		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" stateChange="onVideoStateChange(event);"
+		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" 
+		stateChange="onVideoStateChange(event);"
 		complete="onVideoComplete();"
 		/>
-	<com:SmoothImage id="image" source="{activeElement.get('photoSource')}" width="{video.width}" height="{video.height}" horizontalCenter="0" verticalCenter="0"	click="{playListHide(); playVideoElement()}" />
+	<com:SmoothImage id="image" 
+		source="{activeElement.get('photoSource')}" 
+		width="{video.width}" 
+		height="{video.height}" 
+		horizontalCenter="0" 
+		verticalCenter="0"
+		click="{playListHide(); playVideoElement()}" 
+		/>
  
  	 <!-- Big Play -->
 	<com:PlayerButton id="bigPlayImage" 
@@ -237,29 +274,117 @@
 		/>
  	
 	<!-- Extra displays for identity video and photo -->
-	<mx:VideoDisplay id="identityVideo" visible="false" volume="1" horizontalCenter="0" verticalCenter="0" bufferTime="4" width="{video.width}" height="{video.height}"/>
-	<com:SmoothImage id="identityPhoto" visible="false" horizontalCenter="0" verticalCenter="0" maxWidth="{Application.application.width}" maxHeight="{Application.application.height}" />
+	<mx:VideoDisplay id="identityVideo" 
+		visible="false" 
+		volume="1" 
+		horizontalCenter="0" 
+		verticalCenter="0" 
+		bufferTime="4" 
+		width="{video.width}" 
+		height="{video.height}"
+		/>
+	<com:SmoothImage id="identityPhoto" 
+		visible="false" 
+		horizontalCenter="0" 
+		verticalCenter="0" 
+		maxWidth="{Application.application.width}" 
+		maxHeight="{Application.application.height}" 
+		/>
 
 	<!-- Icon/Logo -->
-	<mx:Box id="logo" visible="{(props.get('showLogo') as Boolean)}" top="15" right="15" left="15" bottom="15" horizontalAlign="{props.get('logoAlign')}" verticalAlign="{props.get('logoVAlign')}" horizontalCenter="0" verticalCenter="0">
-		<mx:Image source="{props.get('logoSource')}" alpha="{(props.get('logoAlpha') as Number)}" maxWidth="{(props.get('logoWidth') as Number)}" maxHeight="{(props.get('logoHeight') as Number)}" horizontalAlign="{props.get('logoAlign')}" verticalAlign="{props.get('logoVAlign')}"/> 
+	<mx:Box 
+		id="logo" 
+		visible="{(props.get('showLogo') as Boolean)}" 
+		top="15" 
+		right="15" 
+		left="15" 
+		bottom="15" 
+		horizontalAlign="{props.get('logoAlign')}" 
+		verticalAlign="{props.get('logoVAlign')}" 
+		horizontalCenter="0" 
+		verticalCenter="0"
+		>
+		<mx:Image 
+			source="{props.get('logoSource')}" 
+			alpha="{(props.get('logoAlpha') as Number)}" 
+			maxWidth="{(props.get('logoWidth') as Number)}" 
+			maxHeight="{(props.get('logoHeight') as Number)}" 
+			horizontalAlign="{props.get('logoAlign')}" 
+			verticalAlign="{props.get('logoVAlign')}"
+			/> 
 	</mx:Box>
 
 	<!-- Tray -->
-	<mx:Canvas id="tray" y="{Application.application.height-tray.height+playListHolder.height}" x="0" width="{Application.application.width}" horizontalScrollPolicy="off" verticalScrollPolicy="off" visible="{(props.get('showTray') as Boolean)}" resize="onTrayResize();" horizontalCenter="0">
-		<mx:VBox verticalGap="0">
-			<mx:VBox id="descriptions" horizontalScrollPolicy="off" verticalScrollPolicy="off" fontFamily="{props.get('trayFont')}" color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" paddingLeft="2" paddingRight="2" width="{tray.width}">
+	<mx:Canvas id="tray" 
+		y="{Application.application.height-tray.height+playListHolder.height}" 
+		x="0" 
+		width="{Application.application.width}" 
+		horizontalScrollPolicy="off" 
+		verticalScrollPolicy="off" 
+		visible="{(props.get('showTray') as Boolean)}" 
+		resize="onTrayResize();" 
+		horizontalCenter="0"
+		>
+		<mx:VBox 
+			verticalGap="0"
+			>
+			<mx:VBox id="descriptions" 
+				horizontalScrollPolicy="off" 
+				verticalScrollPolicy="off" 
+				fontFamily="{props.get('trayFont')}" 
+				color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+				paddingLeft="2" 
+				paddingRight="2" 
+				width="{tray.width}"
+				>
 				<!-- Title and Words -->
-				<mx:Box id="descBg" horizontalCenter="0" verticalCenter="0" verticalGap="0" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="{(props.get('trayAlpha') as Number)}" cornerRadius="2" borderStyle="solid" borderThickness="0" width="100%" paddingTop="6" paddingBottom="6" paddingLeft="6" paddingRight="6">
-					<mx:Label id="trayTitle" fontSize="{(props.get('trayTitleFontSize') as Number)}" fontWeight="{props.get('trayTitleFontWeight')}" text="{activeElement.get('title')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayTitle.visible = (trayTitle.text.length>0);" width="{descBg.width - 15}"/>
-					<mx:Text id="trayContent" fontSize="{(props.get('trayContentFontSize') as Number)}" fontWeight="{props.get('trayContentFontWeight')}" htmlText="{activeElement.get('content')}" truncateToFit="true" maxWidth="{Application.application.width}" updateComplete="trayContent.visible = (trayContent.text.length>0);" height="{(props.get('trayContentFontSize') as Number)*3.2}" width="{descBg.width - 15}"/>
+				<mx:Box id="descBg" 
+					horizontalCenter="0" 
+					verticalCenter="0" 
+					verticalGap="0" 
+					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+					cornerRadius="2" 
+					borderStyle="solid" 
+					borderThickness="0" 
+					width="100%" 
+					paddingTop="6" 
+					paddingBottom="6" 
+					paddingLeft="6" 
+					paddingRight="6"
+					>
+					<mx:Label id="trayTitle" 
+						fontSize="{(props.get('trayTitleFontSize') as Number)}" 
+						fontWeight="{props.get('trayTitleFontWeight')}" 
+						text="{activeElement.get('title')}" 
+						truncateToFit="true" 
+						maxWidth="{Application.application.width}" 
+						updateComplete="trayTitle.visible = (trayTitle.text.length>0);" 
+						width="{descBg.width - 15}"
+						/>
+					<mx:Text id="trayContent" 
+						fontSize="{(props.get('trayContentFontSize') as Number)}" 
+						fontWeight="{props.get('trayContentFontWeight')}" 
+						htmlText="{activeElement.get('content')}" 
+						truncateToFit="true" 
+						maxWidth="{Application.application.width}" 
+						updateComplete="trayContent.visible = (trayContent.text.length>0);" 
+						height="{(props.get('trayContentFontSize') as Number)*3.2}" 
+						width="{descBg.width - 15}"
+						/>
 				</mx:Box>
 			</mx:VBox>
 			
 			<mx:HBox id="controlBox">
-				<mx:Canvas width="{tray.width}">
+				<mx:Canvas 
+					width="{tray.width}">
 					<!-- Play and Pause -->
-					<mx:HBox id="videoControls" bottom="2" top="2" left="2" width="{playImage.width}" resize="resizeProgressBar();">
+					<mx:HBox id="videoControls" 
+						bottom="2" 
+						top="2" 
+						left="2" 
+						width="{playImage.width}" 
+						resize="resizeProgressBar();">
 			    		<com:PlayerButton id="playImage" 
 			    			imageSource="@Embed(source='assets/buttons/play.swf')"
 			    			visible="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}" 
@@ -279,10 +404,18 @@
 					<!-- Progress bar -->
 					<com:PlayerProgress id="progress"
 						targetVideo="{video}"
-						visible="{video.visible}" />
+						visible="{video.visible}" 
+						/>
 
 					<!-- Right Panel -->
-			    	<mx:HBox id="rightPanel" visible="true" bottom="2" top="2" right="2" horizontalGap="2" resize="resizeProgressBar();"> 
+			    	<mx:HBox id="rightPanel" 
+			    		visible="true" 
+			    		bottom="2" 
+			    		top="2" 
+			    		right="2" 
+			    		horizontalGap="2" 
+			    		resize="resizeProgressBar();"
+			    		> 
 			    		<!-- PlayListBtn -->
 			    		<com:PlayerButton id="playlistBtn" 
 			    			imageSource="@Embed(source='assets/buttons/expand-on.swf')"
@@ -349,14 +482,45 @@
 			</mx:HBox>
 			
 			<!-- PlayList -->
-			<mx:Canvas id="playListContainer" height="{playListHolder.height}" width="{tray.width}" backgroundColor="black" borderColor="black" borderSides="top" borderStyle="solid" borderThickness="5">
-				<mx:Canvas id="playListHolder" bottom="0" width="{tray.width}" verticalScrollPolicy="off" horizontalScrollPolicy="off" resize="onPlayListResize()"/>
+			<mx:Canvas id="playListContainer" 
+				height="{playListHolder.height}" 
+				width="{tray.width}" 
+				backgroundColor="black" 
+				borderColor="black" 
+				borderSides="top" 
+				borderStyle="solid" 
+				borderThickness="5">
+				<mx:Canvas id="playListHolder" 
+					bottom="0" 
+					width="{tray.width}" 
+					verticalScrollPolicy="off" 
+					horizontalScrollPolicy="off" 
+					resize="onPlayListResize()"
+					/>
 			</mx:Canvas>					
 		</mx:VBox>	
 	</mx:Canvas>
 
 	<!-- Embed panel -->
-	<com:EmbedPanel id="embedPanel" visible="false" includeInLayout="false" verticalCenter="0" horizontalCenter="0" width="100%" height="100%" backgroundColor="black" backgroundAlpha="0.3"/>
+	<com:EmbedPanel id="embedPanel" 
+		visible="false" 
+		includeInLayout="false" 
+		verticalCenter="0" 
+		horizontalCenter="0" 
+		width="100%" 
+		height="100%" 
+		backgroundColor="black" 
+		backgroundAlpha="0.3"
+		/>
 	<!-- Extra displays for text -->
-	<com:TextPanel id="textPanel" visible="false" includeInLayout="false" verticalCenter="0" horizontalCenter="0" width="100%" height="100%" backgroundColor="black" backgroundAlpha="0.3"/>
+	<com:TextPanel id="textPanel" 
+		visible="false" 
+		includeInLayout="false" 
+		verticalCenter="0" 
+		horizontalCenter="0" 
+		width="100%" 
+		height="100%" 
+		backgroundColor="black" 
+		backgroundAlpha="0.3"
+		/>
 </mx:Application>
