@@ -22,8 +22,12 @@
 		<![CDATA[
 			private var _onClose:Function = function():void {};
 			[Bindable] private var _title:String; 
-			public function set title(t:String):void {_title=t;}
-			public function set onClose(value:Function):void {_onClose = value;}
+			public function set title(t:String):void {
+				_title=t;
+			}
+			public function set onClose(value:Function):void {
+				_onClose = value;
+			}
 			public function close():void {
 				this.visible=false;
 				_onClose(); 

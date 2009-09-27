@@ -6,7 +6,14 @@ import mx.utils.UIDUtil;
 import preload.CustomPreloader;
 public var uuid:String = UIDUtil.createUID();
 
-public function displayError(text:String):void {logo.visible=false; video.visible=false; image.visible=false; tray.visible=false; errorContainer.visible=true; errorContainer.text=text;}
+public function displayError(text:String):void {
+	logo.visible=false; 
+	video.visible=false; 
+	image.visible=false; 
+	tray.visible=false; 
+	errorContainer.visible=true; 
+	errorContainer.text=text;
+}
 
 public function lowBandwidth():Boolean {
 	return(preload.CustomPreloader.kbps < props.get('lowBandwidthThresholdKbps'));
