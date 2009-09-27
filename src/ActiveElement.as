@@ -86,10 +86,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
 	return(true);
 } 	
 
-private function goToActiveElement():void {
-	var request:URLRequest = new URLRequest(new String(activeElement.get('one')));
-	navigateToURL(request);
-}
+private function goToActiveElement():void {goToUrl(activeElement.get('one') as String);}
 
 private function createItemsArray(p:Object) : Array {
 	itemsArray = new Array();

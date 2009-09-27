@@ -1,8 +1,9 @@
 // Random utility functions and methods
 import flash.system.Capabilities;
-import preload.CustomPreloader;
 
 import mx.utils.UIDUtil;
+
+import preload.CustomPreloader;
 public var uuid:String = UIDUtil.createUID();
 
 public function displayError(text:String):void {logo.visible=false; video.visible=false; image.visible=false; tray.visible=false; errorContainer.visible=true; errorContainer.text=text;}
@@ -28,4 +29,9 @@ public function reportPlayTime(time:Number):void {
 	reportLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):void {});
 	reportLoader.addEventListener(IOErrorEvent.IO_ERROR, function httpStatusHandler(e:Event):void {});
 	reportLoader.load(reportRequest);	
+}
+
+public function goToUrl(url:String):void {
+	if(!new RegExp('\:\/\/').test(url)) url = 'http://' + props.get('domain') + url;
+    navigateToURL(new URLRequest(url),"_blank");
 }

@@ -94,11 +94,8 @@ private function initProperties(settings:Object):void {
 	var jsonSource:String = 'http://' + domain + '/js/photos?raw&' + loadParameters.join('&');
 	props.put('jsonSource', jsonSource);
 	
-	// Prepare the embed/share box with some goodies
-	embedPanel.embedTextValue = new String(props.get('embedCode'));
-	embedPanel.podcastLink = "http://"+domain+new String(props.get('podcastLink'));
-	embedPanel.rssLink = "http://"+domain+new String(props.get('rssLink'));
-	embedPanel.mailLink = (props.get('socialSharing') ? "http://"+domain+"/send?popup_p=1&" + loadParameters.join('&') : '');
+	// Mail link from parameters 
+	props.put('mailLink', (props.get('socialSharing') ? "/send?popup_p=1&" + loadParameters.join('&') : ''));
 
 	// Test logoSource
 	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') props.put('logoSource', 'http://' + domain + '/files/sitelogo.gif');

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>                                                                                                                                    
 <mx:Canvas
 	xmlns:mx="http://www.adobe.com/2006/mxml"
-	implements="mx.managers.IFocusManagerComponent" 
+	implements="mx.managers.IFocusManagerComponent"
+	includeInLayout="{this.visible}" 
 	useHandCursor="true" 
 	buttonMode="true" 
 	focusEnabled="true" 

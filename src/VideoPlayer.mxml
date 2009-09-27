@@ -502,16 +502,97 @@
 	</mx:Canvas>
 
 	<!-- Embed panel -->
-	<com:EmbedPanel id="embedPanel" 
-		visible="false" 
-		includeInLayout="false" 
-		verticalCenter="0" 
-		horizontalCenter="0" 
-		width="100%" 
-		height="100%" 
-		backgroundColor="black" 
-		backgroundAlpha="0.3"
-		/>
+	<com:TextPanel id="embedPanel" 
+		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}"
+		title="Share this video"
+		>
+
+		<!-- Embed section -->		
+		<mx:HBox 
+			horizontalGap="5" 
+			verticalAlign="middle"
+			paddingTop="10"
+			>
+			<mx:Image 
+				source="@Embed('assets/buttons/embed.swf')"
+				/>
+			<mx:Label 
+				text="Embed:" 
+				fontSize="14" 
+				fontWeight="bold" 
+				color="white"
+				/>
+		</mx:HBox>
+		<mx:HBox 
+			horizontalGap="10" 
+			width="100%"
+			paddingBottom="25"
+			>
+			<mx:TextArea id="embedText" 
+				paddingTop="5"
+				paddingRight="5"
+				paddingBottom="5"
+				paddingLeft="5"
+				height="30"
+				width="100%"
+				text="{props.get('embedCode')}" 
+				click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
+				backgroundColor="white" 
+				color="#333" 
+				fontSize="12" 
+				/>
+			<com:ActionButton
+				text="Copy" 
+				iconSource="@Embed(source='assets/buttons/copy.swf')"
+				click="System.setClipboard(embedText.text);"
+				/>
+		</mx:HBox>
+		
+		<!-- Share section -->		
+		<mx:HBox 
+			visible="{(props.get('showShare') as Boolean)}"
+			width="100%"
+			paddingTop="10" 
+			borderColor="#666666"
+			borderStyle="solid"
+			borderSides="top"
+			borderThickness="1"
+			>
+			<com:ActionButton
+				text="Mail video" 
+				iconSource="@Embed(source='assets/buttons/mail.swf')"
+				visible="{props.get('mailLink').length>0}"
+				click="{goToUrl(props.get('mailLink') as String)}"
+				/>
+			<com:ActionButton
+				text="Post to Facebook" 
+				iconSource="@Embed(source='assets/buttons/facebook.swf')"
+				visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link').length>0}"
+				click="{goToUrl(activeElement.get('link') + '/facebook')}"
+				/>
+			<com:ActionButton
+				text="Post to Twitter" 
+				iconSource="@Embed(source='assets/buttons/twitter.swf')"
+				visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link').length>0}"
+				click="{goToUrl(activeElement.get('link') + '/facebook')}"
+				/>
+		</mx:HBox>
+		<mx:HBox>
+			<com:ActionButton
+				text="Get as RSS" 
+				iconSource="@Embed(source='assets/buttons/rss.swf')"
+				visible="{props.get('rssLink').length>0}"
+				click="{goToUrl(props.get('rssLink') as String)}"
+				/>
+			<com:ActionButton
+				text="Get as Podcast" 
+				iconSource="@Embed(source='assets/buttons/podcast.swf')"
+				visible="{props.get('podcastLink').length>0}"
+				click="{goToUrl(props.get('podcastLink') as String)}"
+				/>
+		</mx:HBox>
+	</com:TextPanel>
+	<!-- /Embed panel -->
 
 	<!-- Text panel for post-roll html identity text -->
 	<com:TextPanel id="identityPanel" 
@@ -528,7 +609,7 @@
 			paddingTop="10" 
 			paddingBottom="20"
 			/>
-		<mx:Tile 
+		<mx:HBox 
 			visible="{(props.get('showShare') as Boolean)}"
 			width="100%"
 			paddingTop="10" 
@@ -542,7 +623,7 @@
 				iconSource="@Embed(source='assets/buttons/share.swf')"
 				click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible; identityPanel.close();"
 				/>
-		</mx:Tile>
+		</mx:HBox>
 	</com:TextPanel> 
 	<!-- / Text panel for post-roll -->
 	
