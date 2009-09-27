@@ -16,11 +16,6 @@
 	mouseOut="videoTime.visible=false" 
 	click="seekVideoTo((this.contentMouseX-5)/videoProgress.width*_targetVideo.totalTime);" 
 	>
-	
-	<mx:Metadata>
-	    [Event(name="seek", type="com.MyEvent")]
-	</mx:Metadata>
-
 	<!-- VideoProgress -->
 	<mx:Canvas id="videoProgress" 
 		top="11" 
