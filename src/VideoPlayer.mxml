@@ -568,13 +568,13 @@
 				text="Post to Facebook" 
 				iconSource="@Embed(source='assets/buttons/facebook.swf')"
 				visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link').length>0}"
-				click="{goToUrl(activeElement.get('link') + '/facebook')}"
+				click="{goToUrl(activeElement.get('link') + '/facebook?player_id=' + props.get('player_id'))}"
 				/>
 			<com:ActionButton
 				text="Post to Twitter" 
 				iconSource="@Embed(source='assets/buttons/twitter.swf')"
 				visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link').length>0}"
-				click="{goToUrl(activeElement.get('link') + '/twitter')}"
+				click="{goToUrl(activeElement.get('link') + '/twitter?player_id=' + props.get('player_id'))}"
 				/>
 		</mx:HBox>
 		<mx:HBox>
