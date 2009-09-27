@@ -574,7 +574,7 @@
 				text="Post to Twitter" 
 				iconSource="@Embed(source='assets/buttons/twitter.swf')"
 				visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link').length>0}"
-				click="{goToUrl(activeElement.get('link') + '/facebook')}"
+				click="{goToUrl(activeElement.get('link') + '/twitter')}"
 				/>
 		</mx:HBox>
 		<mx:HBox>
