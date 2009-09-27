@@ -46,13 +46,13 @@
 		verticalCenter="0" 
 		horizontalCenter="0"
 		verticalGap="10" 
-		width="90%" 
-		maxWidth="600"
+		width="95%" 
+		maxWidth="700"
 		>
 
 		<!-- Title and close section -->		
 		<mx:Canvas 
-			height="35" 
+			height="26" 
 			width="100%"
 			borderColor="#666666"
 			borderStyle="solid"
@@ -61,14 +61,14 @@
 			>
 			<mx:Image
 				buttonMode="true" 
-				top="5" 
+				top="2" 
 				right="0" 
 				source="@Embed('assets/buttons/close.swf')" 
 				click="{close();}"/>
 			<mx:Label id="textPanelTitle" 
 				top="0" 
 				left="0" 
-				fontSize="22" 
+				fontSize="20" 
 				fontWeight="bold" 
 				color="white" 
 				fontFamily="Helvetica, Arial, sans-serif"
