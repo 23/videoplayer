@@ -515,7 +515,7 @@
 
 	<!-- Text panel for post-roll html identity text -->
 	<com:TextPanel id="identityPanel" 
-		visible="true"
+		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}"
 		>
 		<mx:TextArea id="identityPanelText"
 			width="100%"
