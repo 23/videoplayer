@@ -112,8 +112,12 @@ private function clearVideo():void {
 	image.source = null; image.visible = false;
     if(video.playing) {video.stop(); video.close();}
 }
-private function previousElement():Boolean {clearVideo(); return(setActiveElement(currentElementIndex-1));}
-private function nextElement():Boolean {clearVideo(); return(setActiveElement(currentElementIndex+1));}
+private function previousElement():Boolean {
+	return(setActiveElement(currentElementIndex-1));
+}
+private function nextElement():Boolean {
+	return(setActiveElement(currentElementIndex+1));
+}
 private function setElementByID(id:Number):void {
 	clearVideo(); 
 	setActiveElement(id);
