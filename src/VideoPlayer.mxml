@@ -515,6 +515,7 @@
 
 	<!-- Text panel for post-roll html identity text -->
 	<com:TextPanel id="identityPanel" 
+		visible="true"
 		>
 		<mx:TextArea id="identityPanelText"
 			width="100%"
@@ -538,7 +539,7 @@
 			>
 			<com:ActionButton
 				text="Share this video" 
-				iconSource="@Embed(source='assets/buttons/twitter-icon.swf')"
+				iconSource="@Embed(source='assets/buttons/share.swf')"
 				click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible; identityPanel.close();"
 				/>
 		</mx:Tile>
