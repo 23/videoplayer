@@ -44,10 +44,9 @@ public function handleIdentity(event:String, callback:Function):void {
 		text = new String(activeElement.get('afterText'));
 		if (text.length>0) {
 		   	textCallback = function():void {
-				textPanel.text = text;
-				textPanel.visible = true;
-				textPanel.showShare = props.get('showShare');
-				textPanel.onClose = callback;
+				identityPanelText.htmlText = text;
+				identityPanel.visible = true;
+				identityPanel.onClose = callback;
 		   	}
 		}
 		switch (activeElement.get('afterDownloadType')) {

@@ -1,31 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml">
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	verticalScrollPolicy="off" 
+	horizontalScrollPolicy="off"
+	x="0"
+	y="0"
+	visible="false"
+	includeInLayout="false"
+	width="100%" 
+	height="100%"
+	backgroundColor="black" 
+	backgroundAlpha="0.8"
+	creationComplete="addComponents()" 
+	>
+	
+	<!-- define default property so child nodes know where to go -->
+	<mx:Metadata>
+		[DefaultProperty("contentChild")]
+	</mx:Metadata>
 	<mx:Script>
 		<![CDATA[
 			private var _onClose:Function = function():void {};
-			[Bindable] private var _showShare:Boolean = false; 
-			public function set title(value: String):void {textPanelTitle.text = value;}
-			public function set showShare(value:Boolean):void {_showShare=value;}
-			public function set text(value: String):void {textPanelText.htmlText = value;}
+			[Bindable] private var _title:String; 
+			public function set title(t:String):void {_title=t;}
 			public function set onClose(value:Function):void {_onClose = value;}
+			public function close():void {
+				this.visible=false;
+				_onClose(); 
+			}
+			
+			// Stuff to allow child-notes to be add through MXML
+			private var _components:Array;
+			public function set contentChild(value:Array):void{
+				_components = value;
+			}
+			private function addComponents():void{
+				container.removeAllChildren();
+				for(var i:int=0; i < _components.length; i++){container.addChild(_components[i]);}
+			}
 		]]>
 	</mx:Script>
-	<mx:VBox id="textPanelScreen" width="70%" maxWidth="500" backgroundColor="black" borderThickness="0" cornerRadius="2"
-		horizontalCenter="0" verticalCenter="0" verticalGap="5" horizontalScrollPolicy="off" verticalScrollPolicy="off" 
-		paddingTop="10" paddingRight="10" paddingBottom="10" paddingLeft="10" borderStyle="solid" >
+	<mx:VBox id="textPanelScreen" 
+		horizontalScrollPolicy="off" 
+		verticalScrollPolicy="off" 
+		verticalCenter="0" 
+		horizontalCenter="0"
+		verticalGap="10" 
+		width="90%" 
+		maxWidth="600"
+		>
 
 		<!-- Title and close section -->		
-		<mx:Canvas height="25" width="{textPanelScreen.width-20}">
-			<mx:Image top="0" right="0" source="@Embed('assets/buttons/close.swf')" click="{_onClose(); this.visible=false}"/>
-			<mx:Label id="textPanelTitle" truncateToFit="true" top="0" left="0" fontSize="16" fontAntiAliasType="advanced" fontWeight="bold" fontThickness="150" color="white" fontFamily="Helvetica, Arial, sans-serif"/>
+		<mx:Canvas 
+			height="35" 
+			width="100%"
+			borderColor="#666666"
+			borderStyle="solid"
+			borderSides="bottom"
+			borderThickness="1"
+			>
+			<mx:Image
+				buttonMode="true" 
+				top="5" 
+				right="0" 
+				source="@Embed('assets/buttons/close.swf')" 
+				click="{close();}"/>
+			<mx:Label id="textPanelTitle" 
+				top="0" 
+				left="0" 
+				fontSize="22" 
+				fontWeight="bold" 
+				color="white" 
+				fontFamily="Helvetica, Arial, sans-serif"
+				text="{_title}"
+				/>
 		</mx:Canvas>
 
-		<mx:TextArea id="textPanelText" top="20" right="10" width="100%" backgroundColor="black" color="white" editable="false" borderThickness="0"/>
-
-		<mx:HBox id="textPanelShareLink" buttonMode="true" paddingTop="20" click="{_onClose(); this.visible=false; this.parentApplication.embedPanel.visible=true;}" visible="{_showShare}" includeInLayout="{_showShare}">
-			<mx:Image source="@Embed(source='assets/buttons/share.swf')"/>
-			<mx:Label paddingLeft="5" paddingTop="5" text="Share this video" color="white" fontWeight="bold" fontSize="10"/>
-		</mx:HBox>
-
+		<mx:Box id="container"
+			width="100%"
+			/>			
 	</mx:VBox>
 </mx:Canvas>
