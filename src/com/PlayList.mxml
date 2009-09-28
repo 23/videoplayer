@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" resize="this.parent.height=this.height;" creationComplete="createPlayList()" paddingTop="10" paddingLeft="5" paddingRight="5">
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" resize="this.parent.height=this.height;" creationComplete="createPlayList()" paddingTop="5" paddingLeft="5" paddingRight="5">
 	<mx:Script>
 		<![CDATA[
 			import mx.effects.Move;
@@ -80,7 +80,7 @@
 			
 		]]>
 	</mx:Script>
-	<mx:Label id="playlistHeadline" paddingTop="15" paddingLeft="25" text="" visible="{playlistHeadline.text.length>0}" includeInLayout="{playlistHeadline.visible}" 
+	<mx:Label id="playlistHeadline" paddingTop="5" paddingLeft="25" text="" visible="{playlistHeadline.text.length>0}" includeInLayout="{playlistHeadline.visible}" 
 		fontFamily="{this.parentApplication.props.get('trayFont')}" color="{(StyleManager.getColorName(this.parentApplication.props.get('trayTextColor')) as Number)}" 
 		fontSize="{(this.parentApplication.props.get('trayTitleFontSize') as Number)}" fontWeight="{this.parentApplication.props.get('trayTitleFontWeight')}" truncateToFit="true"/>
 	

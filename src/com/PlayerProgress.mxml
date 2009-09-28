@@ -5,14 +5,14 @@
 	verticalScrollPolicy="off"
 	useHandCursor="true" 
 	buttonMode="true" 
-	height="33"
+	height="32"
 	top="2" 
 	click="seekVideoTo((this.contentMouseX-5)/videoProgress.width*_targetVideo.totalTime);" 
 	>
 	<!-- VideoProgress -->
 	<mx:Canvas id="videoProgress" 
 		top="9" 
-		left="10" 
+		left="5" 
 		right="10" 
 		height="9" 
 		borderColor="#999999" 
@@ -32,14 +32,14 @@
 	</mx:Canvas>					
 
 	<mx:Image id="progressHandle"
-		x="{videoPlayProgress.width+10}"
+		x="{Math.min(videoPlayProgress.width+5, videoProgress.width)}"
 		y="7"
 		source="@Embed(source='assets/buttons/progress-handle.swf')"
 		/>
 
 	<!-- videoTime -->
 	<mx:HBox id="videoTime" 
-		right="10" 
+		right="7" 
 		bottom="0"
 		>
 		<mx:Label id="videoTimeLabel" 

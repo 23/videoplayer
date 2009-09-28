@@ -231,7 +231,7 @@
 	
 	<!-- Simple element to provide a backdrop when everything else fails -->
 	<mx:Box id="background" 
-		backgroundColor="black" 
+		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" 
 		width="100%" 
 		height="100%" 
 		verticalCenter="0" 
@@ -377,13 +377,12 @@
 				borderThickness="1"
 				borderStyle="solid"
 				paddingTop="5"
-				paddingBottom="5"
 				paddingLeft="5"
 				paddingRight="5"
 				horizontalGap="5" 
 				>
 				<mx:Canvas 
-					width="{tray.width-10}">
+					width="{tray.width-12}">
 					<!-- Play and Pause -->
 					<mx:HBox id="videoControls" 
 						bottom="2" 
@@ -515,7 +514,7 @@
 
 	<!-- Embed panel -->
 	<com:TextPanel id="embedPanel"
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" 
+		backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 		title="Share this video"
 		>
 
@@ -549,7 +548,7 @@
 				width="100%"
 				text="{props.get('embedCode')}" 
 				click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
-				backgroundColor="white" 
+				backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 				color="#333" 
 				fontSize="11" 
 				/>
@@ -615,7 +614,7 @@
 
 	<!-- Text panel for post-roll html identity text -->
 	<com:TextPanel id="identityPanel"
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" 
+		backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 		>
 		<mx:TextArea id="identityPanelText"
 			width="100%"
