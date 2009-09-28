@@ -8,7 +8,7 @@
 	focusEnabled="true" 
 	tabEnabled="true"
 	keyDown="if (event.keyCode==Keyboard.ENTER) event.target.dispatchEvent(new MouseEvent(MouseEvent.CLICK));"
-	height="30"
+	height="28"
  	verticalScrollPolicy="off"
   	horizontalScrollPolicy="off"
 	>
@@ -33,12 +33,12 @@
 			selectable="false"
 			buttonMode="true"
 			useHandCursor="true"
-			verticalCenter="0" 
-			x="{(buttonIcon.visible ? 10+buttonIcon.width : 5)}"
-			paddingRight="5"
+			verticalCenter="1" 
+			x="{(buttonIcon.visible ? 8+buttonIcon.width : 3)}"
+			paddingRight="3"
 			fontSize="12" 
 			fontFamily="Arial"
-			color="white"
+			color="#333333"
 			text="{_buttonText}"
 			/>
 	

@@ -224,14 +224,14 @@
             }
             private function resizeProgressBar():void {
             	var x:int = progress.x = (videoControls.visible ? videoControls.width : 0) + 4; 
-            	progress.width = tray.width - (rightPanel.width + 4) - x; 
+            	progress.width = tray.width - (rightPanel.width + 12) - x; 
             }
 		]]>
 	</mx:Script>	
 	
 	<!-- Simple element to provide a backdrop when everything else fails -->
 	<mx:Box id="background" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" 
+		backgroundColor="black" 
 		width="100%" 
 		height="100%" 
 		verticalCenter="0" 
@@ -266,12 +266,8 @@
 		/>
  
  	 <!-- Big Play -->
-	<com:PlayerButton id="bigPlayImage" 
-		width="54" 
-		height="50"
-		imageSource="@Embed(source='assets/buttons/play.swf')"
-		imageWidth="22" 
-		imageHeight="22"
+	<mx:Image id="bigPlayImage" 
+		source="@Embed(source='assets/buttons/bigplay.swf')"
 		verticalCenter="0" 
 		horizontalCenter="0" 
 		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
@@ -325,7 +321,7 @@
 		x="0" 
 		width="{Application.application.width}" 
 		horizontalScrollPolicy="off" 
-		verticalScrollPolicy="off" 
+		verticalScrollPolicy="off"
 		visible="{(props.get('showTray') as Boolean)}" 
 		resize="onTrayResize();" 
 		horizontalCenter="0"
@@ -338,8 +334,6 @@
 				verticalScrollPolicy="off" 
 				fontFamily="{props.get('trayFont')}" 
 				color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-				paddingLeft="2" 
-				paddingRight="2" 
 				width="{tray.width}"
 				>
 				<!-- Title and Words -->
@@ -349,9 +343,6 @@
 					verticalGap="0" 
 					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-					cornerRadius="2" 
-					borderStyle="solid" 
-					borderThickness="0" 
 					width="100%" 
 					paddingTop="6" 
 					paddingBottom="6" 
@@ -380,9 +371,19 @@
 				</mx:Box>
 			</mx:VBox>
 			
-			<mx:HBox id="controlBox">
+			<mx:HBox id="controlBox"
+				backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
+				borderColor="#BBBBBB"
+				borderThickness="1"
+				borderStyle="solid"
+				paddingTop="5"
+				paddingBottom="5"
+				paddingLeft="5"
+				paddingRight="5"
+				horizontalGap="5" 
+				>
 				<mx:Canvas 
-					width="{tray.width}">
+					width="{tray.width-10}">
 					<!-- Play and Pause -->
 					<mx:HBox id="videoControls" 
 						bottom="2" 
@@ -397,11 +398,13 @@
 			    			/>
 			    		<com:PlayerButton id="pauseImage" 
 			    			imageSource="@Embed(source='assets/buttons/pause.swf')"
+			    			buttonPressed="true"
 			    			visible="{(cleanVideoState=='playing' &amp;&amp; !identityVideo.visible)}" 
 			    			click="pauseVideoElement()"
 			    			/>
 			    		<com:PlayerButton id="bufferImage"  
 			    			imageSource="@Embed(source='assets/buttons/buffering.swf')"
+			    			buttonPressed="true"
 			    			visible="{(cleanVideoState=='buffering' &amp;&amp; !identityVideo.visible)}" 
 			    			/>  
 			    	</mx:HBox>					
@@ -418,17 +421,18 @@
 			    		bottom="2" 
 			    		top="2" 
 			    		right="2" 
-			    		horizontalGap="2" 
+			    		horizontalGap="5" 
 			    		resize="resizeProgressBar();"
 			    		> 
 			    		<!-- PlayListBtn -->
 			    		<com:PlayerButton id="playlistBtn" 
 			    			imageSource="@Embed(source='assets/buttons/expand-on.swf')"
+			    			buttonPressed="true"
 			    			visible="{enablePlayList &amp;&amp; showPlayList}" 
 			    			click="playListHide()"
 			    			/>
 			    		<com:PlayerButton id="playlistBtnOn" 
-			    			imageSource="@Embed(source='assets/buttons/expand-off.swf')"
+			    			imageSource="@Embed(source='assets/buttons/expand-on.swf')"
 			    			visible="{enablePlayList &amp;&amp; !showPlayList}" 
 			    			click="playListShow()"
 			    			/>
@@ -441,6 +445,7 @@
 			    			/>
 			    		<com:PlayerButton id="hdOffBtn"
 			    			imageSource="@Embed(source='assets/buttons/hd-on.swf')"
+			    			buttonPressed="true"
 			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; playHD}" 
 			    			click="playHD=false; setActiveElement(currentElementIndex, true)"
 			    			/>
@@ -459,7 +464,8 @@
 			    			click="video.volume=0"
 			    			/>
 			    		<com:PlayerButton id="unmuteImage"
-			    			imageSource="@Embed(source='assets/buttons/mute-off.swf')"
+			    			imageSource="@Embed(source='assets/buttons/mute-on.swf')"
+			    			buttonPressed="true"
 			    			visible="{videoControls.visible &amp;&amp; video.volume==0}" 
 			    			click="video.volume=1"
 			    			/>
@@ -471,7 +477,8 @@
 			    			click="toggleFullScreen()"
 			    			/>
 			    		<com:PlayerButton id="smallscreenImage" 
-			    			imageSource="@Embed(source='assets/buttons/fullscreen-off.swf')"
+			    			imageSource="@Embed(source='assets/buttons/fullscreen-on.swf')"
+			    			buttonPressed="true"
 			    			visible="{inFullScreen}" 
 			    			click="toggleFullScreen()"
 			    			/>
@@ -490,14 +497,14 @@
 			<mx:Canvas id="playListContainer" 
 				height="{playListHolder.height}" 
 				width="{tray.width}" 
-				backgroundColor="black" 
-				borderColor="black" 
-				borderSides="top" 
-				borderStyle="solid" 
-				borderThickness="5">
+				backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
+				borderColor="#BBBBBB"
+				borderSides="right bottom left" 
+				borderStyle="solid"
+				borderThickness="1">
 				<mx:Canvas id="playListHolder" 
 					bottom="0" 
-					width="{tray.width}" 
+					width="{tray.width-2}" 
 					verticalScrollPolicy="off" 
 					horizontalScrollPolicy="off" 
 					resize="onPlayListResize()"
@@ -507,8 +514,8 @@
 	</mx:Canvas>
 
 	<!-- Embed panel -->
-	<com:TextPanel id="embedPanel" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}"
+	<com:TextPanel id="embedPanel"
+		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" 
 		title="Share this video"
 		>
 
@@ -525,20 +532,20 @@
 				text="Embed:" 
 				fontSize="13" 
 				fontWeight="bold" 
-				color="white"
+				color="#333333"
 				/>
 		</mx:HBox>
 		<mx:HBox 
-			horizontalGap="10" 
+			horizontalGap="3" 
 			width="100%"
-			paddingBottom="10"
+			paddingBottom="5"
 			>
 			<mx:TextArea id="embedText" 
-				paddingTop="3"
+				paddingTop="4"
 				paddingRight="3"
-				paddingBottom="3"
+				paddingBottom="4"
 				paddingLeft="3"
-				height="24"
+				height="28"
 				width="100%"
 				text="{props.get('embedCode')}" 
 				click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
@@ -559,13 +566,13 @@
 			verticalGap="5"
 			width="100%"
 			paddingTop="10" 
-			borderColor="#666666"
+			borderColor="#c0c0c0"
 			borderStyle="solid"
 			borderSides="top"
 			borderThickness="1"
 			>
 			<mx:HBox 
-				horizontalGap="3"
+				horizontalGap="5"
 				>
 				<com:ActionButton
 					text="Mail video" 
@@ -607,8 +614,8 @@
 	<!-- /Embed panel -->
 
 	<!-- Text panel for post-roll html identity text -->
-	<com:TextPanel id="identityPanel" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}"
+	<com:TextPanel id="identityPanel"
+		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" 
 		>
 		<mx:TextArea id="identityPanelText"
 			width="100%"
@@ -617,7 +624,7 @@
 			borderStyle="none"
 			fontSize="12" 
 			editable="false" 
-			color="white"
+			color="#333333"
 			paddingTop="10" 
 			paddingBottom="20"
 			/>
@@ -625,7 +632,7 @@
 			visible="{(props.get('showShare') as Boolean)}"
 			width="100%"
 			paddingTop="10" 
-			borderColor="#666666"
+			borderColor="#c0c0c0"
 			borderStyle="solid"
 			borderSides="top"
 			borderThickness="1"
