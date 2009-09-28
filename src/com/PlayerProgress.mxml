@@ -85,7 +85,7 @@
             private function updatePlay(e:Event):void {
             	if(!_targetVideo) return;
             	videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*videoProgress.width;
-				videoTimeLabel.text = formatTime(_targetVideo.playheadTime);
+				videoTimeLabel.text = formatTime(_targetVideo.playheadTime, _targetVideo.totalTime);
             }
             
 			// Which video display are we binding to? (and attach to events)
