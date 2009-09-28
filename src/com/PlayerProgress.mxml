@@ -67,7 +67,14 @@
 			[bindable] private var props:HashCollection = mx.core.Application.application.props;
 			
 			// Component-specific functions and event-handlers
-			private function formatTime(time:int):String {return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());}
+			private function formatTime(time:int, totalTime:int = -1, join:String = ' / '):String {
+				if (time<0) return("");
+				if (totalTime>=0) {
+					return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString() + join + Math.floor(totalTime/60).toString() +':'+ (totalTime%60<10?'0':'') + Math.round(totalTime%60).toString());
+				} else {
+					return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());
+				}
+			}
             private function seekVideoTo(time:int):void {
             	if(!_targetVideo) return;
             	if(!_targetVideo.totalTime || time>_targetVideo.totalTime) return;
