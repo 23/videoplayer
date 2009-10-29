@@ -48,10 +48,10 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
   	activeElement.put('hasInfo', hasInfo);
   	activeElement.put('link', o.one);
 
-	activeElement.put('beforeDownloadType', o.before_download_type); 
-	activeElement.put('beforeDownloadUrl', 'http://' + props.get('domain') + o.before_download_url); 
+	activeElement.put('beforeDownloadType', o.before_download_type);
+	activeElement.put('beforeDownloadUrl', 'http://' + props.get('domain') + o.before_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small'))); 
 	activeElement.put('afterDownloadType', o.after_download_type); 
-	activeElement.put('afterDownloadUrl', 'http://' + props.get('domain') + o.after_download_url); 
+	activeElement.put('afterDownloadUrl', 'http://' + props.get('domain') + o.after_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
 	activeElement.put('afterText', o.after_text); 
 
 	activeElement.put('one', 'http://' + props.get('domain') + o.one); 
