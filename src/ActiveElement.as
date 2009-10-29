@@ -148,6 +148,9 @@ private function playVideoElement():void {
 	videoControls.visible=progress.visible=true;
 	video.source = new String(activeElement.get('videoSource'));
 	if(showBeforeIdentity) {
+		// For some reason, this seems to trigger pre-buffering of the video; which is good.
+		video.play();
+		video.pause();
 		// We'll only do this once for every element, otherwise the preroll will start on every pause/play.
 		showBeforeIdentity = false;
 		handleIdentity('before', function():void {playVideoElement();});
