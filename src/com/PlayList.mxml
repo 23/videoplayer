@@ -80,7 +80,11 @@
 			
 		]]>
 	</mx:Script>
+<<<<<<< HEAD:src/com/PlayList.mxml
 	<mx:Label id="playlistHeadline" paddingTop="5" paddingLeft="25" text="" visible="{playlistHeadline.text.length>0}" includeInLayout="{playlistHeadline.visible}" 
+=======
+	<mx:Label id="playlistHeadline" paddingTop="15" paddingLeft="25" text="" visible="{playlistHeadline.text!=''}" includeInLayout="{playlistHeadline.visible}" 
+>>>>>>> master:src/com/PlayList.mxml
 		fontFamily="{this.parentApplication.props.get('trayFont')}" color="{(StyleManager.getColorName(this.parentApplication.props.get('trayTextColor')) as Number)}" 
 		fontSize="{(this.parentApplication.props.get('trayTitleFontSize') as Number)}" fontWeight="{this.parentApplication.props.get('trayTitleFontWeight')}" truncateToFit="true"/>
 	
