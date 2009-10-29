@@ -570,19 +570,19 @@
 				<com:ActionButton
 					text="Mail video" 
 					iconSource="@Embed(source='assets/buttons/mail.swf')"
-					visible="{props.get('mailLink').length>0}"
+					visible="{props.get('mailLink')!=''}"
 					click="{goToUrl(props.get('mailLink') as String)}"
 					/>
 				<com:ActionButton
 					text="Post to Facebook" 
 					iconSource="@Embed(source='assets/buttons/facebook.swf')"
-					visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link').length>0}"
+					visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link')!=''}"
 					click="{goToUrl(activeElement.get('link') + '/facebook?player_id=' + props.get('player_id'))}"
 					/>
 				<com:ActionButton
 					text="Post to Twitter" 
 					iconSource="@Embed(source='assets/buttons/twitter.swf')"
-					visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link').length>0}"
+					visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link')!=''}"
 					click="{goToUrl(activeElement.get('link') + '/twitter?player_id=' + props.get('player_id'))}"
 					/>
 			</mx:HBox>
@@ -592,13 +592,13 @@
 				<com:ActionButton
 					text="Get as RSS" 
 					iconSource="@Embed(source='assets/buttons/rss.swf')"
-					visible="{props.get('rssLink').length>0}"
+					visible="{props.get('rssLink')!=''}"
 					click="{goToUrl(props.get('rssLink') as String)}"
 					/>
 				<com:ActionButton
 					text="Get as Podcast" 
 					iconSource="@Embed(source='assets/buttons/podcast.swf')"
-					visible="{props.get('podcastLink').length>0}"
+					visible="{props.get('podcastLink')!=''}"
 					click="{goToUrl(props.get('podcastLink') as String)}"
 					/>
 			</mx:HBox>
