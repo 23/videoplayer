@@ -11,7 +11,8 @@ private function initActiveElement():void {
 }
  
 private function resetActiveElement():void {
-  	activeElement.put('video_p', false);
+  	activeElement.put('photo_id', '');
+	activeElement.put('video_p', false);
   	activeElement.put('title', '');
   	activeElement.put('content', '');
   	activeElement.put('link', '');
@@ -43,6 +44,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
   	var title:String = o.title.replace(new RegExp('(<([^>]+)>)', 'ig'), '');
   	var content:String = o.content_text.replace(new RegExp('(<([^>]+)>)', 'ig'), '');
   	var hasInfo:Boolean =  (props.get('showDescriptions') && (title.length>0 || content.length>0));
+  	activeElement.put('photo_id', o.photo_id);
   	activeElement.put('title', title);
   	activeElement.put('content', content);
   	activeElement.put('hasInfo', hasInfo);
