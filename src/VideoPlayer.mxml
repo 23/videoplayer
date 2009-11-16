@@ -61,6 +61,7 @@
 						ExternalInterface.addCallback('play', playVideoElement);
 						ExternalInterface.addCallback('getPlayState', function():String {return(cleanVideoState);});
 						ExternalInterface.addCallback('getPlayheadTime', function():Object {return(video.playheadTime);});
+						ExternalInterface.addCallback('getTotalTime', function():Object {return(video.totalTime);});
 						ExternalInterface.addCallback('getCurrentPhotoID', function():Object {return(activeElement.get('photo_id'));});
 						ExternalInterface.addCallback('getJSONSource', function():Object {return(props.get('jsonSource'));});
 					}
@@ -69,7 +70,7 @@
 			}
 			public function unload():void {
 				// This function is triggered via ExternalInterface and some JavaScript because Flex is useless.
-				video.stop();
+				video.pause();
 				if(video.playing) reportPlayTime(video.playheadTime)
 			}
 			public function load():void {
