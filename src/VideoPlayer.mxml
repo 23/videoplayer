@@ -56,12 +56,22 @@
 			public function init():void {
 				prepareTimers();
 				try {
-					//if (ExternalInterface.available) ExternalInterface.addCallback('unload', unload);
+					if (ExternalInterface.available) {
+						flash.system.Security.allowDomain('*');
+						ExternalInterface.addCallback('unload', unload);
+						ExternalInterface.addCallback('pause', pauseVideoElement);
+						ExternalInterface.addCallback('play', playVideoElement);
+						ExternalInterface.addCallback('getPlayState', function():String {return(cleanVideoState);});
+						ExternalInterface.addCallback('getPlayheadTime', function():Object {return(video.playheadTime);});
+						ExternalInterface.addCallback('getCurrentPhotoID', function():Object {return(activeElement.get('photo_id'));});
+						ExternalInterface.addCallback('getJSONSource', function():Object {return(props.get('jsonSource'));});
+					}
 		        } catch (e:SecurityError) {} catch(e:Error) {}
 				load();
 			}
 			public function unload():void {
 				// This function is triggered via ExternalInterface and some JavaScript because Flex is useless.
+				video.stop();
 				if(video.playing) reportPlayTime(video.playheadTime)
 			}
 			public function load():void {
