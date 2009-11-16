@@ -14,8 +14,6 @@
 	backgroundColor="black" 
 	width="100%" 
 	height="100%" 
-	doubleClickEnabled="true" 
-	doubleClick="goToActiveElement();" 
 	creationComplete="init();" 
 	keyDown="trayShow()" 
 	>
