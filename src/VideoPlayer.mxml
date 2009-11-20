@@ -54,16 +54,17 @@
 			public function init():void {
 				prepareTimers();
 				try {
-					if (ExternalInterface.available) {
+					if (ExternalInterface.available && ExternalInterface.objectID!=null) {
 						flash.system.Security.allowDomain('*');
-						ExternalInterface.addCallback('unload', unload);
-						ExternalInterface.addCallback('pause', pauseVideoElement);
-						ExternalInterface.addCallback('play', playVideoElement);
+						ExternalInterface.addCallback('unloadVideoPlayer', function():void {unload();});
+						ExternalInterface.addCallback('pauseVideo', function():void {pauseVideoElement();});
+						ExternalInterface.addCallback('playVideo', function():void {playVideoElement();});
 						ExternalInterface.addCallback('getPlayState', function():String {return(cleanVideoState);});
 						ExternalInterface.addCallback('getPlayheadTime', function():Object {return(video.playheadTime);});
 						ExternalInterface.addCallback('getTotalTime', function():Object {return(video.totalTime);});
 						ExternalInterface.addCallback('getCurrentPhotoID', function():Object {return(activeElement.get('photo_id'));});
 						ExternalInterface.addCallback('getJSONSource', function():Object {return(props.get('jsonSource'));});
+						ExternalInterface.addCallback('echo', function(x:Object):Object {return(x);});
 					}
 		        } catch (e:SecurityError) {} catch(e:Error) {}
 				load();
