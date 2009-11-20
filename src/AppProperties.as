@@ -99,16 +99,18 @@ private function initProperties(settings:Object):void {
 	props.put('mailLink', (props.get('socialSharing') ? "/send?popup_p=1&" + loadParameters.join('&') : ''));
 
 	// Test logoSource
-	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') props.put('logoSource', 'http://' + domain + '/files/sitelogo.gif');
-	var logoRequest:URLRequest = new URLRequest((props.get('logoSource') as String));
-	var logoLoader:URLLoader = new URLLoader();
-	logoLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):void {
-		props.put('logoSource', ''); props.put('showLogo', false);
-	});
-	logoLoader.addEventListener(IOErrorEvent.IO_ERROR, function httpStatusHandler(e:Event):void {
-		props.put('logoSource', ''); props.put('showLogo', false);
-	});
-	logoLoader.load(logoRequest);
+	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') props.put('showLogo', false);
+	if(props.get('showLogo')) {
+		var logoRequest:URLRequest = new URLRequest((props.get('logoSource') as String));
+		var logoLoader:URLLoader = new URLLoader();
+		logoLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):void {
+			props.put('logoSource', ''); props.put('showLogo', false);
+		});
+		logoLoader.addEventListener(IOErrorEvent.IO_ERROR, function httpStatusHandler(e:Event):void {
+			props.put('logoSource', ''); props.put('showLogo', false);
+		});
+		logoLoader.load(logoRequest);
+	}
 
 	// Logo position
 	var pos:String = props.get('logoPosition').toString();
