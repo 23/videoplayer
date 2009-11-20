@@ -53,9 +53,10 @@
 
 			public function init():void {
 				prepareTimers();
+				flash.system.Security.allowDomain('*');
 				try {
-					if (ExternalInterface.available && ExternalInterface.objectID!=null) {
-						flash.system.Security.allowDomain('*');
+					var objectID:String = new String(ExternalInterface.objectID);
+					if (ExternalInterface.available && (objectID.length>0 && objectID!='null')) {
 						ExternalInterface.addCallback('unloadVideoPlayer', function():void {unload();});
 						ExternalInterface.addCallback('pauseVideo', function():void {pauseVideoElement();});
 						ExternalInterface.addCallback('playVideo', function():void {playVideoElement();});
