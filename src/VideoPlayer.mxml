@@ -72,8 +72,8 @@
 			}
 			public function unload():void {
 				// This function is triggered via ExternalInterface and some JavaScript because Flex is useless.
-				video.pause();
-				if(video.playing) reportPlayTime(video.playheadTime)
+				try {if(video.playing) video.pause();} catch(e:Error){}
+				try {if(video.playing) reportPlayTime(video.playheadTime)} catch(e:Error){}
 			}
 			public function load():void {
 				var domain:String = URLUtil.getServerName(Application.application.url);
