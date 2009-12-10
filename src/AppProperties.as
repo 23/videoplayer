@@ -32,6 +32,7 @@ public var propDefaults:Object = {
 	podcastLink: '',
 	embedCode: '',
 	socialSharing: true,
+	streaming: false,
 
 	autoPlay: false,
 	loop: false,
