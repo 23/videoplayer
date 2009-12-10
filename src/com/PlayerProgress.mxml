@@ -14,7 +14,7 @@
 	backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 	mouseOver="videoTime.visible=true" 
 	mouseOut="videoTime.visible=false" 
-	click="seekVideoTo((this.contentMouseX-5)/videoProgress.width*_targetVideo.totalTime);" 
+	click="seekVideoTo((this.contentMouseX-5)/videoProgress.width*activeElement.getNumber('length'));" 
 	>
 	<!-- VideoProgress -->
 	<mx:Canvas id="videoProgress" 
@@ -25,13 +25,13 @@
 		backgroundColor="0xCCCCCC" 
 		backgroundAlpha="0.6">
 		<mx:Canvas id="videoBufferProgress" 
-			left="0" 
+			x="0" 
 			height="6" 
 			backgroundColor="white" 
 			backgroundAlpha="0.2" 
 			/>
 		<mx:Canvas id="videoPlayProgress" 
-			left="0" 
+			x="0"
 			height="6" 
 			backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 			backgroundAlpha="0.6" 
@@ -65,6 +65,7 @@
 			import mx.core.Application;
 			import com.philemonworks.flex.util.HashCollection;
 			[bindable] private var props:HashCollection = mx.core.Application.application.props;
+			[bindable] private var activeElement:HashCollection = mx.core.Application.application.activeElement;
 			
 			// Component-specific functions and event-handlers
 			private function formatTime(time:int, totalTime:int = -1, join:String = ' / '):String {
@@ -77,22 +78,37 @@
 			}
             private function seekVideoTo(time:int):void {
             	if(!_targetVideo) return;
-            	if(!_targetVideo.totalTime || time>_targetVideo.totalTime) return;
-            	var approxBufferTime:Number = _targetVideo.totalTime * (_targetVideo.bytesLoaded/_targetVideo.bytesTotal);
-            	if(time>approxBufferTime) return;
-            	_targetVideo.playheadTime = time;
-            	if(!_targetVideo.playing) _targetVideo.play();            	
+            	if(time>activeElement.getNumber('length')) return;
+            	var approxBufferTime:Number = (_targetVideo.totalTime * (_targetVideo.bytesLoaded/_targetVideo.bytesTotal)) + activeElement.getNumber('start');
+            	if(time>new Number(activeElement.get('start')) && time<approxBufferTime) {
+            		_targetVideo.playheadTime = time-activeElement.getNumber('start');
+            		if(!_targetVideo.playing) _targetVideo.play();
+            	} else {
+            		if ((props.get('streaming') as Boolean)) {
+            			activeElement.put('start', time);
+            			activeElement.put('skip', '1');
+            			_targetVideo.stop();
+            			_targetVideo.source = getFullVideoSource();
+            			_targetVideo.play();
+            		}
+            	}
             }
             private function updateBuffer(e:Event):void {
             	if(!_targetVideo) return;
-            	videoBufferProgress.width = _targetVideo.bytesLoaded/_targetVideo.bytesTotal*videoProgress.width;
+            	videoBufferProgress.x = activeElement.getNumber('start') / activeElement.getNumber('length') * videoProgress.width;
+            	videoBufferProgress.width = _targetVideo.bytesLoaded/_targetVideo.bytesTotal*(videoProgress.width-videoBufferProgress.x);
             }
             private function updatePlay(e:Event):void {
             	if(!_targetVideo) return;
-            	videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*videoProgress.width;
-				videoTime.x = videoProgress.x + _targetVideo.playheadTime/_targetVideo.totalTime*videoProgress.width - videoTime.width/2;
-				videoTimeLabel.text = formatTime(_targetVideo.playheadTime);
+				videoPlayProgress.x = activeElement.getNumber('start') / activeElement.getNumber('length') * videoProgress.width;
+				videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*(videoProgress.width-videoPlayProgress.x);
+				videoTime.x = videoPlayProgress.x + videoPlayProgress.width - (videoTime.width/2);
+				videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'));
             }
+
+			private function getFullVideoSource():String {
+				return(activeElement.getString('videoSource') + '?start=' + encodeURIComponent(activeElement.getString('start')) + '&skip=' + encodeURIComponent(activeElement.getString('skip')));
+			}            
             
 			// Which video display are we binding to? (and attach to events)
 			private var _targetVideo:VideoDisplay;
