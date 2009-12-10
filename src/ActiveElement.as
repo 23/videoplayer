@@ -25,7 +25,10 @@ private function resetActiveElement():void {
 	activeElement.put('beforeDownloadUrl', ''); 
 	activeElement.put('afterDownloadType', ''); 
 	activeElement.put('afterDownloadUrl', ''); 
-	activeElement.put('afterText', ''); 
+	activeElement.put('afterText', '');
+	activeElement.put('length', '0');
+	activeElement.put('start', '0');
+	activeElement.put('skip', '0');
 }
 
 private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
@@ -49,6 +52,8 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
   	activeElement.put('content', content);
   	activeElement.put('hasInfo', hasInfo);
   	activeElement.put('link', o.one);
+  	activeElement.put('length', o.video_length); 
+  	activeElement.put('start', 0);
 
 	activeElement.put('beforeDownloadType', o.before_download_type);
 	activeElement.put('beforeDownloadUrl', 'http://' + props.get('domain') + o.before_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small'))); 
@@ -148,7 +153,7 @@ private function playVideoElement():void {
 	image.visible=false;
 	video.visible=true;
 	videoControls.visible=progress.visible=true;
-	video.source = new String(activeElement.get('videoSource'));
+	video.source = activeElement.getString('videoSource')
 	if(showBeforeIdentity) {
 		// For some reason, this seems to trigger pre-buffering of the video; which is good.
 		video.play();
