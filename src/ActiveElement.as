@@ -31,7 +31,7 @@ private function resetActiveElement():void {
 	activeElement.put('skip', '0');
 }
 
-private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
+private function setActiveElement(i:int, startPlaying:Boolean=false, start:Number=0, skip:int=0):Boolean {
 	if (!context || !context.photos || !context.photos[i]) return(false);
 	clearVideo();
 	identityVideo.visible = false;
@@ -53,7 +53,8 @@ private function setActiveElement(i:int, startPlaying:Boolean=false):Boolean {
   	activeElement.put('hasInfo', hasInfo);
   	activeElement.put('link', o.one);
   	activeElement.put('length', o.video_length); 
-  	activeElement.put('start', 0);
+  	activeElement.put('start', start);
+  	activeElement.put('skip', skip);
 
 	activeElement.put('beforeDownloadType', o.before_download_type);
 	activeElement.put('beforeDownloadUrl', 'http://' + props.get('domain') + o.before_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small'))); 
@@ -153,7 +154,7 @@ private function playVideoElement():void {
 	image.visible=false;
 	video.visible=true;
 	videoControls.visible=progress.visible=true;
-	video.source = activeElement.getString('videoSource')
+	video.source = getFullVideoSource();
 	if(showBeforeIdentity) {
 		// For some reason, this seems to trigger pre-buffering of the video; which is good.
 		video.play();
@@ -169,4 +170,8 @@ private function pauseVideoElement():void {
 	playVideoElement();
 	video.pause();
 }
+
+private function getFullVideoSource():String {
+	return(activeElement.getString('videoSource') + '?start=' + encodeURIComponent(activeElement.getString('start')) + '&skip=' + encodeURIComponent(activeElement.getString('skip')));
+}            
 

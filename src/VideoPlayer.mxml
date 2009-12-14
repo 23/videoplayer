@@ -449,12 +449,12 @@
 			    		<com:PlayerButton id="hdBtn" 
 			    			imageSource="@Embed(source='assets/buttons/hd-off.swf')"
 			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; !playHD}" 
-			    			click="playHD=true; setActiveElement(currentElementIndex, true)"
+			    			click="playHD=true; setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1)"
 			    			/>
 			    		<com:PlayerButton id="hdOffBtn"
 			    			imageSource="@Embed(source='assets/buttons/hd-on.swf')"
 			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; playHD}" 
-			    			click="playHD=false; setActiveElement(currentElementIndex, true)"
+			    			click="playHD=false; setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1)"
 			    			/>
 
 			    		<!-- InfoBtn -->
