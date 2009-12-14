@@ -59,7 +59,17 @@ package com.philemonworks.flex.util
 		[Bindable("collectionChange")]
 		public function getString(key:String):String {
 			var value:Object = this.get(key)
-			return value == null ? null : value as String
+			//return value == null ? null : value as String
+			return(new String(value));
+		}
+
+		/**
+		 * Convenience method to access a Number value
+		 */
+		[Bindable("collectionChange")]
+		public function getNumber(key:String):Number {
+			var value:Object = this.get(key)
+			return ((value==null || !(new RegExp('^[0-9]+\.?[0-9]*$', 'img').test(new String(value)))) ? 0 : new Number(value));
 		}
 	}
 }

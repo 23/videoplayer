@@ -7,7 +7,7 @@
 	buttonMode="true" 
 	height="32"
 	top="2" 
-	click="seekVideoTo((this.contentMouseX-5)/videoProgress.width*_targetVideo.totalTime);" 
+	click="seekVideoTo((this.contentMouseX-5)/videoProgress.width*activeElement.getNumber('length'));" 
 	>
 	<!-- VideoProgress -->
 	<mx:Canvas id="videoProgress" 
@@ -20,19 +20,19 @@
 		borderThickness="1" 
 	 	>
 		<mx:Canvas id="videoBufferProgress" 
-			left="0" 
+			x="0" 
 			height="7" 
 			backgroundColor="#DDDDDD" 
 			/>
 		<mx:Canvas id="videoPlayProgress" 
-			left="0" 
+			x="0" 
 			height="7" 
 			backgroundColor="#999999" 
 			/>
 	</mx:Canvas>					
 
 	<mx:Image id="progressHandle"
-		x="{Math.min(videoPlayProgress.width+5, videoProgress.width)}"
+		x="{Math.min(videoPlayProgress.x+videoPlayProgress.width+5, videoPlayProgress.x+videoProgress.width)}"
 		y="7"
 		source="@Embed(source='assets/buttons/progress-handle.swf')"
 		/>
@@ -60,6 +60,7 @@
 			import mx.core.Application;
 			import com.philemonworks.flex.util.HashCollection;
 			[bindable] private var props:HashCollection = mx.core.Application.application.props;
+			[bindable] private var activeElement:HashCollection = mx.core.Application.application.activeElement;
 			
 			// Component-specific functions and event-handlers
 			private function formatTime(time:int, totalTime:int = -1, join:String = ' / '):String {
@@ -72,21 +73,36 @@
 			}
             private function seekVideoTo(time:int):void {
             	if(!_targetVideo) return;
-            	if(!_targetVideo.totalTime || time>_targetVideo.totalTime) return;
-            	var approxBufferTime:Number = _targetVideo.totalTime * (_targetVideo.bytesLoaded/_targetVideo.bytesTotal);
-            	if(time>approxBufferTime) return;
-            	_targetVideo.playheadTime = time;
-            	if(!_targetVideo.playing) _targetVideo.play();            	
+            	if(time>activeElement.getNumber('length')) return;
+            	var approxBufferTime:Number = (_targetVideo.totalTime * (_targetVideo.bytesLoaded/_targetVideo.bytesTotal)) + activeElement.getNumber('start');
+            	if(time>new Number(activeElement.get('start')) && time<approxBufferTime) {
+            		_targetVideo.playheadTime = time-activeElement.getNumber('start');
+            		if(!_targetVideo.playing) _targetVideo.play();
+            	} else {
+            		if ((props.get('streaming') as Boolean)) {
+            			activeElement.put('start', time);
+            			activeElement.put('skip', '1');
+            			_targetVideo.stop();
+            			_targetVideo.source = getFullVideoSource();
+            			_targetVideo.play();
+            		}
+            	}
             }
             private function updateBuffer(e:Event):void {
             	if(!_targetVideo) return;
-            	videoBufferProgress.width = _targetVideo.bytesLoaded/_targetVideo.bytesTotal*videoProgress.width;
+            	videoBufferProgress.x = activeElement.getNumber('start') / activeElement.getNumber('length') * videoProgress.width;
+            	videoBufferProgress.width = _targetVideo.bytesLoaded/_targetVideo.bytesTotal*(videoProgress.width-videoBufferProgress.x);
             }
             private function updatePlay(e:Event):void {
             	if(!_targetVideo) return;
-            	videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*videoProgress.width;
-				videoTimeLabel.text = formatTime(_targetVideo.playheadTime, _targetVideo.totalTime);
+				videoPlayProgress.x = activeElement.getNumber('start') / activeElement.getNumber('length') * videoProgress.width;
+				videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*(videoProgress.width-videoPlayProgress.x);
+				videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'));
             }
+
+			private function getFullVideoSource():String {
+				return(activeElement.getString('videoSource') + '?start=' + encodeURIComponent(activeElement.getString('start')) + '&skip=' + encodeURIComponent(activeElement.getString('skip')));
+			}            
             
 			// Which video display are we binding to? (and attach to events)
 			private var _targetVideo:VideoDisplay;
