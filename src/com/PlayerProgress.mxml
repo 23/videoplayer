@@ -97,7 +97,7 @@
             	if(!_targetVideo) return;
 				videoPlayProgress.x = activeElement.getNumber('start') / activeElement.getNumber('length') * videoProgress.width;
 				videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*(videoProgress.width-videoPlayProgress.x);
-				videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'));
+				videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'), activeElement.getNumber('length'));
             }
 
 			private function getFullVideoSource():String {
