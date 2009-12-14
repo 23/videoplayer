@@ -199,6 +199,17 @@
             	}
             }
 			private function onVideoStateChange(evt:VideoEvent):void {
+				// Flex VideoDisplay shows weird stuff during seek; to avoid this,
+				// we show a bitmap snapshot from the video during seek and wait for playing
+				if (evt.currentTarget.state==VideoEvent.SEEKING) {
+					var bmData:BitmapData = new BitmapData(video.width, video.height);  
+					bmData.draw(video as DisplayObject);  
+					var bm:Bitmap = new Bitmap(bmData);  
+					videoShadow.source = bm;
+					videoShadow.visible = true;
+				} 
+				if (evt.currentTarget.state==VideoEvent.PLAYING) videoShadow.visible = false;
+				
 				if(evt.currentTarget.state==VideoEvent.PLAYING || evt.currentTarget.state==VideoEvent.SEEKING) {
 					cleanVideoState = 'playing';
 				} else if(evt.currentTarget.state==VideoEvent.LOADING || evt.currentTarget.state==VideoEvent.BUFFERING) {
@@ -268,6 +279,13 @@
 		stateChange="onVideoStateChange(event);"
 		complete="onVideoComplete();"
 		/>
+	<com:SmoothImage id="videoShadow" 
+		horizontalCenter="0" 
+		verticalCenter="0"
+		width="{video.width}"
+		height="{video.height}"
+		includeInLayout="{videoShadow.visible}"
+		/> 
 	<com:SmoothImage id="image" 
 		source="{activeElement.get('photoSource')}" 
 		width="{video.width}" 
