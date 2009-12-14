@@ -30,7 +30,7 @@ public function h264():Boolean {
 
 public function reportPlayTime(time:Number):void {
 	var id:int = context.photos[currentElementIndex].photo_id;
-	var url:String = 'http://' + props.get('domain') + '/actions?action=report-play-time&uuid=' + encodeURIComponent(uuid) + '&id=' + encodeURIComponent(new String(id)) + '&time=' + encodeURIComponent(new String(time));
+	var url:String = 'http://' + props.get('domain') + '/actions?action=report-play-time&uuid=' + encodeURIComponent(uuid) + '&id=' + encodeURIComponent(new String(id)) + '&time=' + encodeURIComponent(new String(time+activeElement.getNumber('start'))) + '&start=' + encodeURIComponent(activeElement.getString('start'));
 	var reportRequest:URLRequest = new URLRequest(url);
 	var reportLoader:URLLoader = new URLLoader();
 	reportLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):void {});

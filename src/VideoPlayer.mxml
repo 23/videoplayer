@@ -208,7 +208,7 @@
 				}
                 switch (evt.currentTarget.state) {
                 	case VideoEvent.PAUSED:
-                	case VideoEvent.STOPPED:
+                	case VideoEvent.PLAYING:
                 		reportPlayTime(video.playheadTime);
                 		break;
                     case VideoEvent.CONNECTION_ERROR:
@@ -217,6 +217,7 @@
                 }
             }
             private function onVideoComplete(ignoreIdentity:Boolean=false):void {
+     			reportPlayTime(video.playheadTime);
      			if(!ignoreIdentity) return(handleIdentity('after', function():void {onVideoComplete(true);}));
             	if(props.get('loop') || props.get('autoPlay')) {
             		var more:Boolean = nextElement();
