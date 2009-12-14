@@ -201,14 +201,16 @@
 			private function onVideoStateChange(evt:VideoEvent):void {
 				// Flex VideoDisplay shows weird stuff during seek; to avoid this,
 				// we show a bitmap snapshot from the video during seek and wait for playing
-				if (evt.currentTarget.state==VideoEvent.SEEKING) {
+				if (evt.currentTarget.state==VideoEvent.PAUSED || evt.currentTarget.state==VideoEvent.STOPPED) {
 					var bmData:BitmapData = new BitmapData(video.width, video.height);  
 					bmData.draw(video as DisplayObject);  
 					var bm:Bitmap = new Bitmap(bmData);  
 					videoShadow.source = bm;
+				} else if (evt.currentTarget.state==VideoEvent.LOADING) {
 					videoShadow.visible = true;
-				} 
-				if (evt.currentTarget.state==VideoEvent.PLAYING) videoShadow.visible = false;
+				} else if (evt.currentTarget.state==VideoEvent.PLAYING) {
+					videoShadow.visible = false;
+				}
 				
 				if(evt.currentTarget.state==VideoEvent.PLAYING || evt.currentTarget.state==VideoEvent.SEEKING) {
 					cleanVideoState = 'playing';
