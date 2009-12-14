@@ -118,6 +118,9 @@ private function initProperties(settings:Object):void {
 	props.put('logoAlign', (new RegExp('left').test(pos) ? 'left' : 'right'));
 	props.put('logoVAlign', (new RegExp('top').test(pos) ? 'top' : 'bottom'));
 	
+	// If bandwidth or player doesn't allow h264 quality, we won't allow streaming
+	if (!h264()) props.put('streaming', 0);
+	
 	// Should we start by playing HD? 
 	if(props.get('playHD')) playHD = true;
 }
