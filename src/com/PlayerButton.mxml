@@ -2,17 +2,12 @@
 <mx:Canvas 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	implements="mx.managers.IFocusManagerComponent" 
-	width="32" 
-	height="28"  
+	width="26" 
+	height="22"  
 	focusEnabled="true" 
 	tabEnabled="true"
 	buttonMode="true"  
 	keyDown="if (event.keyCode==Keyboard.ENTER) event.target.dispatchEvent(new MouseEvent(MouseEvent.CLICK));"
-	backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
-	backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-	borderStyle="solid" 
-	borderThickness="0" 
-	cornerRadius="2" 
 	mouseOver="onButtonMouseOver(event)" 
 	mouseOut="onButtonMouseOut(event)"
 	hide="onVisibilityChange()"
@@ -27,7 +22,6 @@
 			[bindable] private var props:HashCollection = mx.core.Application.application.props;
 			public var imageContainer:Image = new Image();
 			public function set imageSource(source:Object):void {
-				imageContainer.alpha = 0.7;
 				imageContainer.source = source;
 				this.addChild(imageContainer);					
 			}
@@ -41,12 +35,8 @@
 				this.includeInLayout = this.visible;
 			}
 			private function onButtonMouseOver(e:Event):void {
-    	    	e.currentTarget.setStyle('backgroundAlpha', 1);
-        	    e.currentTarget.getChildren()[0].alpha = 1;         	
 			}
 	        private function onButtonMouseOut(e:Event):void {
-    	    	e.currentTarget.setStyle('backgroundAlpha', props.get('trayAlpha'));
-        	    e.currentTarget.getChildren()[0].alpha = 0.7;
 	        }
 		]]>
 	</mx:Script>

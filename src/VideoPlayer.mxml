@@ -38,7 +38,7 @@
 			import com.adobe.serialization.json.JSONParseError;
 			
 			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = 'reference.dev.visualtube.net';
+			private var defaultDomain:String = 'www.interton.tv';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
@@ -153,14 +153,14 @@
             private function trayShow():void {
             	if(!props.get('showTray')) {tray.visible=false; return;}
             	trayTimer.reset(); trayTimer.start();
-		        tray.y = Application.application.height - tray.height + (showPlayList ? 0 : playListHolder.height); // ... to just inside, depending on context
+		        tray.y = 2 + Application.application.height - tray.height + (showPlayList ? 0 : playListHolder.height); // ... to just inside, depending on context
             	tray.visible = true;
             }            
             private function trayHide():void {
             	if (showPlayList) return;
             	trayTimer.stop();
             	if(props.getNumber('trayTimeout')<=0) return;
-				tray.y = Application.application.height; // ... to outside of frame
+				tray.y = Application.application.height+2; // ... to outside of frame
                 tray.visible = false;
             }            
 			private var trayTimer:Timer = new Timer(3000,1);
@@ -250,8 +250,8 @@
             	resizeProgressBar();
             }
             private function resizeProgressBar():void {
-            	var x:int = progress.x = (videoControls.visible ? videoControls.width : 0) + 4; 
-            	progress.width = tray.width - (rightPanel.width + 4) - x; 
+            	//var x:int = progress.x = (videoControls.visible ? videoControls.width : 0) + 4; 
+            	//progress.width = tray.width - (rightPanel.width + 4) - x; 
             }
 		]]>
 	</mx:Script>	
@@ -307,11 +307,9 @@
  
  	 <!-- Big Play -->
 	<com:PlayerButton id="bigPlayImage" 
-		width="54" 
-		height="50"
-		imageSource="@Embed(source='assets/buttons/play.swf')"
-		imageWidth="22" 
-		imageHeight="22"
+		width="60" 
+		height="54"
+		imageSource="@Embed(source='assets/buttons/bigplay.swf')"
 		verticalCenter="0" 
 		horizontalCenter="0" 
 		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
@@ -363,25 +361,24 @@
 
 	<!-- Tray -->
 	<mx:Canvas id="tray" 
-		y="{Application.application.height-tray.height+playListHolder.height}" 
 		x="0" 
 		width="{Application.application.width}" 
 		horizontalScrollPolicy="off" 
-		verticalScrollPolicy="off" 
+		verticalScrollPolicy="off"
 		visible="{(props.get('showTray') as Boolean)}" 
 		resize="onTrayResize();" 
 		horizontalCenter="0"
 		>
 		<mx:VBox 
-			verticalGap="0"
+			verticalScrollPolicy="off" 
+			horizontalScrollPolicy="off" 
+			verticalGap="-1"
 			>
 			<mx:VBox id="descriptions" 
 				horizontalScrollPolicy="off" 
 				verticalScrollPolicy="off" 
 				fontFamily="{props.get('trayFont')}" 
-				color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-				paddingLeft="2" 
-				paddingRight="2" 
+				color="#333333" 
 				width="{tray.width}"
 				>
 				<!-- Title and Words -->
@@ -389,11 +386,7 @@
 					horizontalCenter="0" 
 					verticalCenter="0" 
 					verticalGap="0" 
-					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
-					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-					cornerRadius="2" 
-					borderStyle="solid" 
-					borderThickness="0" 
+					backgroundColor="#f0f0f0" 
 					width="100%" 
 					paddingTop="6" 
 					paddingBottom="6" 
@@ -421,17 +414,25 @@
 						/>
 				</mx:Box>
 			</mx:VBox>
-			
-			<mx:HBox id="controlBox">
-				<mx:Canvas 
-					width="{tray.width}">
+			<mx:Canvas id="controlBox"
+				height="50"
+				verticalScrollPolicy="off" 
+				horizontalScrollPolicy="off" 
+				backgroundColor="#f0f0f0"
+				backgroundAlpha="{(descriptions.visible ? 1 : 0)}"
+				width="{tray.width}"
+				>			
 					<!-- Play and Pause -->
-					<mx:HBox id="videoControls" 
-						bottom="2" 
-						top="2" 
-						left="2" 
-						width="{playImage.width}" 
-						resize="resizeProgressBar();">
+					<mx:HBox id="videoControls"
+						left="0"
+						top="0" 
+						height="27"
+						width="200"
+						paddingLeft="4"
+						paddingTop="4"
+						horizontalGap="3"
+						backgroundImage="@Embed(source='assets/buttons/tray-background-top.swf')"
+						>
 			    		<com:PlayerButton id="playImage" 
 			    			imageSource="@Embed(source='assets/buttons/play.swf')"
 			    			visible="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}" 
@@ -446,34 +447,6 @@
 			    			imageSource="@Embed(source='assets/buttons/buffering.swf')"
 			    			visible="{(cleanVideoState=='buffering' &amp;&amp; !identityVideo.visible)}" 
 			    			/>  
-			    	</mx:HBox>					
-						
-					<!-- Progress bar -->
-					<com:PlayerProgress id="progress"
-						targetVideo="{video}"
-						visible="{video.visible}" 
-						/>
-
-					<!-- Right Panel -->
-			    	<mx:HBox id="rightPanel" 
-			    		visible="true" 
-			    		bottom="2" 
-			    		top="2" 
-			    		right="2" 
-			    		horizontalGap="2" 
-			    		resize="resizeProgressBar();"
-			    		> 
-			    		<!-- PlayListBtn -->
-			    		<com:PlayerButton id="playlistBtn" 
-			    			imageSource="@Embed(source='assets/buttons/expand-on.swf')"
-			    			visible="{enablePlayList &amp;&amp; showPlayList}" 
-			    			click="playListHide()"
-			    			/>
-			    		<com:PlayerButton id="playlistBtnOn" 
-			    			imageSource="@Embed(source='assets/buttons/expand-off.swf')"
-			    			visible="{enablePlayList &amp;&amp; !showPlayList}" 
-			    			click="playListShow()"
-			    			/>
 
 					    <!-- HDbutton-->
 			    		<com:PlayerButton id="hdBtn" 
@@ -485,25 +458,6 @@
 			    			imageSource="@Embed(source='assets/buttons/hd-on.swf')"
 			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; playHD}" 
 			    			click="playHD=false; setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1)"
-			    			/>
-
-			    		<!-- InfoBtn -->
-			    		<com:PlayerButton id="infoImage" 
-			    			imageSource="@Embed(source='assets/buttons/info.swf')"
-			    			visible="{(activeElement.get('hasInfo') as Boolean)}" 
-			    			click="infoToggle();"
-			    			/>
-
-						<!-- Mute and Unmute -->
-			    		<com:PlayerButton id="muteImage"
-			    			imageSource="@Embed(source='assets/buttons/mute-on.swf')"
-			    			visible="{videoControls.visible &amp;&amp; video.volume>0}" 
-			    			click="video.volume=0"
-			    			/>
-			    		<com:PlayerButton id="unmuteImage"
-			    			imageSource="@Embed(source='assets/buttons/mute-off.swf')"
-			    			visible="{videoControls.visible &amp;&amp; video.volume==0}" 
-			    			click="video.volume=1"
 			    			/>
 
 						<!-- Fullscreen -->
@@ -525,15 +479,50 @@
 			    			click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible;"
 			    			/>
 					</mx:HBox>
-				</mx:Canvas>
-			</mx:HBox>
+
+					<mx:Canvas
+						left="0"
+						bottom="-1"
+						verticalScrollPolicy="off" 
+						horizontalScrollPolicy="off" 
+						height="25"
+						width="100%"
+						backgroundImage="@Embed(source='assets/buttons/tray-background-bottom.swf')"
+						>
+						<!-- Progress bar -->
+						<com:PlayerProgress id="progress"
+							x="4"
+							y="5"
+							targetVideo="{video}"
+							visible="{video.visible}"
+							width="{tray.width - 28}" 
+							/>
+
+			    		<!-- PlayListBtn -->
+			    		<mx:Image id="playlistBtn" 
+			    			right="15"
+			    			y="-3"
+			    			source="@Embed(source='assets/buttons/expand-on.swf')"
+			    			visible="{enablePlayList &amp;&amp; showPlayList}" 
+			    			click="playListHide()"
+			    			/>
+			    		<mx:Image id="playlistBtnOn" 
+			    			right="15"
+			    			y="-3"
+			    			source="@Embed(source='assets/buttons/expand-off.swf')"
+			    			visible="{enablePlayList &amp;&amp; !showPlayList}" 
+			    			click="playListShow()"
+			    			/>
+
+					</mx:Canvas> 
+			</mx:Canvas>
 			
 			<!-- PlayList -->
 			<mx:Canvas id="playListContainer" 
 				height="{playListHolder.height}" 
 				width="{tray.width}" 
-				backgroundColor="black" 
-				borderColor="black" 
+				backgroundColor="#B1B1A5" 
+				borderColor="#B1B1A5" 
 				borderSides="top" 
 				borderStyle="solid" 
 				borderThickness="5">

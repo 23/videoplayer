@@ -5,54 +5,41 @@
 	verticalScrollPolicy="off"
 	useHandCursor="true" 
 	buttonMode="true" 
-	height="28"
-	top="2" 
-	cornerRadius="2" 
-	borderStyle="solid" 
-	borderThickness="0" 
-	backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
-	backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-	mouseOver="videoTime.visible=true" 
-	mouseOut="videoTime.visible=false" 
+	height="12"
 	click="seekVideoTo((this.contentMouseX-5)/videoProgress.width*activeElement.getNumber('length'));" 
 	>
 	<!-- VideoProgress -->
 	<mx:Canvas id="videoProgress" 
-		top="11" 
-		left="10" 
-		right="10" 
-		height="6" 
-		backgroundColor="0xCCCCCC" 
-		backgroundAlpha="0.6">
+		top="1" 
+		left="0" 
+		height="10"
+		right="{videoTime.width+4}"
+		backgroundImage="@Embed(source='assets/buttons/progress-background.swf')" 
+		>
 		<mx:Canvas id="videoBufferProgress" 
 			x="0" 
-			height="6" 
-			backgroundColor="white" 
-			backgroundAlpha="0.2" 
+			height="10" 
+			backgroundImage="@Embed(source='assets/buttons/progress-played.swf')" 
+			backgroundAlpha="0.2"
 			/>
 		<mx:Canvas id="videoPlayProgress" 
 			x="0"
-			height="6" 
-			backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
-			backgroundAlpha="0.6" 
+			height="10" 
+			backgroundImage="@Embed(source='assets/buttons/progress-played.swf')" 
 			/>
 	</mx:Canvas>					
 
 	<!-- videoTime -->
 	<mx:HBox id="videoTime" 
-		visible="false" 
-		y="{(this.height-videoTime.height)/2}" 
-		backgroundColor="0xFFFFFF" 
-		cornerRadius="2" 
-		borderStyle="solid" 
-		borderColor="white"
+		right="0"
+		y="-2" 
 		>
 		<mx:Label id="videoTimeLabel" 
-			selectable="false" 
+			selectable="false"
 			fontFamily="Helvetica, Arial" 
-			fontSize="9" 
-			height="12" 
-			color="black"
+			fontSize="10" 
+			height="15" 
+			color="white"
 			/>
 	</mx:HBox>
 	
@@ -102,8 +89,7 @@
             	if(!_targetVideo) return;
 				videoPlayProgress.x = activeElement.getNumber('start') / activeElement.getNumber('length') * videoProgress.width;
 				videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*(videoProgress.width-videoPlayProgress.x);
-				videoTime.x = videoPlayProgress.x + videoPlayProgress.width - (videoTime.width/2);
-				videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'));
+				videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'), activeElement.getNumber('length'));
             }
 
 			private function getFullVideoSource():String {
