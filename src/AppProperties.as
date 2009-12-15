@@ -23,6 +23,10 @@ public var propDefaults:Object = {
 	logoAlpha: parseFloat('0.7'),
 	logoWidth: parseFloat('80'),
 	logoHeight: parseFloat('40'),
+	verticalPadding: parseFloat('0'),
+	horizontalPadding: parseFloat('0'),
+	trayTimeout: parseFloat('5000'),
+	infoTimeout: parseFloat('5000'),
 	recommendationHeadline: 'Also have a look at...',
 	recommendationMethod: 'channel-popular',
 	lowBandwidthThresholdKbps: parseFloat('0'),
@@ -117,6 +121,12 @@ private function initProperties(settings:Object):void {
 	var pos:String = props.get('logoPosition').toString();
 	props.put('logoAlign', (new RegExp('left').test(pos) ? 'left' : 'right'));
 	props.put('logoVAlign', (new RegExp('top').test(pos) ? 'top' : 'bottom'));
+
+	// Tray and information timeout
+	trayTimer.delay = props.getNumber('trayTimeout');
+	trayTimer.reset();
+	infoTimer.delay = props.getNumber('infoTimeout');
+	infoTimer.reset();
 	
 	// If bandwidth or player doesn't allow h264 quality, we won't allow streaming
 	if (!h264()) props.put('streaming', 0);
