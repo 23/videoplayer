@@ -159,6 +159,7 @@
             private function trayHide():void {
             	if (showPlayList) return;
             	trayTimer.stop();
+            	if(props.getNumber('trayTimeout')<=0) return;
 				tray.y = Application.application.height; // ... to outside of frame
                 tray.visible = false;
             }            
@@ -176,6 +177,7 @@
 				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void{infoHide();});
             }             
             private function infoHide():void {
+            	if(props.getNumber('infoTimeout')<=0) return;
 				descriptions.visible = false;
             }
             private function infoShow(timeout:Boolean=true):void {
@@ -266,6 +268,12 @@
 		color="white"
 		/>
 	
+	<mx:Canvas id="contentContainer"
+		x="{props.getNumber('horizontalPadding')/2}"
+		y="0"
+		width="{Application.application.width-props.getNumber('horizontalPadding')}"
+		height="{Application.application.height-props.getNumber('verticalPadding')}"
+		>
 	<!-- Image and Video -->
 	<mx:VideoDisplay id="video" 
 		autoRewind="false"  
@@ -274,9 +282,9 @@
 		volume="1" 
 		horizontalCenter="0" 
 		verticalCenter="0" 
-		bufferTime="5"
-		width="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : Application.application.width)}"
-		height="{(Application.application.width/Application.application.height>activeElement.get('aspectRatio') ? Application.application.height : Application.application.width/(activeElement.get('aspectRatio') as Number))}"
+		bufferTime="3"
+		width="{(contentContainer.width/contentContainer.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : contentContainer.width)}"
+		height="{(contentContainer.width/contentContainer.height>activeElement.get('aspectRatio') ? contentContainer.height : contentContainer.width/(activeElement.get('aspectRatio') as Number))}"
 		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" 
 		stateChange="onVideoStateChange(event);"
 		complete="onVideoComplete();"
@@ -320,8 +328,8 @@
 		visible="false" 
 		horizontalCenter="0" 
 		verticalCenter="0" 
-		maxWidth="{Application.application.width}" 
-		maxHeight="{Application.application.height}" 
+		maxWidth="{contentContainer.width}" 
+		maxHeight="{contentContainer.height}" 
 		/>
 
 	<!-- Icon/Logo -->
@@ -346,6 +354,8 @@
 			verticalAlign="{props.get('logoVAlign')}"
 			/> 
 	</mx:Box>
+		
+	</mx:Canvas> 
 
 	<!-- Tray -->
 	<mx:Canvas id="tray" 
