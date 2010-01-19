@@ -85,7 +85,7 @@
 				// Mash up embed parameters, including .swf?..., Flashvars, width and height to get a good embed code   
 				var a:Array = []; var v:String;
 				for (v in Application.application.parameters) {a.push(encodeURIComponent(v) + '=' + encodeURIComponent(Application.application.parameters[v]));}
-				a.push('width=' + encodeURIComponent(Application.application.height));
+				a.push('width=' + encodeURIComponent(Application.application.width));
 				a.push('height=' + encodeURIComponent(Application.application.height));
 				
 				// Get settings for this player from 23 Video
