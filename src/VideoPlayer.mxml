@@ -50,6 +50,8 @@
 			[Bindable] private var enablePlayList: Boolean = false;		
 			[Bindable] private var showPlayList: Boolean = false;
 			[Bindable] private var cleanVideoState:String = 'paused';
+			
+			[Bindable] public var clickTarget:String = '';  
 
 			public function init():void {
 				prepareTimers();
@@ -327,6 +329,8 @@
 		bufferTime="2" 
 		width="{video.width}" 
 		height="{video.height}"
+		buttonMode="true"
+		click="if(clickTarget.length) goToUrl(clickTarget);"
 		/>
 	<com:SmoothImage id="identityPhoto" 
 		visible="false" 
@@ -334,6 +338,8 @@
 		verticalCenter="0" 
 		maxWidth="{contentContainer.width}" 
 		maxHeight="{contentContainer.height}" 
+		buttonMode="true"
+		click="if(clickTarget.length) goToUrl(clickTarget);"
 		/>
 
 	<!-- Icon/Logo -->
@@ -348,6 +354,8 @@
 		verticalAlign="{props.get('logoVAlign')}" 
 		horizontalCenter="0" 
 		verticalCenter="0"
+		buttonMode="true"
+		click="if(clickTarget.length) goToUrl(clickTarget);"
 		>
 		<mx:Image 
 			source="{props.get('logoSource')}" 
