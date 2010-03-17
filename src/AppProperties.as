@@ -32,7 +32,7 @@ public var propDefaults:Object = {
 	lowBandwidthThresholdKbps: parseFloat('0'),
 	maintainIdentityAspectRatio: true,
 	
-	start: parseFloat('100'),
+	start: parseFloat('0'),
 	player_id: parseFloat('0'),
 	rssLink: '',
 	podcastLink: '',
