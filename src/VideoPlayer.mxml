@@ -325,6 +325,7 @@
 		bufferTime="2" 
 		width="{video.width}" 
 		height="{video.height}"
+		maintainAspectRatio="{props.get('maintainIdentityAspectRatio')}"
 		buttonMode="true"
 		click="if(clickTarget.length) goToUrl(clickTarget);"
 		/>
