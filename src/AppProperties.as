@@ -13,7 +13,7 @@ public var propDefaults:Object = {
 	trayAlpha: parseFloat('0.8'),
 	showTray: true,
 	showDescriptions: true,
-	logoSource: 'no logo',
+	logoSource: '',
 	showBigPlay: true,
 	showLogo: true,
 	showShare: true,
@@ -105,7 +105,10 @@ private function initProperties(settings:Object):void {
 	props.put('mailLink', (props.get('socialSharing') ? "/send?popup_p=1&" + loadParameters.join('&') : ''));
 
 	// Test logoSource
-	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') props.put('showLogo', false);
+	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') {
+		props.put('showLogo', false);
+		props.put('logoSource', '');	
+	}
 	if(props.get('showLogo')) {
 		var logoRequest:URLRequest = new URLRequest((props.get('logoSource') as String));
 		var logoLoader:URLLoader = new URLLoader();
