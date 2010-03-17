@@ -31,6 +31,7 @@ public var propDefaults:Object = {
 	recommendationMethod: 'channel-popular',
 	lowBandwidthThresholdKbps: parseFloat('0'),
 	
+	start: parseFloat('100'),
 	player_id: parseFloat('0'),
 	rssLink: '',
 	podcastLink: '',
