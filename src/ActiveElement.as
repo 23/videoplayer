@@ -22,9 +22,11 @@ private function resetActiveElement():void {
   	activeElement.put('photoHeight', new Number(0));
   	activeElement.put('aspectRatio', new Number(1));
 	activeElement.put('beforeDownloadType', ''); 
-	activeElement.put('beforeDownloadUrl', ''); 
+	activeElement.put('beforeDownloadUrl', '');
+	activeElement.put('beforeLink', ''); 
 	activeElement.put('afterDownloadType', ''); 
 	activeElement.put('afterDownloadUrl', ''); 
+	activeElement.put('afterLink', ''); 
 	activeElement.put('afterText', '');
 	activeElement.put('length', '0');
 	activeElement.put('start', '0');
@@ -57,12 +59,15 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
   	activeElement.put('skip', skip);
 
 	activeElement.put('beforeDownloadType', o.before_download_type);
-	activeElement.put('beforeDownloadUrl', 'http://' + props.get('domain') + o.before_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small'))); 
+	activeElement.put('beforeDownloadUrl', 'http://' + props.get('domain') + o.before_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
+	activeElement.put('beforeLink', o.before_link); 
 	activeElement.put('afterDownloadType', o.after_download_type); 
 	activeElement.put('afterDownloadUrl', 'http://' + props.get('domain') + o.after_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
+	activeElement.put('afterLink', o.after_link);
 	activeElement.put('afterText', o.after_text); 
 
 	activeElement.put('one', 'http://' + props.get('domain') + o.one); 
+	clickTarget = activeElement.getString('one');
 
 	var hasHD:Boolean = (h264()&&typeof(o.video_hd_download)!='undefined'&&o.video_hd_download.length>0);
 	activeElement.put('hasHD', hasHD);

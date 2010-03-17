@@ -13,7 +13,7 @@ public var propDefaults:Object = {
 	trayAlpha: parseFloat('0.9'),
 	showTray: true,
 	showDescriptions: true,
-	logoSource: 'no logo',
+	logoSource: '',
 	showBigPlay: true,
 	showLogo: true,
 	showShare: true,
@@ -31,6 +31,7 @@ public var propDefaults:Object = {
 	recommendationMethod: 'channel-popular',
 	lowBandwidthThresholdKbps: parseFloat('0'),
 	
+	start: parseFloat('100'),
 	player_id: parseFloat('0'),
 	rssLink: '',
 	podcastLink: '',
@@ -104,7 +105,10 @@ private function initProperties(settings:Object):void {
 	props.put('mailLink', (props.get('socialSharing') ? "/send?popup_p=1&" + loadParameters.join('&') : ''));
 
 	// Test logoSource
-	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') props.put('showLogo', false);
+	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') {
+		props.put('showLogo', false);
+		props.put('logoSource', '');	
+	}
 	if(props.get('showLogo')) {
 		var logoRequest:URLRequest = new URLRequest((props.get('logoSource') as String));
 		var logoLoader:URLLoader = new URLLoader();
@@ -137,7 +141,7 @@ private function initProperties(settings:Object):void {
 
 private function getRecommendationSource():String {
 	var domain:String = new String(props.get('domain'));
-	if(!context || !context.photos) return('http://' + domain + '/js/photos?raw&size=20');
+	if(!context || !context.photos) return('http://' + domain + '/js/photos?raw&size=10');
 	
 	if(context.photos.length==1) {
 		// There's only one video to play, we'll need to construct recommendation in another fashion.
@@ -146,13 +150,13 @@ private function getRecommendationSource():String {
 		switch (method) {
 			case 'site-new':
 			case 'channel-new':
-				recommendationSource = 'http://' + domain + '/js/photos?raw&size=20&orderby=uploaded&order=desc';
+				recommendationSource = 'http://' + domain + '/js/photos?raw&size=10&orderby=uploaded&order=desc';
 				break;
 			case 'site-popular':
 			case 'channel-popular':
 			case 'similar':
 			default:
-				recommendationSource = 'http://' + domain + '/js/photos?raw&size=20&orderby=rank&order=desc';
+				recommendationSource = 'http://' + domain + '/js/photos?raw&size=10&orderby=rank&order=desc';
 				break;
 		}
 		if (context.photos[0].album_id!='' && (method=='channel-new' || method=='channel-popular')) recommendationSource += '&album_id=' + context.photos[0].album_id;
