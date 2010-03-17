@@ -30,6 +30,7 @@ public var propDefaults:Object = {
 	recommendationHeadline: 'Also have a look at...',
 	recommendationMethod: 'channel-popular',
 	lowBandwidthThresholdKbps: parseFloat('0'),
+	maintainIdentityAspectRatio: true,
 	
 	start: parseFloat('100'),
 	player_id: parseFloat('0'),
