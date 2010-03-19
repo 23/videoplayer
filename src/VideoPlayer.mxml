@@ -356,7 +356,6 @@
 		horizontalCenter="0" 
 		verticalCenter="0"
 		buttonMode="true"
-		click="if(clickTarget.length) goToUrl(clickTarget);"
 		>
 		<mx:Image 
 			source="{props.get('logoSource')}" 
@@ -365,6 +364,7 @@
 			maxHeight="{(props.get('logoHeight') as Number)}" 
 			horizontalAlign="{props.get('logoAlign')}" 
 			verticalAlign="{props.get('logoVAlign')}"
+			click="if(clickTarget.length) goToUrl(clickTarget);"
 			/> 
 	</mx:Box>
 		
