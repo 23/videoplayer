@@ -344,6 +344,7 @@
 		color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 		backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 		visible="{props.get('identityCountdown') &amp;&amp; identityVideo.visible}"
+		allowClose="{props.get('identityAllowClose')}"
 		close="{identityVideo.stop(); identityVideo.dispatchEvent(new Event('complete', true));}"
 		/>
 
