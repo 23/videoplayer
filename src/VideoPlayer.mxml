@@ -327,6 +327,7 @@
 		height="{video.height}"
 		maintainAspectRatio="{props.get('maintainIdentityAspectRatio')}"
 		buttonMode="true"
+		playheadUpdate="{var secs:int=Math.round(identityVideo.totalTime-identityVideo.playheadTime); var mess:String = (secs!=1 ? props.getString('identityCountdownTextPlural') : props.getString('identityCountdownTextSingular')); identityMessage.message = mess.replace(/%/, secs);}"
 		click="if(clickTarget.length) goToUrl(clickTarget);"
 		/>
 	<com:SmoothImage id="identityPhoto" 
@@ -337,6 +338,13 @@
 		maxHeight="{contentContainer.height}" 
 		buttonMode="true"
 		click="if(clickTarget.length) goToUrl(clickTarget);"
+		/>
+	<com:OverlayMessage id="identityMessage"
+		fontFamily="{props.get('trayFont')}" 
+		color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+		backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+		visible="{props.get('identityCountdown') &amp;&amp; identityVideo.visible}"
+		close="{identityVideo.stop(); identityVideo.dispatchEvent(new Event('complete', true));}"
 		/>
 
 	<!-- Icon/Logo -->
