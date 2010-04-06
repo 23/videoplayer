@@ -19,6 +19,8 @@
 		<![CDATA[
 			[Bindable] private var _message:String = ""; 
 			public function set message(m:String):void {_message=m;}
+			[Bindable] private var _allowClose:Boolean = true; 
+			public function set allowClose(b:Boolean):void {_allowClose=b;}
 			private function closeHandler():void{
 				this.visible=false;
 				dispatchEvent(new Event("close", true)); 
@@ -38,6 +40,7 @@
 		buttonMode="true" 
 		top="2" 
 		right="2" 
-		source="@Embed('assets/buttons/close.swf')" 
+		source="@Embed('assets/buttons/close.swf')"
+		visible="{_allowClose}" 
 		click="{closeHandler();}"/>
 </mx:Canvas>
