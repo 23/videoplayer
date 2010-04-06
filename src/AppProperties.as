@@ -28,7 +28,7 @@ public var propDefaults:Object = {
 	trayTimeout: parseFloat('5000'),
 	infoTimeout: parseFloat('5000'),
 	recommendationHeadline: 'Also have a look at...',
-	identityCountdown: true,
+	identityCountdown: false,
 	identityCountdownTextSingular: "This advertisement will end in % second",
 	identityCountdownTextPlural: "This advertisement will end in % seconds",
 	recommendationMethod: 'channel-popular',
