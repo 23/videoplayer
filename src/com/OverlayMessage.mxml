@@ -3,9 +3,12 @@
 	x="0"
 	y="0" 
 	width="100%" 
-	height="20" 
+	height="22" 
 	backgroundColor="black" 
-	backgroundAlpha="0.3"
+	backgroundAlpha="0.5"
+	fontFamily="Arial"
+	fontSize="11" 
+	color="white"
 	verticalScrollPolicy="off" 
 	horizontalScrollPolicy="off">
 	
@@ -23,11 +26,18 @@
 		]]>
 	</mx:Script>
 
-	<mx:Label top="2" left="10" text="{_message}" color="white" fontSize="11" fontFamily="Arial" />
+	<mx:Label id="messageLabel" 
+		top="3" 
+		left="5" 
+		text="{_message}" 
+		color="{this.getStyle('color')}" 
+		fontSize="{this.getStyle('fontSize')}" 
+		fontFamily="{this.getStyle('fontFamily')}" 
+		/>
 	<mx:Image
 		buttonMode="true" 
 		top="2" 
-		right="0" 
+		right="2" 
 		source="@Embed('assets/buttons/close.swf')" 
 		click="{closeHandler();}"/>
 </mx:Canvas>
