@@ -101,7 +101,8 @@ private function initProperties(settings:Object):void {
 		}
     }
 	if (defaultPhotoId.length) loadParameters.push('photo_id=' + encodeURI(defaultPhotoId)); 
-	if (defaultAlbumId.length) loadParameters.push('album_id=' + encodeURI(defaultAlbumId)); 
+	if (defaultAlbumId.length) loadParameters.push('album_id=' + encodeURI(defaultAlbumId));
+	if (playerId.length) loadParameters.push('player_id=' + encodeURI(playerId));
 
 	// Use load parameters to build JSON source
 	var jsonSource:String = 'http://' + domain + '/js/photos?raw&' + loadParameters.join('&');
@@ -168,6 +169,7 @@ private function getRecommendationSource():String {
 				recommendationSource = 'http://' + domain + '/js/photos?raw&size=10&orderby=rank&order=desc';
 				break;
 		}
+		if (playerId.length) recommendationSource += '&player_id=' + encodeURI(playerId);
 		if (context.photos[0].album_id!='' && (method=='channel-new' || method=='channel-popular')) recommendationSource += '&album_id=' + context.photos[0].album_id;
 		return(recommendationSource);
 	} else {
