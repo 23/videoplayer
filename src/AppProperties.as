@@ -102,7 +102,7 @@ private function initProperties(settings:Object):void {
     }
 	if (defaultPhotoId.length) loadParameters.push('photo_id=' + encodeURI(defaultPhotoId)); 
 	if (defaultAlbumId.length) loadParameters.push('album_id=' + encodeURI(defaultAlbumId));
-	if (playerId.length) loadParameters.push('player_id=' + encodeURI(playerId));
+	loadParameters.push('player_id=' + encodeURI(playerId));
 
 	// Use load parameters to build JSON source
 	var jsonSource:String = 'http://' + domain + '/js/photos?raw&' + loadParameters.join('&');
