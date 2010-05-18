@@ -41,6 +41,7 @@ public var propDefaults:Object = {
 	rssLink: '',
 	podcastLink: '',
 	embedCode: '',
+	currentVideoEmbedCode: '',
 	socialSharing: true,
 	streaming: false,
 
@@ -100,7 +101,8 @@ private function initProperties(settings:Object):void {
 		}
     }
 	if (defaultPhotoId.length) loadParameters.push('photo_id=' + encodeURI(defaultPhotoId)); 
-	if (defaultAlbumId.length) loadParameters.push('album_id=' + encodeURI(defaultAlbumId)); 
+	if (defaultAlbumId.length) loadParameters.push('album_id=' + encodeURI(defaultAlbumId));
+	loadParameters.push('player_id=' + encodeURI(playerId));
 
 	// Use load parameters to build JSON source
 	var jsonSource:String = 'http://' + domain + '/js/photos?raw&' + loadParameters.join('&');
@@ -137,6 +139,9 @@ private function initProperties(settings:Object):void {
 	infoTimer.delay = props.getNumber('infoTimeout');
 	infoTimer.reset();
 	
+	// Make the embed code current
+	updateCurrentVideoEmbedCode();
+	
 	// If bandwidth or player doesn't allow h264 quality, we won't allow streaming
 	if (!h264()) props.put('streaming', 0);
 	
@@ -164,9 +169,27 @@ private function getRecommendationSource():String {
 				recommendationSource = 'http://' + domain + '/js/photos?raw&size=10&orderby=rank&order=desc';
 				break;
 		}
+		if (playerId.length) recommendationSource += '&player_id=' + encodeURI(playerId);
 		if (context.photos[0].album_id!='' && (method=='channel-new' || method=='channel-popular')) recommendationSource += '&album_id=' + context.photos[0].album_id;
 		return(recommendationSource);
 	} else {
 		return(new String(props.get('jsonSource')));
 	}
+}
+
+private function updateCurrentVideoEmbedCode():void {
+	try {
+		var e:String = props.getString('embedCode');
+		if (!e.match(/photo\%5fid/)) {
+			// remove album_id and token
+			e = e.replace(new RegExp('(album\%5fid|token)=[^\&]*', 'img'), '');
+			// set photo_id
+			e = e.replace(new RegExp('FlashVars="'), 'FlashVars="photo\%5fid=' + activeElement.getString('photo_id') + '&');
+			e = e.replace(new RegExp('FlashVars" value="', 'img'), 'FlashVars="photo\%5fid=' + activeElement.getString('photo_id') + '&');
+		}
+		props.put('currentVideoEmbedCode', e);
+	} catch(err:ErrorEvent) {
+		// A safety net for bad code
+		props.put('currentVideoEmbedCode', props.getString('embedCode'));
+	}  
 }

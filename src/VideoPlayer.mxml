@@ -38,10 +38,11 @@
 			import com.adobe.serialization.json.JSONParseError;
 			
 			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = 'reference.dev.visualtube.net';
+			private var defaultDomain:String = '23.dev.23video.com';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
+			private var playerId:String = '0';
 
 			private var context:Object = {};
 			private var recommendations:Object = {};
@@ -83,6 +84,7 @@
 				
 				// Are we using a specific player, or just the default? (if so, we want to specify the player id to get the correct video settings)
 				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(Application.application.url);
+				if (testCustomPlayer && testCustomPlayer.length>1) playerId = testCustomPlayer[1]; 
 				
 				// Mash up embed parameters, including .swf?..., Flashvars, width and height to get a good embed code   
 				var a:Array = []; var v:String;
@@ -91,7 +93,7 @@
 				a.push('height=' + encodeURIComponent(Application.application.height));
 				
 				// Get settings for this player from 23 Video
-				var settings_endpoint:String = 'http://' + domain + '/js/video-settings?raw&parameters=' + encodeURIComponent(a.join('&')) + (testCustomPlayer && testCustomPlayer.length>1 ? '&player_id=' + testCustomPlayer[1] : '');
+				var settings_endpoint:String = 'http://' + domain + '/js/video-settings?raw&parameters=' + encodeURIComponent(a.join('&')) + (playerId ? '&player_id=' + playerId : '');
 				doJSON(settings_endpoint, function(o:Object):void{
 					initProperties(o.settings);
 					initActiveElement();
@@ -606,7 +608,7 @@
 				paddingLeft="3"
 				height="28"
 				width="100%"
-				text="{props.get('embedCode')}" 
+				text="{props.get('currentVideoEmbedCode')}" 
 				click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
 				backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 				color="#333" 
