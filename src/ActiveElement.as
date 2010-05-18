@@ -92,6 +92,9 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
   		showImageElement();
   	}
 
+	// Make embed code current
+	updateCurrentVideoEmbedCode();
+
 	// We want the tray and possible the info box to show up when a new element starts playing
 	infoShow();
 	trayShow();

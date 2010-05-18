@@ -600,7 +600,7 @@
 				paddingLeft="3"
 				height="24"
 				width="100%"
-				text="{props.get('embedCode')}" 
+				text="{props.get('currentVideoEmbedCode')}" 
 				click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
 				backgroundColor="white" 
 				color="#333" 
