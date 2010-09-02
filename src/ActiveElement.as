@@ -128,6 +128,7 @@ private function createItemsArray(p:Object) : Array {
 private function clearVideo():void {
 	video.source = null; video.visible = false;
 	image.source = null; image.visible = false;
+	if(identityVideo.playing) {identityVideo.stop(); identityVideo.dispatchEvent(new Event('complete', true));}
     if(video.playing) {video.stop(); video.close();}
 }
 private function previousElement():Boolean {
