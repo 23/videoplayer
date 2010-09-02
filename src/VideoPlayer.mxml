@@ -38,7 +38,7 @@
 			import com.adobe.serialization.json.JSONParseError;
 			
 			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = '23.dev.23video.com';
+			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
@@ -135,6 +135,7 @@
             			if(evt.itemID>=0) {
             				setElementByID(evt.itemID); 
             				playListHide();
+            				playVideoElement();
             			}
             		});
 				playListHolder.addChild(playList);
