@@ -92,7 +92,7 @@ private function initProperties(settings:Object):void {
 	var domain:String = URLUtil.getServerName(Application.application.url);
 	if(domain=='localhost' || domain=='') domain=defaultDomain;
 	props.put('domain', domain);
-    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'video_encoded_p'];
+    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size'];
     for (var i:int=0; i<options.length; i++) {
 		var opt:String = options[i];
 		if (Application.application.parameters[opt]) {

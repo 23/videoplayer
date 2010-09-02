@@ -135,7 +135,6 @@
             			if(evt.itemID>=0) {
             				setElementByID(evt.itemID); 
             				playListHide();
-            				playVideoElement();
             			}
             		});
 				playListHolder.addChild(playList);
