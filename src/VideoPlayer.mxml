@@ -38,7 +38,7 @@
 			import com.adobe.serialization.json.JSONParseError;
 			
 			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = 'reference.dev.visualtube.net';
+			private var defaultDomain:String = '23.dev.23video.com';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
@@ -133,9 +133,8 @@
 						// When clicking the recommendation playlist, we shift context -- it's no longer the initially selected video, but the playlist objects
 						context = recommendations;
             			if(evt.itemID>=0) {
-            				setElementByID(evt.itemID); 
             				playListHide();
-            				playVideoElement();
+            				setElementByID(evt.itemID, true); 
             			}
             		});
 				playListHolder.addChild(playList);

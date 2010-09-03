@@ -137,9 +137,9 @@ private function previousElement():Boolean {
 private function nextElement():Boolean {
 	return(setActiveElement(currentElementIndex+1));
 }
-private function setElementByID(id:Number):void {
+private function setElementByID(id:Number, startPlaying:Boolean=false):void {
 	clearVideo(); 
-	setActiveElement(id);
+	setActiveElement(id, startPlaying);
 }
 
 private function showImageElement():void {
