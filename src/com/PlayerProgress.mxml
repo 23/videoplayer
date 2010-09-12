@@ -71,7 +71,7 @@
 					return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());
 				}
 			}
-            private function seekVideoTo(time:int):void {
+            public function seekVideoTo(time:int):void {
             	if(!_targetVideo) return;
             	if(time>activeElement.getNumber('length')) return;
             	var approxBufferTime:Number = (_targetVideo.totalTime * (_targetVideo.bytesLoaded/_targetVideo.bytesTotal)) + activeElement.getNumber('start');
