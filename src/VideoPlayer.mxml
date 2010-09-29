@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
-  Squares for 23 Video
+  Squares for 23
   Benjamin Bernhard, benjamin@23company.com
   Steffen Tiedemann Christensen, steffen@23company.com
 -->
@@ -14,9 +14,25 @@
 	backgroundColor="black" 
 	width="100%" 
 	height="100%" 
-	creationComplete="init();" 
-	keyDown="trayShow()" 
+	creationComplete="init(); resizeTray();" 
+	resize="resizeTray();" 
 	>
+	<mx:Style>
+     @font-face {
+        src:url("assets/fonts/HelveticaNeue.ttc");
+        fontFamily: helvetica;
+        advancedAntiAliasing: true;
+     }		
+     @font-face {
+        src:url("assets/fonts/HelveticaNeue.ttc");
+        fontFamily: helvetica;
+        fontWeight: bold;
+        advancedAntiAliasing: true;
+     }		
+     Application {
+     	fontFamily: helvetica;
+     }
+	</mx:Style>
  	<mx:Script source="Utility.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
  	<mx:Script source="Identity.as"></mx:Script>
@@ -106,24 +122,27 @@
 				video.mx_internal::videoPlayer.smoothing = true;
 				setActiveElement(0, false, props.getNumber('start'));
 				
-				if (props.get('showTray') && props.get('showBrowse')) {
+				tray.visible=true;
+				resizeTray();
+
+ 				if (props.get('showTray') && props.get('showBrowse')) {
 					// Generate the recommendation playlist
 					var recommendationSource:String = getRecommendationSource();
 					if(recommendationSource==props.get('jsonSource')) {
 						// The list displays all the items in the feed
 						recommendations=context; createPlayList();
 					} else {
-						// The list consists of recommendations, we'll need to load them 
+						// The list consists of recommendations, we'll need to load them
 						try {
 							doJSON(recommendationSource, function(o:Object):void{recommendations=o; createPlayList();});
-				        } catch(e:JSONParseError) {enablePlayList = false; props.put('showShare', false);}
+						} catch(e:JSONParseError) {enablePlayList = false; props.put('showShare', false);}
 					}
-				}
-			}
+ 				}
+			}			
 			
             private function createPlayList():void  {
             	var arr:Array = createItemsArray(recommendations);
-            	if(arr.length==0) return;
+            	if(arr.length<=1) return;
 				enablePlayList = true;
 				playListHolder.removeAllChildren(); // if we've done this before, clean up after ourselves.
             	playList = new PlayList();
@@ -146,7 +165,7 @@
 				}
             }
 			private function playListShow():void {
-				if (!props.get('showTray') || !props.get('showBrowse')) return;
+				if (!props.get('showTray') || !props.get('showBrowse') || !enablePlayList) return;
 				showPlayList = true;
 				trayShow();
             }
@@ -157,14 +176,12 @@
             private function trayShow():void {
             	if(!props.get('showTray')) {tray.visible=false; return;}
             	trayTimer.reset(); trayTimer.start();
-		        tray.y = Application.application.height - tray.height + (showPlayList ? 0 : playListHolder.height); // ... to just inside, depending on context
             	tray.visible = true;
             }            
             private function trayHide():void {
             	if (showPlayList) return;
             	trayTimer.stop();
             	if(props.getNumber('trayTimeout')<=0) return;
-				tray.y = Application.application.height; // ... to outside of frame
                 tray.visible = false;
             }            
 			private var trayTimer:Timer = new Timer(3000,1);
@@ -220,10 +237,13 @@
 				
 				if(evt.currentTarget.state==VideoEvent.PLAYING || evt.currentTarget.state==VideoEvent.SEEKING) {
 					cleanVideoState = 'playing';
+					playListHide();
 				} else if(evt.currentTarget.state==VideoEvent.LOADING || evt.currentTarget.state==VideoEvent.BUFFERING) {
 					cleanVideoState = 'buffering';
+					playListHide();
 				} else if(evt.currentTarget.state==VideoEvent.DISCONNECTED || evt.currentTarget.state==VideoEvent.COMPLETE || evt.currentTarget.state==VideoEvent.PAUSED || evt.currentTarget.state==VideoEvent.STOPPED) {
 					cleanVideoState = 'paused';
+					if (identityVideo.visible==false) playListShow();
 				}
                 switch (evt.currentTarget.state) {
                 	case VideoEvent.PAUSED:
@@ -234,6 +254,7 @@
                         displayError('Unable to connect to video');
                         break;
                 }
+                resizeTray();
             }
             private function onVideoComplete(ignoreIdentity:Boolean=false):void {
      			reportPlayTime(video.playheadTime);
@@ -249,13 +270,20 @@
             	var c:Array = playListHolder.getChildren();
             	if (c.length) c[0].width = playListContainer.width;
             }
-            private function onTrayResize():void {
-            	if(tray.visible) trayShow(); // if the tray is displayed and changes size, force a replacement
-            	resizeProgressBar();
-            }
-            private function resizeProgressBar():void {
-            	var x:int = progress.x = (videoControls.visible ? videoControls.width : 0) + 4; 
-            	progress.width = tray.width - (rightPanel.width + 4) - x; 
+            private function resizeTray():void {
+            	if(tray) {
+            		var before:Boolean = tray.visible;
+	            	tray.visible = false;
+	            	
+	            	// Tray
+	            	tray.width = video.width-20;
+	            	// Sharing
+	            	embedPanel.width = tray.width;
+	            	// Progress etc
+	            	progressContainer.width = tray.width-61;
+
+	            	tray.visible = before;
+	            }
             }
 		]]>
 	</mx:Script>	
@@ -292,6 +320,7 @@
 		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" 
 		stateChange="onVideoStateChange(event);"
 		complete="onVideoComplete();"
+		resize="resizeTray();"
 		/>
 	<com:SmoothImage id="videoShadow" 
 		horizontalCenter="0" 
@@ -378,295 +407,206 @@
 			click="if(clickTarget.length) goToUrl(clickTarget);"
 			/> 
 	</mx:Box>
-		
-	</mx:Canvas> 
 
 	<!-- Tray -->
-	<mx:Canvas id="tray" 
-		y="{Application.application.height-tray.height+playListHolder.height}" 
-		x="0" 
-		width="{Application.application.width}" 
+	<mx:VBox id="tray" 
+		width="{video.width-20}" 
 		horizontalScrollPolicy="off" 
 		verticalScrollPolicy="off" 
-		visible="{(props.get('showTray') as Boolean)}" 
-		resize="onTrayResize();" 
 		horizontalCenter="0"
+		verticalGap="1"
+		visible="false"
+		bottom="10"
 		>
-		<mx:VBox 
-			verticalGap="0"
+
+		<!-- PlayList -->
+		<mx:Canvas id="playListContainer"
+			height="123" 
+			width="100%" 
+			backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
+			backgroundAlpha="0.8" 
+			visible="{showPlayList}"
+			includeInLayout="{playListContainer.visible}"
 			>
-			<mx:VBox id="descriptions" 
+			<mx:Canvas id="playListHolder" 
+				width="{tray.width}"
+				verticalScrollPolicy="off" 
+				horizontalScrollPolicy="off" 
+				resize="onPlayListResize()"
+				/>
+		</mx:Canvas>					
+		<!-- /PlayList -->
+
+		<!-- Embed panel -->
+		<mx:HBox 
+			id="embedPanel" 
+			width="100%" 
+			horizontalGap="1" 
+			height="68" 
+			horizontalScrollPolicy="off" 
+			verticalScrollPolicy="off" 
+			visible="false"
+			includeInLayout="{embedPanel.visible}"
+			>
+			<mx:VBox id="sharing" width="{embedPanel.width}" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="0.8" paddingLeft="10" paddingRight="10" paddingTop="5" height="100%"  verticalGap="3" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+				<mx:Text text="EMBED" color="white" fontSize="13" fontWeight="bold" />
+				<mx:TextArea id="embedText" height="21" width="100%" backgroundAlpha="0.15" text="{props.get('embedCode')}" 
+					click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
+					backgroundColor="white" borderStyle="none" paddingTop="2" paddingLeft="2" color="white" fontSize="11" /> 
+			</mx:VBox>
+		</mx:HBox>
+		<!-- /Embed panel -->
+		
+		<!-- Words panel -->
+		<mx:VBox id="descriptions" 
+			width="100%" 
+			horizontalGap="1" 
+			height="68" 
+			horizontalScrollPolicy="off" 
+			verticalScrollPolicy="off" 
+			visible="false"
+			includeInLayout="{descriptions.visible}"
+			fontFamily="{props.get('trayFont')}" 
+			color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+			>
+			<mx:Text id="trayContent" 
+				fontSize="{(props.get('trayContentFontSize') as Number)}" 
+				fontWeight="{props.get('trayContentFontWeight')}" 
+				htmlText="{activeElement.get('content')}" 
+				truncateToFit="true" 
+				maxWidth="{Application.application.width}" 
+				updateComplete="trayContent.visible = (trayContent.text.length>0);" 
+				height="{(props.get('trayContentFontSize') as Number)*3.2}" 
+				width="{descriptions.width - 15}"
+				/>
+		</mx:VBox>
+		<!-- /Words panel -->
+		
+	
+		<mx:VBox 
+			id="videoControls"
+			verticalGap="0" hide="embedPanel.visible=false;"
+			 horizontalScrollPolicy="off" verticalScrollPolicy="off">
+			<mx:HBox
+				horizontalGap="1" 
 				horizontalScrollPolicy="off" 
 				verticalScrollPolicy="off" 
-				fontFamily="{props.get('trayFont')}" 
-				color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-				paddingLeft="2" 
-				paddingRight="2" 
-				width="{tray.width}"
-				>
-				<!-- Title and Words -->
-				<mx:Box id="descBg" 
-					horizontalCenter="0" 
-					verticalCenter="0" 
-					verticalGap="0" 
-					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
-					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-					cornerRadius="2" 
-					borderStyle="solid" 
-					borderThickness="0" 
-					width="100%" 
-					paddingTop="6" 
-					paddingBottom="6" 
-					paddingLeft="6" 
-					paddingRight="6"
+				id="controlBox">
+	    		<com:PlayerButton id="playImage"
+	    			width="60" height="45" 
+	    			imageSource="@Embed(source='assets/buttons/play.swf')"
+	    			visible="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}" 
+	    			click="playVideoElement()"
+					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
+					backgroundAlpha="0.8" 
+	    			/>
+	    		<com:PlayerButton id="pauseImage" 
+	    			width="60" height="45" 
+	    			imageSource="@Embed(source='assets/buttons/pause.swf')"
+	    			visible="{(cleanVideoState=='playing' &amp;&amp; !identityVideo.visible)}" 
+	    			click="pauseVideoElement()"
+					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
+					backgroundAlpha="0.8" 
+	    			/>
+	    		<com:PlayerButton id="bufferImage"  
+	    			width="60" height="45" 
+	    			imageSource="@Embed(source='assets/buttons/buffering.swf')"
+	    			visible="{(cleanVideoState=='buffering' &amp;&amp; !identityVideo.visible)}" 
+					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
+					backgroundAlpha="0.8" 
+	    			/>  
+
+				<mx:VBox 
+					id="progressContainer"
+					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
+					backgroundAlpha="0.8"
+					verticalGap="1"
+					paddingLeft="8"
+					paddingRight="8"
+					horizontalScrollPolicy="off" 
+					verticalScrollPolicy="off" 
+					width="{video.width-61}"
+					height="45"
 					>
-					<mx:Label id="trayTitle" 
-						fontSize="{(props.get('trayTitleFontSize') as Number)}" 
-						fontWeight="{props.get('trayTitleFontWeight')}" 
-						text="{activeElement.get('title')}" 
-						truncateToFit="true" 
-						maxWidth="{Application.application.width}" 
-						updateComplete="trayTitle.visible = (trayTitle.text.length>0);" 
-						width="{descBg.width - 15}"
-						/>
-					<mx:Text id="trayContent" 
-						fontSize="{(props.get('trayContentFontSize') as Number)}" 
-						fontWeight="{props.get('trayContentFontWeight')}" 
-						htmlText="{activeElement.get('content')}" 
-						truncateToFit="true" 
-						maxWidth="{Application.application.width}" 
-						updateComplete="trayContent.visible = (trayContent.text.length>0);" 
-						height="{(props.get('trayContentFontSize') as Number)*3.2}" 
-						width="{descBg.width - 15}"
-						/>
-				</mx:Box>
-			</mx:VBox>
-			
-			<mx:HBox id="controlBox">
-				<mx:Canvas 
-					width="{tray.width}">
-					<!-- Play and Pause -->
-					<mx:HBox id="videoControls" 
-						bottom="2" 
-						top="2" 
-						left="2" 
-						width="{playImage.width}" 
-						resize="resizeProgressBar();">
-			    		<com:PlayerButton id="playImage" 
-			    			imageSource="@Embed(source='assets/buttons/play.swf')"
-			    			visible="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}" 
-			    			click="playVideoElement()"
-			    			/>
-			    		<com:PlayerButton id="pauseImage" 
-			    			imageSource="@Embed(source='assets/buttons/pause.swf')"
-			    			visible="{(cleanVideoState=='playing' &amp;&amp; !identityVideo.visible)}" 
-			    			click="pauseVideoElement()"
-			    			/>
-			    		<com:PlayerButton id="bufferImage"  
-			    			imageSource="@Embed(source='assets/buttons/buffering.swf')"
-			    			visible="{(cleanVideoState=='buffering' &amp;&amp; !identityVideo.visible)}" 
-			    			/>  
-			    	</mx:HBox>					
+
+					<mx:HBox 
+						paddingTop="3"
+						height="24"
+						width="100%"
+						horizontalGap="0">
+						<!-- Title -->
+						<mx:Text 
+							text="{activeElement.getString('title').toUpperCase()}"
+							truncateToFit="true"
+							color="white"
+							paddingTop="3"
+							fontSize="13"
+							fontWeight="bold"
+							visible="{video.width-featureButtons.width>100}"
+							height="17"
+							includeInLayout="true"
+							width="{progressContainer.width-featureButtons.width-13}"
+							/>
+
+						<mx:HBox
+							id="featureButtons"
+							horizontalGap="0"
+							paddingTop="2"
+							>
+							<!-- FeedPanel -->
+				    		<com:PlayerButton id="feedpanelBtn" 
+				    			imageSource="@Embed(source='assets/buttons/share.swf')"
+				    			visible="{(props.get('showShare') as Boolean)}" 
+				    			click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible;"
+				    			/>
+
+							<!-- Fullscreen -->
+				    		<com:PlayerButton id="fullscreenImage"
+				    			imageSource="@Embed(source='assets/buttons/fullscreen.swf')"
+				    			click="toggleFullScreen()"
+				    			/>
+
+							<!-- HDbutton-->
+							<com:PlayerButton id="hdBtn"
+								imageSource="@Embed(source='assets/buttons/hd-off.swf')"
+								visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; !playHD}"
+								click="playHD=true; setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1)"
+								/>
+							<com:PlayerButton id="hdOffBtn"
+								imageSource="@Embed(source='assets/buttons/hd-on.swf')"
+								visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; playHD}"
+								click="playHD=false; setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1)"
+								/>
+
+							<!-- Link -->
+				    		<com:PlayerButton id="linkBtn" 
+				    			imageSource="@Embed(source='assets/buttons/link.swf')"
+				    			click="{goToUrl(activeElement.get('link') + '?player_id=' + props.get('player_id'))}"
+				    			/>
+							<!-- Twitter -->
+				    		<com:PlayerButton id="twitterBtn" 
+				    			imageSource="@Embed(source='assets/buttons/twitter.swf')"
+				    			click="{goToUrl(activeElement.get('link') + '/twitter?player_id=' + props.get('player_id'))}"
+				    			/>
+							<!-- Facebook -->
+				    		<com:PlayerButton id="facebookBtn" 
+				    			imageSource="@Embed(source='assets/buttons/facebook.swf')"
+				    			click="{goToUrl(activeElement.get('link') + '/facebook?player_id=' + props.get('player_id'))}"
+				    			/>
+				    	</mx:HBox> 
+					</mx:HBox> 
 						
 					<!-- Progress bar -->
 					<com:PlayerProgress id="progress"
 						targetVideo="{video}"
-						visible="{video.visible}" 
+						visible="{video.visible}"
+						width="100%" 
+						height="21"
 						/>
-
-					<!-- Right Panel -->
-			    	<mx:HBox id="rightPanel" 
-			    		visible="true" 
-			    		bottom="2" 
-			    		top="2" 
-			    		right="2" 
-			    		horizontalGap="2" 
-			    		resize="resizeProgressBar();"
-			    		> 
-			    		<!-- PlayListBtn -->
-			    		<com:PlayerButton id="playlistBtn" 
-			    			imageSource="@Embed(source='assets/buttons/expand-on.swf')"
-			    			visible="{enablePlayList &amp;&amp; showPlayList}" 
-			    			click="playListHide()"
-			    			/>
-			    		<com:PlayerButton id="playlistBtnOn" 
-			    			imageSource="@Embed(source='assets/buttons/expand-off.swf')"
-			    			visible="{enablePlayList &amp;&amp; !showPlayList}" 
-			    			click="playListShow()"
-			    			/>
-
-					    <!-- HDbutton-->
-			    		<com:PlayerButton id="hdBtn" 
-			    			imageSource="@Embed(source='assets/buttons/hd-off.swf')"
-			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; !playHD}" 
-			    			click="playHD=true; setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1)"
-			    			/>
-			    		<com:PlayerButton id="hdOffBtn"
-			    			imageSource="@Embed(source='assets/buttons/hd-on.swf')"
-			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; playHD}" 
-			    			click="playHD=false; setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1)"
-			    			/>
-
-			    		<!-- InfoBtn -->
-			    		<com:PlayerButton id="infoImage" 
-			    			imageSource="@Embed(source='assets/buttons/info.swf')"
-			    			visible="{(activeElement.get('hasInfo') as Boolean)}" 
-			    			click="infoToggle();"
-			    			/>
-
-						<!-- Mute and Unmute -->
-			    		<com:PlayerButton id="muteImage"
-			    			imageSource="@Embed(source='assets/buttons/mute-on.swf')"
-			    			visible="{videoControls.visible &amp;&amp; video.volume>0}" 
-			    			click="video.volume=0"
-			    			/>
-			    		<com:PlayerButton id="unmuteImage"
-			    			imageSource="@Embed(source='assets/buttons/mute-off.swf')"
-			    			visible="{videoControls.visible &amp;&amp; video.volume==0}" 
-			    			click="video.volume=1"
-			    			/>
-
-						<!-- Fullscreen -->
-			    		<com:PlayerButton id="fullscreenImage" 
-			    			imageSource="@Embed(source='assets/buttons/fullscreen-on.swf')"
-			    			visible="{!inFullScreen}" 
-			    			click="toggleFullScreen()"
-			    			/>
-			    		<com:PlayerButton id="smallscreenImage" 
-			    			imageSource="@Embed(source='assets/buttons/fullscreen-off.swf')"
-			    			visible="{inFullScreen}" 
-			    			click="toggleFullScreen()"
-			    			/>
-
-						<!-- FeedPanel -->
-			    		<com:PlayerButton id="feedpanelBtn" 
-			    			imageSource="@Embed(source='assets/buttons/share.swf')"
-			    			visible="{(props.get('showShare') as Boolean)}" 
-			    			click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible;"
-			    			/>
-					</mx:HBox>
-				</mx:Canvas>
+				</mx:VBox>
 			</mx:HBox>
-			
-			<!-- PlayList -->
-			<mx:Canvas id="playListContainer" 
-				height="{playListHolder.height}" 
-				width="{tray.width}" 
-				backgroundColor="black" 
-				borderColor="black" 
-				borderSides="top" 
-				borderStyle="solid" 
-				borderThickness="5">
-				<mx:Canvas id="playListHolder" 
-					bottom="0" 
-					width="{tray.width}" 
-					verticalScrollPolicy="off" 
-					horizontalScrollPolicy="off" 
-					resize="onPlayListResize()"
-					/>
-			</mx:Canvas>					
 		</mx:VBox>	
-	</mx:Canvas>
-
-	<!-- Embed panel -->
-	<com:TextPanel id="embedPanel" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}"
-		title="Share this video"
-		>
-
-		<!-- Embed section -->		
-		<mx:HBox 
-			horizontalGap="5" 
-			verticalAlign="middle"
-			paddingTop="5"
-			>
-			<mx:Image 
-				source="@Embed('assets/buttons/embed.swf')"
-				/>
-			<mx:Label 
-				text="Embed:" 
-				fontSize="13" 
-				fontWeight="bold" 
-				color="white"
-				/>
-		</mx:HBox>
-		<mx:HBox 
-			horizontalGap="10" 
-			width="100%"
-			paddingBottom="10"
-			>
-			<mx:TextArea id="embedText" 
-				paddingTop="3"
-				paddingRight="3"
-				paddingBottom="3"
-				paddingLeft="3"
-				height="24"
-				width="100%"
-				text="{props.get('currentVideoEmbedCode')}" 
-				click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
-				backgroundColor="white" 
-				color="#333" 
-				fontSize="11" 
-				/>
-			<com:ActionButton
-				text="Copy" 
-				iconSource="@Embed(source='assets/buttons/copy.swf')"
-				click="System.setClipboard(embedText.text);"
-				/>
-		</mx:HBox>
-		
-		<!-- Share section -->		
-		<mx:VBox
-			visible="{(props.get('showShare') as Boolean)}"
-			verticalGap="5"
-			width="100%"
-			paddingTop="10" 
-			borderColor="#666666"
-			borderStyle="solid"
-			borderSides="top"
-			borderThickness="1"
-			>
-			<mx:HBox 
-				horizontalGap="3"
-				>
-				<com:ActionButton
-					text="Mail video" 
-					iconSource="@Embed(source='assets/buttons/mail.swf')"
-					visible="{props.get('mailLink')!=''}"
-					click="{goToUrl(props.get('mailLink') as String)}"
-					/>
-				<com:ActionButton
-					text="Post to Facebook" 
-					iconSource="@Embed(source='assets/buttons/facebook.swf')"
-					visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link')!=''}"
-					click="{goToUrl(activeElement.get('link') + '/facebook?player_id=' + props.get('player_id'))}"
-					/>
-				<com:ActionButton
-					text="Post to Twitter" 
-					iconSource="@Embed(source='assets/buttons/twitter.swf')"
-					visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link')!=''}"
-					click="{goToUrl(activeElement.get('link') + '/twitter?player_id=' + props.get('player_id'))}"
-					/>
-			</mx:HBox>
-			<mx:HBox
-				horizontalGap="5"
-				>
-				<com:ActionButton
-					text="Get as RSS" 
-					iconSource="@Embed(source='assets/buttons/rss.swf')"
-					visible="{props.get('rssLink')!=''}"
-					click="{goToUrl(props.get('rssLink') as String)}"
-					/>
-				<com:ActionButton
-					text="Get as Podcast" 
-					iconSource="@Embed(source='assets/buttons/podcast.swf')"
-					visible="{props.get('podcastLink')!=''}"
-					click="{goToUrl(props.get('podcastLink') as String)}"
-					/>
-			</mx:HBox>
-		</mx:VBox> 
-	</com:TextPanel>
-	<!-- /Embed panel -->
+	</mx:VBox>
 
 	<!-- Text panel for post-roll html identity text -->
 	<com:TextPanel id="identityPanel" 
@@ -700,6 +640,14 @@
 		</mx:HBox>
 	</com:TextPanel> 
 	<!-- / Text panel for post-roll -->
-	
-	
+	</mx:Canvas>
 </mx:Application>
+
+<!-- 
+  Identity: pre, post, text
+  Logo
+  App properties
+  Font sizes
+  Tray hide
+  Descriptions + Info icon
+--> 
