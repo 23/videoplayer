@@ -19,7 +19,6 @@
 			maintainAspectRatio="false"
 			width="{this.width}"
 			height="{this.height}"
-			source="@Embed(source='assets/buttons/action-button.png', scaleGridTop=8, scaleGridBottom=20, scaleGridLeft=8, scaleGridRight=50)"
 			/>
 		<mx:Image id="buttonIcon"
 			buttonMode="true" 
