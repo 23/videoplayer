@@ -1,4 +1,3 @@
-import mx.events.VideoEvent;
 [Bindable] public var numElements:int = 0;
 [Bindable] public var currentElementIndex:int = 0;
 [Bindable] public var activeElement:HashCollection = new HashCollection();
@@ -113,7 +112,7 @@ private function createItemsArray(p:Object) : Array {
 		var o:Object = p.photos[i];
 		var item : Object = new Object();
 		item.itemID = i;		
-		item.photoSource = 'http://' + props.get('domain') + o.small_download;
+		item.photoSource = 'http://' + props.get('domain') + o.quad75_download;
 		item.videoSource = 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined' ? o.video_medium_download : o.video_small_download);
 		item.photoWidth = new Number(o.large_width);
 		item.photoHeight = new Number(o.large_height);
