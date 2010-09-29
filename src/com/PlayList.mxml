@@ -7,7 +7,7 @@
 			
 			private var _items : Array;
 			
-			public function set headline(value:String):void {playlistHeadline.text = value;}
+			public function set headline(value:String):void {}
 
 			public function set itemArray(value : Array) : void
 			{
@@ -63,8 +63,6 @@
 						playlistElement.itemID = _items[i].itemID;
 						playlistElement.movieName = _items[i].title;
 						playlistElement.sourceURL = _items[i].photoSource;
-						playlistElement.width = 100;
-						playlistElement.height = 100;
 						playlistElement.verticalScrollPolicy = "off";
 						playlistElement.horizontalScrollPolicy = "off";
 						playListBox.addChild(playlistElement);
@@ -80,11 +78,7 @@
 			
 		]]>
 	</mx:Script>
-	<mx:Label id="playlistHeadline" paddingTop="15" paddingLeft="25" text="" visible="{playlistHeadline.text!=''}" includeInLayout="{playlistHeadline.visible}" 
-		fontFamily="{this.parentApplication.props.get('trayFont')}" color="{(StyleManager.getColorName(this.parentApplication.props.get('trayTextColor')) as Number)}" 
-		fontSize="{(this.parentApplication.props.get('trayTitleFontSize') as Number)}" fontWeight="{this.parentApplication.props.get('trayTitleFontWeight')}" truncateToFit="true"/>
-	
-	<mx:Canvas width="100%" height="100">
+	<mx:Canvas width="100%" height="123">
 		<mx:Canvas id="previousBtn" click="{scrollBack()}" width="25" backgroundImage="@Embed('assets/buttons/previous.swf')" top="0" left="0" bottom="0" alpha="0.7" mouseOver="previousBtn.alpha=1;" mouseOut="previousBtn.alpha=0.7;"/>
 		<mx:Canvas verticalCenter="0" verticalScrollPolicy="off" horizontalScrollPolicy="off" left="{previousBtn.width+5}" right="{nextBtn.width+5}" id="playListCanvas">
 			<mx:HBox id="playListBox" verticalScrollPolicy="off" verticalCenter="0"/>
