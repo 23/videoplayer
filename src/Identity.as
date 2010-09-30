@@ -5,13 +5,14 @@ import mx.events.VideoEvent;
 public function showIdentityVideo(url:String, link:String, callback:Function):void {
 	videoControls.visible = video.visible = false;
 	infoHide();
+	playListHide();
 	identityVideo.visible = true;
 	identityVideo.source = url;
 	identityVideo.play();
 	clickTarget = link;
 	var onComplete:Function = function():void {
 			if(!identityVideo.visible) return;
-			infoShow();
+			playListShow();
 			identityVideo.visible = false;
 			videoControls.visible = video.visible = true;
 			clickTarget = activeElement.getString('one');

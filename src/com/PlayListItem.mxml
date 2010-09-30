@@ -14,7 +14,6 @@
 			private var _photoSource : String;
 			private var _title : String;
 			
-			
 			public function set sourceURL(value : String) : void 
 			{
 				_sourceURL = value;
@@ -54,6 +53,6 @@
 		]]>
 	</mx:Script>
 	<com:SmoothImage id="moviePreview" top="0" width="75" height="75" scaleContent="true" visible="false" verticalAlign="bottom"/>
-	<mx:Text id="nameLabel" top="75" color="0xFFFFFF" fontSize="9" width="75" height="20" truncateToFit="true" bottom="2" visible="false" selectable="false" />
+	<mx:Text id="nameLabel" color="white" top="75" fontSize="9" width="75" height="20" truncateToFit="true" bottom="2" visible="false" selectable="false" />
 	<mx:Canvas id="clickHolder" width="100%" height="100%" verticalCenter="0" horizontalCenter="0" backgroundColor="black" backgroundAlpha="0.001" useHandCursor="true" buttonMode="true"/>
 </mx:Canvas>

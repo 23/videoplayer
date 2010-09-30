@@ -20,17 +20,17 @@
 	<mx:Style>
      @font-face {
         src:url("assets/fonts/HelveticaNeue.ttc");
-        fontFamily: helvetica;
+        fontFamily: Helvetica;
         advancedAntiAliasing: true;
      }		
      @font-face {
         src:url("assets/fonts/HelveticaNeue.ttc");
-        fontFamily: helvetica;
+        fontFamily: Helvetica;
         fontWeight: bold;
         advancedAntiAliasing: true;
      }		
      Application {
-     	fontFamily: helvetica;
+     	fontFamily: Helvetica;
      }
 	</mx:Style>
  	<mx:Script source="Utility.as"></mx:Script>
@@ -342,6 +342,8 @@
 	<com:PlayerButton id="bigPlayImage" 
 		width="54" 
 		height="50"
+		backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+		backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 		imageSource="@Embed(source='assets/buttons/play.swf')"
 		imageWidth="22" 
 		imageHeight="22"
@@ -424,7 +426,7 @@
 			height="123" 
 			width="100%" 
 			backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
-			backgroundAlpha="0.8" 
+			backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 			visible="{showPlayList}"
 			includeInLayout="{playListContainer.visible}"
 			>
@@ -438,45 +440,68 @@
 		<!-- /PlayList -->
 
 		<!-- Embed panel -->
-		<mx:HBox 
+		<mx:VBox 
 			id="embedPanel" 
 			width="100%" 
 			horizontalGap="1" 
 			height="68" 
+			backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+			backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+			paddingLeft="10" 
+			paddingRight="10" 
+			paddingTop="5" 
+			verticalGap="3" 
 			horizontalScrollPolicy="off" 
 			verticalScrollPolicy="off" 
 			visible="false"
 			includeInLayout="{embedPanel.visible}"
 			>
-			<mx:VBox id="sharing" width="{embedPanel.width}" backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" backgroundAlpha="0.8" paddingLeft="10" paddingRight="10" paddingTop="5" height="100%"  verticalGap="3" horizontalScrollPolicy="off" verticalScrollPolicy="off">
-				<mx:Text text="EMBED" color="white" fontSize="13" fontWeight="bold" />
-				<mx:TextArea id="embedText" height="21" width="100%" backgroundAlpha="0.15" text="{props.get('embedCode')}" 
-					click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
-					backgroundColor="white" borderStyle="none" paddingTop="2" paddingLeft="2" color="white" fontSize="11" /> 
-			</mx:VBox>
-		</mx:HBox>
+			<mx:Text 
+				text="EMBED"
+				color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+				fontSize="{(props.get('trayTitleFontSize') as Number)}" 
+				fontWeight="{props.get('trayTitleFontWeight')}" 
+				/>
+			<mx:TextArea 
+				id="embedText" 
+				height="21" 
+				width="100%" 
+				color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+				backgroundColor="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+				backgroundAlpha="0.15" 
+				text="{props.get('embedCode')}" 
+				click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
+				borderStyle="none" 
+				paddingTop="2" 
+				paddingLeft="2" 
+				fontSize="11" /> 
+		</mx:VBox>
 		<!-- /Embed panel -->
 		
 		<!-- Words panel -->
 		<mx:VBox id="descriptions" 
 			width="100%" 
 			horizontalGap="1" 
-			height="68" 
 			horizontalScrollPolicy="off" 
 			verticalScrollPolicy="off" 
 			visible="false"
+			backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+			backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 			includeInLayout="{descriptions.visible}"
 			fontFamily="{props.get('trayFont')}" 
 			color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 			>
 			<mx:Text id="trayContent" 
+				paddingLeft="10" 
+				paddingTop="5" 
 				fontSize="{(props.get('trayContentFontSize') as Number)}" 
 				fontWeight="{props.get('trayContentFontWeight')}" 
+				color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 				htmlText="{activeElement.get('content')}" 
 				truncateToFit="true" 
 				maxWidth="{Application.application.width}" 
 				updateComplete="trayContent.visible = (trayContent.text.length>0);" 
-				height="{(props.get('trayContentFontSize') as Number)*3.2}" 
+				height="{(props.get('trayContentFontSize') as Number)*4.8}" 
 				width="{descriptions.width - 15}"
 				/>
 		</mx:VBox>
@@ -498,7 +523,7 @@
 	    			visible="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}" 
 	    			click="playVideoElement()"
 					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
-					backgroundAlpha="0.8" 
+					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 	    			/>
 	    		<com:PlayerButton id="pauseImage" 
 	    			width="60" height="45" 
@@ -506,20 +531,20 @@
 	    			visible="{(cleanVideoState=='playing' &amp;&amp; !identityVideo.visible)}" 
 	    			click="pauseVideoElement()"
 					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
-					backgroundAlpha="0.8" 
+					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 	    			/>
 	    		<com:PlayerButton id="bufferImage"  
 	    			width="60" height="45" 
 	    			imageSource="@Embed(source='assets/buttons/buffering.swf')"
 	    			visible="{(cleanVideoState=='buffering' &amp;&amp; !identityVideo.visible)}" 
 					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
-					backgroundAlpha="0.8" 
+					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 	    			/>  
 
 				<mx:VBox 
 					id="progressContainer"
 					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
-					backgroundAlpha="0.8"
+					backgroundAlpha="{(props.get('trayAlpha') as Number)}"
 					verticalGap="1"
 					paddingLeft="8"
 					paddingRight="8"
@@ -538,10 +563,10 @@
 						<mx:Text 
 							text="{activeElement.getString('title').toUpperCase()}"
 							truncateToFit="true"
-							color="white"
-							paddingTop="3"
-							fontSize="13"
-							fontWeight="bold"
+							fontSize="{(props.get('trayTitleFontSize') as Number)}" 
+							fontWeight="{props.get('trayTitleFontWeight')}" 
+							color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+							paddingTop="2"
 							visible="{video.width-featureButtons.width>100}"
 							height="17"
 							includeInLayout="true"
@@ -553,6 +578,7 @@
 							horizontalGap="0"
 							paddingTop="2"
 							>
+
 							<!-- FeedPanel -->
 				    		<com:PlayerButton id="feedpanelBtn" 
 				    			imageSource="@Embed(source='assets/buttons/share.swf')"
@@ -560,12 +586,12 @@
 				    			click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible;"
 				    			/>
 
-							<!-- Fullscreen -->
-				    		<com:PlayerButton id="fullscreenImage"
-				    			imageSource="@Embed(source='assets/buttons/fullscreen.swf')"
-				    			click="toggleFullScreen()"
+				    		<!-- InfoBtn -->
+				    		<com:PlayerButton id="infoImage" 
+				    			imageSource="@Embed(source='assets/buttons/info.swf')"
+				    			visible="{(activeElement.get('hasInfo') as Boolean)}" 
+				    			click="infoToggle();"
 				    			/>
-
 							<!-- HDbutton-->
 							<com:PlayerButton id="hdBtn"
 								imageSource="@Embed(source='assets/buttons/hd-off.swf')"
@@ -581,17 +607,25 @@
 							<!-- Link -->
 				    		<com:PlayerButton id="linkBtn" 
 				    			imageSource="@Embed(source='assets/buttons/link.swf')"
+				    			visible="{(props.get('showShare') as Boolean)}" 
 				    			click="{goToUrl(activeElement.get('link') + '?player_id=' + props.get('player_id'))}"
 				    			/>
 							<!-- Twitter -->
 				    		<com:PlayerButton id="twitterBtn" 
 				    			imageSource="@Embed(source='assets/buttons/twitter.swf')"
+				    			visible="{(props.get('showShare') as Boolean)}" 
 				    			click="{goToUrl(activeElement.get('link') + '/twitter?player_id=' + props.get('player_id'))}"
 				    			/>
 							<!-- Facebook -->
 				    		<com:PlayerButton id="facebookBtn" 
 				    			imageSource="@Embed(source='assets/buttons/facebook.swf')"
+				    			visible="{(props.get('showShare') as Boolean)}" 
 				    			click="{goToUrl(activeElement.get('link') + '/facebook?player_id=' + props.get('player_id'))}"
+				    			/>
+							<!-- Fullscreen -->
+				    		<com:PlayerButton id="fullscreenImage"
+				    			imageSource="@Embed(source='assets/buttons/fullscreen.swf')"
+				    			click="toggleFullScreen()"
 				    			/>
 				    	</mx:HBox> 
 					</mx:HBox> 
@@ -642,12 +676,3 @@
 	<!-- / Text panel for post-roll -->
 	</mx:Canvas>
 </mx:Application>
-
-<!-- 
-  Identity: pre, post, text
-  Logo
-  App properties
-  Font sizes
-  Tray hide
-  Descriptions + Info icon
---> 
