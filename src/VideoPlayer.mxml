@@ -123,7 +123,7 @@
 			
             private function createPlayList():void  {
             	var arr:Array = createItemsArray(recommendations);
-            	if(arr.length==0) return;
+            	if(arr.length<=1) return;
 				enablePlayList = true;
 				playListHolder.removeAllChildren(); // if we've done this before, clean up after ourselves.
             	playList = new PlayList();
