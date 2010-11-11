@@ -160,13 +160,13 @@ private function getRecommendationSource():String {
 		switch (method) {
 			case 'site-new':
 			case 'channel-new':
-				recommendationSource = 'http://' + domain + '/js/photos?raw&size=10&orderby=uploaded&order=desc';
+				recommendationSource = 'http://' + domain + '/js/photos?raw&size=20&orderby=uploaded&order=desc';
 				break;
 			case 'site-popular':
 			case 'channel-popular':
 			case 'similar':
 			default:
-				recommendationSource = 'http://' + domain + '/js/photos?raw&size=10&orderby=rank&order=desc';
+				recommendationSource = 'http://' + domain + '/js/photos?raw&size=20&orderby=rank&order=desc';
 				break;
 		}
 		if (playerId.length) recommendationSource += '&player_id=' + encodeURI(playerId);
