@@ -151,7 +151,7 @@ private function initProperties(settings:Object):void {
 
 private function getRecommendationSource():String {
 	var domain:String = new String(props.get('domain'));
-	if(!context || !context.photos) return('http://' + domain + '/js/photos?raw&size=10');
+	if(!context || !context.photos) return('http://' + domain + '/js/photos?raw&size=20');
 	
 	if(context.photos.length==1) {
 		// There's only one video to play, we'll need to construct recommendation in another fashion.
