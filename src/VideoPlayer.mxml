@@ -238,7 +238,7 @@
             private function onVideoComplete(ignoreIdentity:Boolean=false):void {
      			reportPlayTime(video.playheadTime);
      			if(!ignoreIdentity) return(handleIdentity('after', function():void {onVideoComplete(true);}));
-            	if(props.get('loop') || props.get('autoPlay')) {
+            	if(props.get('loop')) {
             		var more:Boolean = nextElement();
             		if(!more) onPlayListDone();
             	} else {
