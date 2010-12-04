@@ -64,7 +64,7 @@
 						ExternalInterface.addCallback('pauseVideo', function():void {pauseVideoElement();});
 						ExternalInterface.addCallback('playVideo', function():void {playVideoElement();});
 						ExternalInterface.addCallback('getPlayState', function():String {return(cleanVideoState);});
-						ExternalInterface.addCallback('getPlayheadTime', function():Object {return(video.playheadTime);});
+						ExternalInterface.addCallback('getPlayheadTime', function():Object {return(video.playheadTime + activeElement.getNumber('start'));});
 						ExternalInterface.addCallback('setPlayheadTime', function(time:int):void {progress.seekVideoTo(time);});
 						ExternalInterface.addCallback('getTotalTime', function():Object {return(video.totalTime);});
 						ExternalInterface.addCallback('getCurrentPhotoID', function():Object {return(activeElement.get('photo_id'));});
