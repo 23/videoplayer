@@ -8,3 +8,16 @@ private function doJSON(url:String, f:Function):DynamicURLLoader {
 	loader.load(new URLRequest(url));
 	return(loader);
 }
+private function doAPI(method:String, parameters:Object, f:Function):DynamicURLLoader {
+	parameters['raw'] = 't';
+	parameters['format'] = 'json';
+	var url:String = 'http://' + props.get('domain') + method + '?' + toQueryString(parameters); 
+	return doJSON(url, f);
+}
+private function toQueryString(o:Object):String {
+	var a:Array = [];
+	for (var s:String in o) {
+		a.push(encodeURIComponent(s) + '=' + encodeURIComponent(o[s]));
+	}
+	return(a.join('&'));
+}
