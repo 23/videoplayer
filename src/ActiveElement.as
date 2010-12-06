@@ -166,7 +166,7 @@ private function showVideoElement():void {
 	image.visible=true;
 }
 
-private function playVideoElement():void {
+public function playVideoElement():void {
 	if(!activeElement.get('video_p')) return;
 	image.visible=false;
 	video.visible=true;
