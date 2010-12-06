@@ -19,11 +19,14 @@
 	>                                                                                             
 	<mx:Script>
 		<![CDATA[
+			import com.philemonworks.flex.util.HashCollection;
+			
 			import mx.controls.Image;
 			import mx.core.Application;
-			import com.philemonworks.flex.util.HashCollection;
-			[bindable] private var props:HashCollection = mx.core.Application.application.props;
+			import mx.core.FlexGlobals;
+			[bindable] private var props:HashCollection = mx.core.FlexGlobals.topLevelApplication.props;
 			public var imageContainer:Image = new Image();
+			private var _imageWidth:int, _imageHeight:int;
 			public function set imageSource(source:Object):void {
 				imageContainer.alpha = 0.95;
 				imageContainer.source = source;

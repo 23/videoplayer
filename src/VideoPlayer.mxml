@@ -80,7 +80,7 @@
 						ExternalInterface.addCallback('pauseVideo', function():void {pauseVideoElement();});
 						ExternalInterface.addCallback('playVideo', function():void {playVideoElement();});
 						ExternalInterface.addCallback('getPlayState', function():String {return(cleanVideoState);});
-						ExternalInterface.addCallback('getPlayheadTime', function():Object {return(video.playheadTime);});
+						ExternalInterface.addCallback('getPlayheadTime', function():Object {return(video.playheadTime + activeElement.getNumber('start'));});
 						ExternalInterface.addCallback('setPlayheadTime', function(time:int):void {progress.seekVideoTo(time);});
 						ExternalInterface.addCallback('getTotalTime', function():Object {return(video.totalTime);});
 						ExternalInterface.addCallback('getCurrentPhotoID', function():Object {return(activeElement.get('photo_id'));});
@@ -96,18 +96,18 @@
 				try {if(video.playing) reportPlayTime(video.playheadTime)} catch(e:Error){}
 			}
 			public function load():void {
-				var domain:String = URLUtil.getServerName(Application.application.url);
+				var domain:String = URLUtil.getServerName(FlexGlobals.topLevelApplication.url);
 				if(domain=='localhost' || domain=='') domain=defaultDomain;
 				
 				// Are we using a specific player, or just the default? (if so, we want to specify the player id to get the correct video settings)
-				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(Application.application.url);
+				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(FlexGlobals.topLevelApplication.url);
 				if (testCustomPlayer && testCustomPlayer.length>1) playerId = testCustomPlayer[1]; 
 				
 				// Mash up embed parameters, including .swf?..., Flashvars, width and height to get a good embed code   
 				var a:Array = []; var v:String;
-				for (v in Application.application.parameters) {a.push(encodeURIComponent(v) + '=' + encodeURIComponent(Application.application.parameters[v]));}
-				a.push('width=' + encodeURIComponent(Application.application.width));
-				a.push('height=' + encodeURIComponent(Application.application.height));
+				for (v in FlexGlobals.topLevelApplication.parameters) {a.push(encodeURIComponent(v) + '=' + encodeURIComponent(FlexGlobals.topLevelApplication.parameters[v]));}
+				a.push('width=' + encodeURIComponent(FlexGlobals.topLevelApplication.width));
+				a.push('height=' + encodeURIComponent(FlexGlobals.topLevelApplication.height));
 				
 				// Get settings for this player from 23 Video
 				var settings_endpoint:String = 'http://' + domain + '/js/video-settings?raw&parameters=' + encodeURIComponent(a.join('&')) + (playerId ? '&player_id=' + playerId : '');
@@ -191,7 +191,7 @@
             	// Hide when the timer completes
 				trayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void {trayHide();});
 				// Reset timer when the mouse moves in the application
-				Application.application.addEventListener(MouseEvent.MOUSE_MOVE, function():void {trayShow();});
+				FlexGlobals.topLevelApplication.addEventListener(MouseEvent.MOUSE_MOVE, function():void {trayShow();});
             	
             	// INFORMATION BOX WITH TITLE AND DESCRIPTION
             	// Hide when the timer completes
@@ -259,7 +259,7 @@
             private function onVideoComplete(ignoreIdentity:Boolean=false):void {
      			reportPlayTime(video.playheadTime);
      			if(!ignoreIdentity) return(handleIdentity('after', function():void {onVideoComplete(true);}));
-            	if(props.get('loop') || props.get('autoPlay')) {
+            	if(props.get('loop')) {
             		var more:Boolean = nextElement();
             		if(!more) onPlayListDone();
             	} else {
@@ -290,7 +290,7 @@
 	
 	<!-- Simple element to provide a backdrop when everything else fails -->
 	<mx:Box id="background" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" 
+		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}" 
 		width="100%" 
 		height="100%" 
 		verticalCenter="0" 
@@ -303,8 +303,8 @@
 	<mx:Canvas id="contentContainer"
 		x="{props.getNumber('horizontalPadding')/2}"
 		y="0"
-		width="{Application.application.width-props.getNumber('horizontalPadding')}"
-		height="{Application.application.height-props.getNumber('verticalPadding')}"
+		width="{FlexGlobals.topLevelApplication.width-props.getNumber('horizontalPadding')}"
+		height="{FlexGlobals.topLevelApplication.height-props.getNumber('verticalPadding')}"
 		>
 	<!-- Image and Video -->
 	<mx:VideoDisplay id="video" 
@@ -342,11 +342,11 @@
 	<com:PlayerButton id="bigPlayImage" 
 		width="54" 
 		height="50"
-		backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+		backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 		backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 		imageSource="@Embed(source='assets/buttons/play.swf')"
-		imageWidth="22" 
-		imageHeight="22"
+		imageWidth="54" 
+		imageHeight="50"
 		verticalCenter="0" 
 		horizontalCenter="0" 
 		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
@@ -378,8 +378,8 @@
 		/>
 	<com:OverlayMessage id="identityMessage"
 		fontFamily="{props.get('trayFont')}" 
-		color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-		backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+		color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+		backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 		visible="{props.get('identityCountdown') &amp;&amp; identityVideo.visible}"
 		allowClose="{props.get('identityAllowClose')}"
 		close="{identityVideo.stop(); identityVideo.dispatchEvent(new Event('complete', true));}"
@@ -425,7 +425,7 @@
 		<mx:Canvas id="playListContainer"
 			height="123" 
 			width="100%" 
-			backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
+			backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
 			backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 			visible="{showPlayList}"
 			includeInLayout="{playListContainer.visible}"
@@ -445,7 +445,7 @@
 			width="100%" 
 			horizontalGap="1" 
 			height="68" 
-			backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+			backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 			backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 			paddingLeft="10" 
 			paddingRight="10" 
@@ -458,7 +458,7 @@
 			>
 			<mx:Text 
 				text="EMBED"
-				color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+				color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 				fontSize="{(props.get('trayTitleFontSize') as Number)}" 
 				fontWeight="{props.get('trayTitleFontWeight')}" 
 				/>
@@ -466,8 +466,8 @@
 				id="embedText" 
 				height="21" 
 				width="100%" 
-				color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-				backgroundColor="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+				color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+				backgroundColor="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 				backgroundAlpha="0.15" 
 				text="{props.get('embedCode')}" 
 				click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
@@ -485,21 +485,21 @@
 			horizontalScrollPolicy="off" 
 			verticalScrollPolicy="off" 
 			visible="false"
-			backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+			backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 			backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 			includeInLayout="{descriptions.visible}"
 			fontFamily="{props.get('trayFont')}" 
-			color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+			color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 			>
 			<mx:Text id="trayContent" 
 				paddingLeft="10" 
 				paddingTop="5" 
 				fontSize="{(props.get('trayContentFontSize') as Number)}" 
 				fontWeight="{props.get('trayContentFontWeight')}" 
-				color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+				color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 				htmlText="{activeElement.get('content')}" 
 				truncateToFit="true" 
-				maxWidth="{Application.application.width}" 
+				maxWidth="{FlexGlobals.topLevelApplication.width}" 
 				updateComplete="trayContent.visible = (trayContent.text.length>0);" 
 				height="{(props.get('trayContentFontSize') as Number)*4.8}" 
 				width="{descriptions.width - 15}"
@@ -522,7 +522,7 @@
 	    			imageSource="@Embed(source='assets/buttons/play.swf')"
 	    			visible="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}" 
 	    			click="playVideoElement()"
-					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
+					backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
 					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 	    			/>
 	    		<com:PlayerButton id="pauseImage" 
@@ -530,20 +530,20 @@
 	    			imageSource="@Embed(source='assets/buttons/pause.swf')"
 	    			visible="{(cleanVideoState=='playing' &amp;&amp; !identityVideo.visible)}" 
 	    			click="pauseVideoElement()"
-					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
+					backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
 					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 	    			/>
 	    		<com:PlayerButton id="bufferImage"  
 	    			width="60" height="45" 
 	    			imageSource="@Embed(source='assets/buttons/buffering.swf')"
 	    			visible="{(cleanVideoState=='buffering' &amp;&amp; !identityVideo.visible)}" 
-					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
+					backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
 					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 	    			/>  
 
 				<mx:VBox 
 					id="progressContainer"
-					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
+					backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
 					backgroundAlpha="{(props.get('trayAlpha') as Number)}"
 					verticalGap="1"
 					paddingLeft="8"
@@ -565,7 +565,7 @@
 							truncateToFit="true"
 							fontSize="{(props.get('trayTitleFontSize') as Number)}" 
 							fontWeight="{props.get('trayTitleFontWeight')}" 
-							color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+							color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 							paddingTop="2"
 							visible="{video.width-featureButtons.width>100}"
 							height="17"
@@ -644,7 +644,7 @@
 
 	<!-- Text panel for post-roll html identity text -->
 	<com:TextPanel id="identityPanel" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}"
+		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}"
 		>
 		<mx:TextArea id="identityPanelText"
 			width="100%"
