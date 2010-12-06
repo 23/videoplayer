@@ -65,6 +65,15 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	activeElement.put('afterDownloadUrl', 'http://' + props.get('domain') + o.after_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
 	activeElement.put('afterLink', o.after_link);
 	activeElement.put('afterText', o.after_text); 
+	
+	// Get sections and show, otherwise reset
+	if(o.sections_p) {
+		try {
+			doAPI('/api/photo/section/list', {photo_id:o.photo_id, token:o.token}, function(sec:Object):void{progress.setSections(sec.sections);});
+		} catch(e:Error) {progress.setSections([]);}
+	} else {
+		progress.setSections([]);
+	}
 
 	activeElement.put('one', 'http://' + props.get('domain') + o.one); 
 	clickTarget = activeElement.getString('one');

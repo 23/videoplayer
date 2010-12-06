@@ -8,6 +8,7 @@
 	height="32"
 	top="2" 
 	click="seekVideoTo((this.contentMouseX-5)/videoProgress.width*activeElement.getNumber('length'));" 
+	resize="drawSections();"
 	>
 	<!-- VideoProgress -->
 	<mx:Canvas id="videoProgress" 
@@ -31,6 +32,11 @@
 			/>
 	</mx:Canvas>					
 
+	<!-- Sections -->
+	<mx:Canvas id="sectionContainer" top="0" left="0" width="100%" height="100%">
+		
+	</mx:Canvas>
+	
 	<mx:Image id="progressHandle"
 		x="{Math.min(videoPlayProgress.x+videoPlayProgress.width+5, videoPlayProgress.x+videoProgress.width)}"
 		y="7"
@@ -53,12 +59,11 @@
 	
 	<mx:Script>
 		<![CDATA[
-			import mx.events.VideoEvent;
-			import mx.controls.VideoDisplay;
-
-			// Import props hash array from main application 
-			import mx.core.Application;
 			import com.philemonworks.flex.util.HashCollection;
+			
+			import mx.controls.VideoDisplay;
+			import mx.core.Application;
+			import mx.events.VideoEvent;
 			[bindable] private var props:HashCollection = mx.core.FlexGlobals.topLevelApplication.props;
 			[bindable] private var activeElement:HashCollection = mx.core.FlexGlobals.topLevelApplication.activeElement;
 			
@@ -114,6 +119,41 @@
 				v.addEventListener(ProgressEvent.PROGRESS, updateBuffer);
 			}
 			public function get targetVideo():VideoDisplay {return(_targetVideo);}
+			
+			private var _sections:Array = [];
+			public function setSections(s:Array):void{
+				_sections = s;
+				drawSections();
+			}			
+			private function drawSections():void{
+				// Clear current objects
+				sectionContainer.removeAllChildren();
+				// Add new ones
+				for (var i:int=0; i<_sections.length; i++) {
+					var s:Object = _sections[i];
+					var section:PlayerProgressSection = new com.PlayerProgressSection;
+					
+					// Position section indicator
+					section.labelFontSize = (props.getNumber('trayTitleFontSize') || 12)-2; 
+					section.labelFontWeight = props.getString('trayTitleFontWeight'); 
+					
+					section.width = 10;
+					section.height = 10;
+					section.y = 8;
+					section.x = 4 + ((s.start_time/activeElement.getNumber('length')) * videoProgress.width);
+					section.title = s.title;
+					section.startTime = s.start_time;
+					
+					// Listen to clicks
+					section.addEventListener(MouseEvent.CLICK, function(e:Event):void{
+						e.stopPropagation();
+						seekVideoTo(e.currentTarget.startTime);
+					});
+					
+					// Add to progress bar
+					sectionContainer.addChild(section);
+				}
+			}
 		]]>
 	</mx:Script>	
 </mx:Canvas>
