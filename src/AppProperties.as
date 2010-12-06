@@ -1,5 +1,7 @@
 // ActionScript file
+import mx.core.FlexGlobals;
 import mx.utils.URLUtil;
+
 [Bindable] public var props:HashCollection = new HashCollection()
 public var propDefaults:Object = {
 	backgroundColor: 'black',
@@ -74,30 +76,30 @@ private function initProperties(settings:Object):void {
 	}
 	// Read from FlashVars
 	for (name in propDefaults) {
-	  	if(typeof(Application.application.parameters[name])!='undefined') {
-	  		if(name!='showDescriptions' && name!='autoPlay') loadSettings.push(name + '=' + encodeURI(Application.application.parameters[name]));
+	  	if(typeof(FlexGlobals.topLevelApplication.parameters[name])!='undefined') {
+	  		if(name!='showDescriptions' && name!='autoPlay') loadSettings.push(name + '=' + encodeURI(FlexGlobals.topLevelApplication.parameters[name]));
 	  		if (typeof propDefaults[name]=='boolean') {
-			 	props.put(name, new Boolean(parseFloat(Application.application.parameters[name])));
+			 	props.put(name, new Boolean(parseFloat(FlexGlobals.topLevelApplication.parameters[name])));
 		 	} else {	
-	  	    	if (isNaN(Application.application.parameters[name]) || name=='logoSource') {
-			 		props.put(name, Application.application.parameters[name]);
+	  	    	if (isNaN(FlexGlobals.topLevelApplication.parameters[name]) || name=='logoSource') {
+			 		props.put(name, FlexGlobals.topLevelApplication.parameters[name]);
 	  	    	} else {
-				 	props.put(name, parseFloat(Application.application.parameters[name]));
+				 	props.put(name, parseFloat(FlexGlobals.topLevelApplication.parameters[name]));
 	  	    	}
 	  	    }
 	  	}
 	}
 
 	// Determine a load parameters
-	var domain:String = URLUtil.getServerName(Application.application.url);
+	var domain:String = URLUtil.getServerName(FlexGlobals.topLevelApplication.url);
 	if(domain=='localhost' || domain=='') domain=defaultDomain;
 	props.put('domain', domain);
     var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size'];
     for (var i:int=0; i<options.length; i++) {
 		var opt:String = options[i];
-		if (Application.application.parameters[opt]) {
-			loadParameters.push(opt + '=' + encodeURI(Application.application.parameters[opt]));
-			loadSettings.push(opt + '=' + encodeURI(Application.application.parameters[opt]));
+		if (FlexGlobals.topLevelApplication.parameters[opt]) {
+			loadParameters.push(opt + '=' + encodeURI(FlexGlobals.topLevelApplication.parameters[opt]));
+			loadSettings.push(opt + '=' + encodeURI(FlexGlobals.topLevelApplication.parameters[opt]));
 		}
     }
 	if (defaultPhotoId.length) loadParameters.push('photo_id=' + encodeURI(defaultPhotoId)); 

@@ -14,12 +14,13 @@
 	hide="onVisibilityChange()"
 	show="onVisibilityChange()"
 	added="onVisibilityChange()"
-	>                                                                                             
+	>
 	<mx:Script>
 		<![CDATA[
+			import com.philemonworks.flex.util.HashCollection;
+			import mx.core.FlexGlobals;
 			import mx.controls.Image;
 			import mx.core.Application;
-			import com.philemonworks.flex.util.HashCollection;
 
 			[Embed(source="assets/buttons/player-button-background.png")] [Bindable] public var playerButtonBackground:Class;
 			[Embed(source="assets/buttons/player-button-pressed.png")] [Bindable] public var playerButtonPressed:Class;
@@ -31,8 +32,9 @@
 				imageContainer.y = 1;
 			}
 
-			[bindable] private var props:HashCollection = mx.core.Application.application.props;
+			[bindable] private var props:HashCollection = mx.core.FlexGlobals.topLevelApplication.props;
 			public var imageContainer:Image = new Image();
+			private var _imageWidth:int, _imageHeight:int;
 			public function set imageSource(source:Object):void {
 				imageContainer.source = source;
 				this.addChild(imageContainer);					
