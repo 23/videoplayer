@@ -80,18 +80,18 @@
 				try {if(video.playing) reportPlayTime(video.playheadTime)} catch(e:Error){}
 			}
 			public function load():void {
-				var domain:String = URLUtil.getServerName(Application.application.url);
+				var domain:String = URLUtil.getServerName(FlexGlobals.topLevelApplication.url);
 				if(domain=='localhost' || domain=='') domain=defaultDomain;
 				
 				// Are we using a specific player, or just the default? (if so, we want to specify the player id to get the correct video settings)
-				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(Application.application.url);
+				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(FlexGlobals.topLevelApplication.url);
 				if (testCustomPlayer && testCustomPlayer.length>1) playerId = testCustomPlayer[1]; 
 				
 				// Mash up embed parameters, including .swf?..., Flashvars, width and height to get a good embed code   
 				var a:Array = []; var v:String;
-				for (v in Application.application.parameters) {a.push(encodeURIComponent(v) + '=' + encodeURIComponent(Application.application.parameters[v]));}
-				a.push('width=' + encodeURIComponent(Application.application.width));
-				a.push('height=' + encodeURIComponent(Application.application.height));
+				for (v in FlexGlobals.topLevelApplication.parameters) {a.push(encodeURIComponent(v) + '=' + encodeURIComponent(FlexGlobals.topLevelApplication.parameters[v]));}
+				a.push('width=' + encodeURIComponent(FlexGlobals.topLevelApplication.width));
+				a.push('height=' + encodeURIComponent(FlexGlobals.topLevelApplication.height));
 				
 				// Get settings for this player from 23 Video
 				var settings_endpoint:String = 'http://' + domain + '/js/video-settings?raw&parameters=' + encodeURIComponent(a.join('&')) + (playerId ? '&player_id=' + playerId : '');
@@ -157,14 +157,14 @@
             private function trayShow():void {
             	if(!props.get('showTray')) {tray.visible=false; return;}
             	trayTimer.reset(); trayTimer.start();
-		        tray.y = Application.application.height - tray.height + (showPlayList ? 0 : playListHolder.height); // ... to just inside, depending on context
+		        tray.y = FlexGlobals.topLevelApplication.height - tray.height + (showPlayList ? 0 : playListHolder.height); // ... to just inside, depending on context
             	tray.visible = true;
             }            
             private function trayHide():void {
             	if (showPlayList) return;
             	trayTimer.stop();
             	if(props.getNumber('trayTimeout')<=0) return;
-				tray.y = Application.application.height; // ... to outside of frame
+				tray.y = FlexGlobals.topLevelApplication.height; // ... to outside of frame
                 tray.visible = false;
             }            
 			private var trayTimer:Timer = new Timer(3000,1);
@@ -174,7 +174,7 @@
             	// Hide when the timer completes
 				trayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void {trayHide();});
 				// Reset timer when the mouse moves in the application
-				Application.application.addEventListener(MouseEvent.MOUSE_MOVE, function():void {trayShow();});
+				FlexGlobals.topLevelApplication.addEventListener(MouseEvent.MOUSE_MOVE, function():void {trayShow();});
             	
             	// INFORMATION BOX WITH TITLE AND DESCRIPTION
             	// Hide when the timer completes
@@ -262,7 +262,7 @@
 	
 	<!-- Simple element to provide a backdrop when everything else fails -->
 	<mx:Box id="background" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" 
+		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}" 
 		width="100%" 
 		height="100%" 
 		verticalCenter="0" 
@@ -275,8 +275,8 @@
 	<mx:Canvas id="contentContainer"
 		x="{props.getNumber('horizontalPadding')/2}"
 		y="0"
-		width="{Application.application.width-props.getNumber('horizontalPadding')}"
-		height="{Application.application.height-props.getNumber('verticalPadding')}"
+		width="{FlexGlobals.topLevelApplication.width-props.getNumber('horizontalPadding')}"
+		height="{FlexGlobals.topLevelApplication.height-props.getNumber('verticalPadding')}"
 		>
 	<!-- Image and Video -->
 	<mx:VideoDisplay id="video" 
@@ -314,8 +314,8 @@
 		width="54" 
 		height="50"
 		imageSource="@Embed(source='assets/buttons/play.swf')"
-		imageWidth="22" 
-		imageHeight="22"
+		imageWidth="54" 
+		imageHeight="50"
 		verticalCenter="0" 
 		horizontalCenter="0" 
 		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
@@ -347,8 +347,8 @@
 		/>
 	<com:OverlayMessage id="identityMessage"
 		fontFamily="{props.get('trayFont')}" 
-		color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-		backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+		color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+		backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 		visible="{props.get('identityCountdown') &amp;&amp; identityVideo.visible}"
 		allowClose="{props.get('identityAllowClose')}"
 		close="{identityVideo.stop(); identityVideo.dispatchEvent(new Event('complete', true));}"
@@ -383,9 +383,9 @@
 
 	<!-- Tray -->
 	<mx:Canvas id="tray" 
-		y="{Application.application.height-tray.height+playListHolder.height}" 
+		y="{FlexGlobals.topLevelApplication.height-tray.height+playListHolder.height}" 
 		x="0" 
-		width="{Application.application.width}" 
+		width="{FlexGlobals.topLevelApplication.width}" 
 		horizontalScrollPolicy="off" 
 		verticalScrollPolicy="off" 
 		visible="{(props.get('showTray') as Boolean)}" 
@@ -399,7 +399,7 @@
 				horizontalScrollPolicy="off" 
 				verticalScrollPolicy="off" 
 				fontFamily="{props.get('trayFont')}" 
-				color="{(StyleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+				color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 				paddingLeft="2" 
 				paddingRight="2" 
 				width="{tray.width}"
@@ -409,7 +409,7 @@
 					horizontalCenter="0" 
 					verticalCenter="0" 
 					verticalGap="0" 
-					backgroundColor="{(StyleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+					backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 					cornerRadius="2" 
 					borderStyle="solid" 
@@ -421,20 +421,20 @@
 					paddingRight="6"
 					>
 					<mx:Label id="trayTitle" 
-						fontSize="{(props.get('trayTitleFontSize') as Number)}" 
+						fontSize="{(props.get('trayTitleFontSize') as Number) || 10}" 
 						fontWeight="{props.get('trayTitleFontWeight')}" 
 						text="{activeElement.get('title')}" 
 						truncateToFit="true" 
-						maxWidth="{Application.application.width}" 
+						maxWidth="{FlexGlobals.topLevelApplication.width}" 
 						updateComplete="trayTitle.visible = (trayTitle.text.length>0);" 
 						width="{descBg.width - 15}"
 						/>
 					<mx:Text id="trayContent" 
-						fontSize="{(props.get('trayContentFontSize') as Number)}" 
+						fontSize="{(props.get('trayContentFontSize') as Number) || 10}" 
 						fontWeight="{props.get('trayContentFontWeight')}" 
 						htmlText="{activeElement.get('content')}" 
 						truncateToFit="true" 
-						maxWidth="{Application.application.width}" 
+						maxWidth="{FlexGlobals.topLevelApplication.width}" 
 						updateComplete="trayContent.visible = (trayContent.text.length>0);" 
 						height="{(props.get('trayContentFontSize') as Number)*3.2}" 
 						width="{descBg.width - 15}"
@@ -570,7 +570,7 @@
 
 	<!-- Embed panel -->
 	<com:TextPanel id="embedPanel" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}"
+		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}"
 		title="Share this video"
 		>
 
@@ -670,7 +670,7 @@
 
 	<!-- Text panel for post-roll html identity text -->
 	<com:TextPanel id="identityPanel" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}"
+		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}"
 		>
 		<mx:TextArea id="identityPanelText"
 			width="100%"

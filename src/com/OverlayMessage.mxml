@@ -33,7 +33,7 @@
 		left="5" 
 		text="{_message}" 
 		color="{this.getStyle('color')}" 
-		fontSize="{this.getStyle('fontSize')}" 
+		fontSize="{this.getStyle('fontSize') || 10}" 
 		fontFamily="{this.getStyle('fontFamily')}" 
 		/>
 	<mx:Image

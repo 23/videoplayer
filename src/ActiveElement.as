@@ -1,5 +1,5 @@
 import mx.events.VideoEvent;
-[Bindable] public var numElements:int = 0;
+[Bindable] public var numVideoElements:int = 0;
 [Bindable] public var currentElementIndex:int = 0;
 [Bindable] public var activeElement:HashCollection = new HashCollection();
 public var itemsArray: Array;
@@ -39,7 +39,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	identityVideo.visible = false;
 	identityVideo.close();
 	showBeforeIdentity = true;
-	numElements = context.photos.length;
+	numVideoElements = context.photos.length;
 	currentElementIndex = i;
 	var o:Object = context.photos[i];
   	var video_p:Boolean = new Boolean(parseInt(o.video_p)) && new Boolean(parseInt(o.video_encoded_p));
