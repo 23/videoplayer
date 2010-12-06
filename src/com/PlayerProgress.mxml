@@ -140,6 +140,11 @@
 					var section:PlayerProgressSection = new com.PlayerProgressSection;
 					
 					// Position section indicator
+					section.labelBackgroundColor = (styleManager.getColorName(props.get('trayBackgroundColor')) as Number);
+					section.labelAlpha = props.getNumber('trayAlpha');
+					section.labelFontSize = (props.getNumber('trayTitleFontSize') || 12)-2; 
+					section.labelFontWeight = props.getString('trayTitleFontWeight'); 
+					
 					section.width = 12;
 					section.height = 12;
 					section.y = 8;
