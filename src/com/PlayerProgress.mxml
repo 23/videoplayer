@@ -83,15 +83,15 @@
         		_targetVideo.bufferTime = 2; // default buffer time is two secs
             	if(time>new Number(activeElement.get('start')) && time<approxBufferTime) {
             		_targetVideo.playheadTime = time-activeElement.getNumber('start');
-            		if(!_targetVideo.playing) _targetVideo.play();
+            		if(!_targetVideo.playing) this.parentApplication.playVideoElement();
             	} else {
-            		if ((props.get('streaming') as Boolean) && _targetVideo.playing) {
+            		if ((props.get('streaming') as Boolean)) {
             			activeElement.put('start', time);
             			activeElement.put('skip', '1');
             			_targetVideo.bufferTime = 0; // when skipping we'll skip the buffer
-            			_targetVideo.stop();
+						if(_targetVideo.playing) _targetVideo.stop();
             			_targetVideo.source = getFullVideoSource();
-            			_targetVideo.play();
+						this.parentApplication.playVideoElement();
             		}
             	}
             }
