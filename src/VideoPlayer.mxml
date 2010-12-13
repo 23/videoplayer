@@ -552,6 +552,7 @@
 					verticalScrollPolicy="off" 
 					width="{video.width-61}"
 					height="45"
+					clipContent="false"
 					>
 
 					<mx:HBox 
