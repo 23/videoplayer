@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	backgroundColor="black"
+	color="white"
+ 	width="{container.width}"
+	height="{container.height}"
+	visible="false"
+	>
+	<mx:Metadata>
+		[Event(name="change", type="flash.events.Event")]
+	</mx:Metadata>
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.RadioButton;
+			// Options
+			private var _options:Array = [];
+			public var orderFromBottom:Boolean = true;
+			public function set options(o:Array):void {
+				_options = o;
+				draw();
+			}
+			public function get options():Array {return(_options);}
+			
+			// Value
+			public function set value(v:Object):void {
+				group.selectedValue = v;				
+			}
+			public function get value():Object {return(group.selectedValue);}
+			
+			// Some helpers
+			public function toggle():void {this.visible = !this.visible;}
+
+			// Build content
+			private function draw():void {
+				container.removeAllChildren();
+				var _o:Array = (orderFromBottom ? _options.reverse() : _options);
+				for (var i:Object in _o) {
+					var r:RadioButton = new mx.controls.RadioButton;
+					r.group = group;
+					r.value = _o[i].value; 
+					r.label = _o[i].label;
+					container.addChild(r);
+				}
+			}
+		]]>
+	</mx:Script>	
+	
+	<mx:RadioButtonGroup id="group" change="{dispatchEvent(new Event('change'))}" />
+	<mx:VBox 
+		id="container"
+		/>
+</mx:Canvas>

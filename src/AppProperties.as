@@ -37,6 +37,7 @@ public var propDefaults:Object = {
 	recommendationMethod: 'channel-popular',
 	lowBandwidthThresholdKbps: parseFloat('0'),
 	maintainIdentityAspectRatio: true,
+	subtitlesOnByDefault: false,
 	
 	start: parseFloat('0'),
 	player_id: parseFloat('0'),
@@ -148,7 +149,7 @@ private function initProperties(settings:Object):void {
 	if (!h264()) props.put('streaming', 0);
 	
 	// Should we start by playing HD? 
-	if(props.get('playHD')) playHD = true;
+	if(props.get('playHD')) currentVideoFormat = 'video_hd';
 }
 
 private function getRecommendationSource():String {
