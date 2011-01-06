@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
-
-  * Subtitle styling
-  * Menu styling
-  * Menu placement
-  * Menu destroy
-  * Keyboard control
-  * CC-ikon
-  * Player configuration
-
   Demonic for 23 Video
   Benjamin Bernhard, benjamin@23company.com
-  Steffen Tiedemann Christensen , steffen@23company.com
+  Steffen Tiedemann Christensen, steffen@23company.com
+
+  * Subtitle sync
+  * Keyboard control
 -->
 <mx:Application 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
@@ -514,19 +508,42 @@
 			    			click="playListShow()"
 			    			/>
 
+						<!-- InfoBtn -->
+						<com:PlayerButton id="infoImage" 
+										  imageSource="@Embed(source='assets/buttons/info.swf')"
+										  visible="{(activeElement.get('hasInfo') as Boolean)}" 
+										  click="infoToggle();"
+										  />
 					    <!-- HDbutton-->
 			    		<com:PlayerButton id="hdBtn" 
-			    			imageSource="@Embed(source='assets/buttons/hd-off.swf')"
-			    			click="{switchVideoFormat('video_hd')}"
-			    			/>
+			    			imageSource="@Embed(source='assets/buttons/hd.swf')"
+			    			>
+							<com:PlayerMenu 
+								id="formatsMenu"
+								value="{currentVideoFormat}"
+								change="{switchVideoFormat(new String(formatsMenu.value));}"
+								backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+								backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+								fontFamily="{props.get('trayFont')}" 
+								color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+								/>
+						</com:PlayerButton>
 
-			    		<!-- InfoBtn -->
-			    		<com:PlayerButton id="infoImage" 
-			    			imageSource="@Embed(source='assets/buttons/info.swf')"
-			    			visible="{(activeElement.get('hasInfo') as Boolean)}" 
-			    			click="infoToggle();"
-			    			/>
-
+						<!-- Subtitle button-->
+						<com:PlayerButton id="subtitlesBtn" 
+						  	imageSource="@Embed(source='assets/buttons/cc.swf')"
+							>
+							<com:PlayerMenu 
+								id="subtitlesMenu"
+								value="{subtitles.locale}"
+								change="{subtitles.locale=new String(subtitlesMenu.value);}"
+								backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+								backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+								fontFamily="{props.get('trayFont')}" 
+								color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+								/>
+						</com:PlayerButton>
+						
 						<!-- Mute and Unmute -->
 			    		<com:PlayerButton id="muteImage"
 			    			imageSource="@Embed(source='assets/buttons/mute-on.swf')"
@@ -713,22 +730,4 @@
 		</mx:HBox>
 	</com:TextPanel> 
 	<!-- / Text panel for post-roll -->
-	
-	<com:PlayerMenu 
-		id="subtitlesMenu"
-		right="0"
-		top="0"
-		value="{subtitles.locale}"
-		change="{subtitles.locale=new String(subtitlesMenu.value);}"
-		visible="true"
-		/>
-	<com:PlayerMenu 
-		id="formatsMenu"
-		left="0"
-		top="0"
-		value="{currentVideoFormat}"
-		change="{switchVideoFormat(new String(formatsMenu.value));}"
-		visible="true"
-		/>
-	
 </mx:Application>

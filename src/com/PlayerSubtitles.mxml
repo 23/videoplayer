@@ -4,6 +4,7 @@
 	width="100%" 
 	height="100%"
 	initialize="{init();}"
+	resize="{resize();}"
 	>
 	<mx:Script>
 		<![CDATA[
@@ -17,9 +18,10 @@
 			// Supported locales
 			[Bindable] private var _supportedLocales:Object = {};
 			public function set suppportedLocales(l:Object):void {
+				clearSubtitles();
 				_supportedLocales = l;
 			}
-			public function get suppportedLocales():Object {return(_supportedLocales);} 
+			[Bindable] public function get suppportedLocales():Object {return(_supportedLocales);} 
 
 			// Locale
 			[Bindable] private var _locale:String = '';
@@ -41,7 +43,7 @@
 			// The actual subtitles + parsing
 			import com.adobe.serialization.json.JSON;
 			import com.adobe.serialization.json.JSONParseError;
-			private var subtitleTimer:Timer = new Timer(200);
+			private var subtitleTimer:Timer = new Timer(100);
 			private var subtitles:Array;
 			private function loadSubtitles():void{
 				if(!_localeObject.href)return;
@@ -64,7 +66,7 @@
 			}
 			private function displaySubtitles(e:Event):void{
 				if(!subtitles.length || !_targetVideo.playing) return;
-				var playheadTime:Number = _targetVideo.playheadTime + this.parentApplication.activeElement.getNumber('start');
+				var playheadTime:Number = _targetVideo.playheadTime + this.parentApplication.activeElement.getNumber('start') + 0.05;
 				for (var i:Object in subtitles) {
 					if(subtitles[i].timestamp_begin<=playheadTime && subtitles[i].timestamp_end>=playheadTime) {
 						display.text = subtitles[i].text.join('\n');
@@ -75,6 +77,12 @@
 			private function init():void {
 				subtitleTimer.addEventListener(TimerEvent.TIMER, displaySubtitles);
 			}
+			private function resize():void {
+				var maxSize:int = 18;
+				var minSize:int = 10;
+				var varSize:int = this.width/30;
+				display.setStyle('fontSize', (varSize>maxSize ? maxSize : (varSize<minSize ? minSize : varSize)));
+			}
 		]]>
 	</mx:Script>	
 	
@@ -82,7 +90,6 @@
 		id="display"
 		bottom="30" 
 		horizontalCenter="0" 
-		fontSize="18" 
 		color="white"
 		/>
 </mx:Canvas>

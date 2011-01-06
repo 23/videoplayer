@@ -18,6 +18,7 @@
 	hide="onVisibilityChange()"
 	show="onVisibilityChange()"
 	added="onVisibilityChange()"
+	clipContent="false"
 	>
 	<mx:Script>
 		<![CDATA[

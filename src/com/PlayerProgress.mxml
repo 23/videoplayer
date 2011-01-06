@@ -91,7 +91,7 @@
             		if(!_targetVideo.playing) this.parentApplication.playVideoElement();
             	} else {
             		if ((props.get('streaming') as Boolean)) {
-            			activeElement.put('start', time);
+            			activeElement.put('start', Math.floor(time));
             			activeElement.put('skip', '1');
             			_targetVideo.bufferTime = 0; // when skipping we'll skip the buffer
 						if(_targetVideo.playing) _targetVideo.stop();
