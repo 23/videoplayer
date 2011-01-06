@@ -33,13 +33,14 @@
 		color="{labelTextColor}"
 		width="{labelText.width + 10}" 
 		height="{labelText.height + 8}" 
-		top="-30" 
+		top="-40" 
+		backgroundAlpha="{labelAlpha}"
 		horizontalCenter="0" 
+		cornerRadius="2" 
+		borderStyle="solid"
+		borderThickness="0" 
 		clipContent="false"
 		borderColor="#b3b3b3"
-		borderThickness="1"
-		borderStyle="solid"
-		cornerRadius="3"
 		visible="false"
 		>
 		<mx:Label 

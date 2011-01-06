@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	backgroundColor="black"
+	color="white"
+ 	width="{container.width}"
+	height="{container.height}"
+	visible="false"
+	click="{event.stopPropagation();}"
+	initialize="{init()}"
+	>
+	<mx:Metadata>
+		[Event(name="change", type="flash.events.Event")]
+	</mx:Metadata>
+	<mx:Script>
+		<![CDATA[
+			import com.PlayerButton;
+			
+			import mx.controls.RadioButton;
+
+			// Skin
+			[Embed("assets/buttons/notSelectedIcon.png")] public var notSelectedIcon:Class;
+			[Embed("assets/buttons/selectedIcon.png")] public var selectedIcon:Class;
+			
+			// Options
+			private var _options:Array = [];
+			public var orderFromBottom:Boolean = true;
+			public function set options(o:Array):void {
+				_options = o;
+				draw();
+			}
+			public function get options():Array {return(_options);}
+			
+			// Value
+			public function set value(v:Object):void {
+				group.selectedValue = v;				
+			}
+			public function get value():Object {return(group.selectedValue);}
+			
+			// Some helpers
+			private var showDate:Number = new Number(new Date());
+			public function toggle(forceHide:Boolean=false):void {
+				this.y = -1 * this.height - 7;
+				this.x = this.parent.width - this.width;
+				var v:Boolean = (forceHide ? false : !this.visible);
+				// This isn't pretty, but basically we don't want to destroy a menu we've just created
+				if(!v && (new Number(new Date())-showDate)<50) return;
+				if(v) showDate = new Number(new Date());
+				this.visible = v;
+			}
+
+			// Init
+			private function init():void {
+				this.parentApplication.addEventListener(MouseEvent.CLICK, function(e:Event):void{toggle(true);});
+				this.parent.addEventListener(MouseEvent.CLICK, function(e:Event):void{toggle();});
+			}
+			
+			// Build content
+			private function draw():void {
+				// Only show button if there are more than one option
+				this.parent.visible = (_options.length>1);
+				
+				container.removeAllChildren();
+				var _o:Array = (orderFromBottom ? _options.reverse() : _options);
+				for (var i:Object in _o) {
+					var r:RadioButton = new mx.controls.RadioButton;
+					r.group = group;
+					r.setStyle('color', this.getStyle('color'));
+					r.setStyle('textSelectedColor', this.getStyle('color'));
+					r.setStyle('textRollOverColor', this.getStyle('color'));
+					r.setStyle('fontSize', 10);
+					r.setStyle('upIcon', notSelectedIcon);
+					r.setStyle('overIcon', notSelectedIcon);
+					r.setStyle('downIcon', notSelectedIcon);
+					r.setStyle('selectedUpIcon', selectedIcon);
+					r.setStyle('selectedOverIcon', selectedIcon);
+					r.setStyle('selectedDownIcon', selectedIcon);
+					r.height = 15;
+					r.value = _o[i].value; 
+					r.label = _o[i].label;
+					container.addChild(r);
+				}
+			}
+		]]>
+	</mx:Script>	
+	
+	<mx:RadioButtonGroup id="group" change="{dispatchEvent(new Event('change')); toggle(true);}" />
+	<mx:VBox 
+		id="container"
+		paddingTop="5"
+		paddingRight="8"
+		paddingBottom="5"
+		paddingLeft="8"
+		/>
+</mx:Canvas>

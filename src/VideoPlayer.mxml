@@ -2,7 +2,10 @@
 <!-- 
   Angelic for 23 Video
   Benjamin Bernhard, benjamin@23company.com
-  Steffen Tiedemann Christensen , steffen@23company.com
+  Steffen Tiedemann Christensen, steffen@23company.com
+
+  * Subtitle sync
+  * Keyboard control
 -->
 <mx:Application 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
@@ -25,20 +28,22 @@
  	<mx:Script source="doJSON.as"></mx:Script>
 	<mx:Script>
 		<![CDATA[
-			import com.PlayListEvent;
 			import com.PlayList;
-			import mx.events.VideoEvent;
-			import mx.controls.Alert;
-			import flash.display.StageDisplayState;
-			import com.philemonworks.flex.util.HashCollection;
-			import mx.core.mx_internal;
-			import flash.external.ExternalInterface;
-			import com.SmoothImage;
+			import com.PlayListEvent;
 			import com.PlayerButton;
+			import com.SmoothImage;
 			import com.adobe.serialization.json.JSONParseError;
+			import com.philemonworks.flex.util.HashCollection;
+			
+			import flash.display.StageDisplayState;
+			import flash.external.ExternalInterface;
+			
+			import mx.controls.Alert;
+			import mx.core.mx_internal;
+			import mx.events.VideoEvent;
 			
 			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = '23.dev.23video.com';
+			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
@@ -349,6 +354,14 @@
 		allowClose="{props.get('identityAllowClose')}"
 		close="{identityVideo.stop(); identityVideo.dispatchEvent(new Event('complete', true));}"
 		/>
+	<com:PlayerSubtitles id="subtitles"
+		 width="100%"
+		 height="100%"
+		 x="0"
+		 y="0"
+		 targetVideo="{video}"
+		 visible="{video.visible}" 
+		 />
 
 	<!-- Icon/Logo -->
 	<mx:Box 
@@ -498,26 +511,43 @@
 			    			click="playListShow()"
 			    			/>
 
-					    <!-- HDbutton-->
+						<!-- InfoBtn -->
+						<com:PlayerButton id="infoImage" 
+										  imageSource="@Embed(source='assets/buttons/info.swf')"
+										  visible="{(activeElement.get('hasInfo') as Boolean)}" 
+										  click="infoToggle();"
+										  />
+
+						<!-- HDbutton-->
 			    		<com:PlayerButton id="hdBtn" 
-			    			imageSource="@Embed(source='assets/buttons/hd-off.swf')"
-			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; !playHD}" 
-			    			click="playHD=true; setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1)"
-			    			/>
-			    		<com:PlayerButton id="hdOffBtn"
-			    			imageSource="@Embed(source='assets/buttons/hd-on.swf')"
-			    			buttonPressed="true"
-			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; playHD}" 
-			    			click="playHD=false; setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1)"
-			    			/>
+			    			imageSource="@Embed(source='assets/buttons/hd.swf')"
+			    			>
+							<com:PlayerMenu 
+								id="formatsMenu"
+								value="{currentVideoFormat}"
+								change="{switchVideoFormat(new String(formatsMenu.value));}"
+								backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+								backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+								fontFamily="{props.get('trayFont')}" 
+								color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+								/>
+						</com:PlayerButton>
 
-			    		<!-- InfoBtn -->
-			    		<com:PlayerButton id="infoImage" 
-			    			imageSource="@Embed(source='assets/buttons/info.swf')"
-			    			visible="{(activeElement.get('hasInfo') as Boolean)}" 
-			    			click="infoToggle();"
-			    			/>
-
+						<!-- Subtitle button-->
+						<com:PlayerButton id="subtitlesBtn" 
+						  	imageSource="@Embed(source='assets/buttons/cc.swf')"
+							>
+							<com:PlayerMenu 
+								id="subtitlesMenu"
+								value="{subtitles.locale}"
+								change="{subtitles.locale=new String(subtitlesMenu.value);}"
+								backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+								backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+								fontFamily="{props.get('trayFont')}" 
+								color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+								/>
+						</com:PlayerButton>
+						
 						<!-- Mute and Unmute -->
 			    		<com:PlayerButton id="muteImage"
 			    			imageSource="@Embed(source='assets/buttons/mute-on.swf')"
@@ -706,6 +736,4 @@
 		</mx:HBox>
 	</com:TextPanel> 
 	<!-- / Text panel for post-roll -->
-	
-	
 </mx:Application>

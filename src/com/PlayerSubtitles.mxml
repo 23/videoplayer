@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="100%" 
+	height="100%"
+	initialize="{init();}"
+	resize="{resize();}"
+	>
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.VideoDisplay;
+			private var _targetVideo:VideoDisplay;
+			public function set targetVideo(v:VideoDisplay):void {
+				_targetVideo = v;
+			}
+			public function get targetVideo():VideoDisplay {return(_targetVideo);}
+			
+			// Supported locales
+			[Bindable] private var _supportedLocales:Object = {};
+			public function set suppportedLocales(l:Object):void {
+				clearSubtitles();
+				_supportedLocales = l;
+			}
+			[Bindable] public function get suppportedLocales():Object {return(_supportedLocales);} 
+
+			// Locale
+			[Bindable] private var _locale:String = '';
+			[Bindable] private var _localeObject:Object = {};
+			public function set locale(l:String):void {
+				if(_locale==l) return;
+				if(_supportedLocales[l]) {
+					_locale = l;	
+					_localeObject = _supportedLocales[l];
+					loadSubtitles();
+				} else {
+					clearSubtitles();
+					_locale = '';
+					_localeObject = ''; 
+				}
+			}
+			public function get locale():String {return(_locale);}
+			
+			// The actual subtitles + parsing
+			import com.adobe.serialization.json.JSON;
+			import com.adobe.serialization.json.JSONParseError;
+			private var subtitleTimer:Timer = new Timer(100);
+			private var subtitles:Array;
+			private function loadSubtitles():void{
+				if(!_localeObject.href)return;
+				clearSubtitles()
+				try {
+					var loader:URLLoader = new URLLoader();
+					loader.addEventListener(Event.COMPLETE, function(e:Event):void {
+							try {
+								subtitles = JSON.decode(loader.data).subtitles;
+								subtitleTimer.start();
+							}catch(e:JSONParseError){} 
+						});
+					loader.load(new URLRequest(_localeObject.href));
+				}catch(e:ErrorEvent){}
+			}
+			private function clearSubtitles():void {
+				display.text = '';
+				subtitles = [];
+				subtitleTimer.stop();
+			}
+			private function displaySubtitles(e:Event):void{
+				if(!subtitles.length || !_targetVideo.playing) return;
+				var playheadTime:Number = _targetVideo.playheadTime + this.parentApplication.activeElement.getNumber('start') + 0.05;
+				for (var i:Object in subtitles) {
+					if(subtitles[i].timestamp_begin<=playheadTime && subtitles[i].timestamp_end>=playheadTime) {
+						display.text = subtitles[i].text.join('\n');
+						break;
+					}
+				}
+			}
+			private function init():void {
+				subtitleTimer.addEventListener(TimerEvent.TIMER, displaySubtitles);
+			}
+			private function resize():void {
+				var maxSize:int = 18;
+				var minSize:int = 10;
+				var varSize:int = this.width/30;
+				display.setStyle('fontSize', (varSize>maxSize ? maxSize : (varSize<minSize ? minSize : varSize)));
+			}
+		]]>
+	</mx:Script>	
+	
+	<mx:Label 
+		id="display"
+		bottom="44" 
+		horizontalCenter="0" 
+		color="white"
+		/>
+</mx:Canvas>
