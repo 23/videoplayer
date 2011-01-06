@@ -2,7 +2,8 @@
 [Bindable] public var currentElementIndex:int = 0;
 [Bindable] public var activeElement:HashCollection = new HashCollection();
 public var itemsArray: Array;
-[Bindable] public var playHD:Boolean = false;
+private var supportedFormats:Array = [];
+[Bindable]public var currentVideoFormat:String = 'video_medium';
 [Bindable] public var showBeforeIdentity:Boolean = false; 
 
 private function initActiveElement():void {
@@ -32,7 +33,7 @@ private function resetActiveElement():void {
 	activeElement.put('skip', '0');
 }
 
-private function setActiveElement(i:int, startPlaying:Boolean=false, start:Number=0, skip:int=0):Boolean {
+private function setActiveElement(i:int, startPlaying:Boolean=false, start:Number=0, skip:int=0, format:String=null):Boolean {
 	if (!context || !context.photos || !context.photos[i]) return(false);
 	clearVideo();
 	identityVideo.visible = false;
@@ -66,6 +67,33 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	activeElement.put('afterText', o.after_text); 
 	
 	// Get sections and show, otherwise reset
+	if(!skip) {
+		if(o.subtitles_p) {
+			try {
+				doAPI('/api/photo/subtitle/list', {photo_id:o.photo_id, token:o.token, subtitle_format:'json', stripped_p:'1'}, function(sub:Object):void{
+					var locales:Object = {};
+					var defaultLocale:String = '';
+					var localeMenu:Array = [];
+					localeMenu.push({value:'', label:'No subtitles'});
+					for (var i:int=0; i<sub.subtitles.length; i++) {
+						locales[sub.subtitles[i].locale] = {href:'http://' + props.get('domain') + sub.subtitles[i].href, language:sub.subtitles[i].language, locale:sub.subtitles[i].locale};
+						localeMenu.push({value:sub.subtitles[i].locale, label:sub.subtitles[i].language});
+						if(sub.subtitles[i].default_p) defaultLocale = sub.subtitles[i].locale; 
+					}
+					// Let the subtitles component know about this
+					subtitles.suppportedLocales = locales;
+					subtitles.locale = (props.get('subtitlesOnByDefault') ? defaultLocale : '');
+					// Create a menu from the same options
+					subtitlesMenu.options = localeMenu;
+					subtitlesMenu.value = subtitles.locale;
+				});
+			} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
+		} else {
+			subtitles.suppportedLocales = {}; subtitlesMenu.options = [];
+		}
+	}
+	
+	// Get subtitles and show, otherwise reset
 	if(o.sections_p) {
 		try {
 			doAPI('/api/photo/section/list', {photo_id:o.photo_id, token:o.token}, function(sec:Object):void{progress.setSections(sec.sections);});
@@ -74,20 +102,17 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 		progress.setSections([]);
 	}
 
+	// Supported formats, default format and build menu
+	if(!skip) prepareSupportedFormats(o);
+	// Switch to format if needed
+	setVideoFormat(format || currentVideoFormat);
+	
+	// Link back to the video
 	activeElement.put('one', 'http://' + props.get('domain') + o.one); 
 	clickTarget = activeElement.getString('one');
-
-	var hasHD:Boolean = (h264()&&typeof(o.video_hd_download)!='undefined'&&o.video_hd_download.length>0);
-	activeElement.put('hasHD', hasHD);
-
-	// Video source depending on flash version and HD context
-	var videoSource:String = 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined' ? o.video_medium_download : o.video_small_download);
-	if (hasHD && playHD) videoSource = 'http://' + props.get('domain') + o.video_hd_download;
-  	activeElement.put('videoSource', videoSource);
   	
   	// Photo source
   	activeElement.put('photoSource', 'http://' + props.get('domain') + o.large_download);
-
   	activeElement.put('photoWidth', new Number(o.large_width));
   	activeElement.put('photoHeight', new Number(o.large_height));
   	activeElement.put('aspectRatio', parseInt(o.large_width) / parseInt(o.large_height));
@@ -110,6 +135,52 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	return(true);
 } 	
 
+private function prepareSupportedFormats(o:Object):void {
+	// Reset list
+	supportedFormats = [];
+
+	// Build list of supported formats and their URLs
+	if (!h264() && typeof(o.video_small_download)!='undefined'&&o.video_small_download.length>0) {
+		supportedFormats.push({format:'video_small', pseudo:false, label: 'Low (180p)', source:'http://' + props.get('domain') + o.video_small_download});
+	}
+	if (h264()&&typeof(o.video_mobile_high_download)!='undefined'&&o.video_mobile_high_download.length>0) {
+		supportedFormats.push({format:'video_mobile_high', pseudo:true, label: 'Low (180p)', source:'http://' + props.get('domain') + o.video_mobile_high_download}); 
+	}
+	if (h264()&&typeof(o.video_medium_download)!='undefined'&&o.video_medium_download.length>0) {
+		supportedFormats.push({format:'video_medium', pseudo:true, label: 'Standard (360p)', source:'http://' + props.get('domain') + o.video_medium_download}); 
+	}
+	if (h264()&&typeof(o.video_hd_download)!='undefined'&&o.video_hd_download.length>0) {
+		supportedFormats.push({format:'video_hd', pseudo:true, label: 'HD (720p)', source:'http://' + props.get('domain') + o.video_hd_download}); 
+	}
+	if (h264()&&typeof(o.video_1080p_download)!='undefined'&&o.video_1080p_download.length>0) {
+		supportedFormats.push({format:'video_1080p', pseudo:true, label: 'Full HD (1080p)', source:'http://' + props.get('domain') + o.video_1080p_download}); 
+	}
+	
+	// We'll want a menu for this
+	var _formats:Array = [];
+	for (var i:Object in supportedFormats) {
+		_formats.push({value:supportedFormats[i].format, label:supportedFormats[i].label});
+	}
+	formatsMenu.options = _formats;	
+}
+public function setVideoFormat(format:String):void {
+	var o:Object = null;
+	for (var i:Object in supportedFormats) {
+		if(supportedFormats[i].format==format) {
+			o = supportedFormats[i];
+			continue;
+		}
+	}
+	if(!o) o=supportedFormats[supportedFormats.length-1];
+	if(!o.pseudo) activeElement.put('start', 0);
+	activeElement.put('videoSource', o.source);
+	currentVideoFormat = o.format;
+}
+
+public function switchVideoFormat(format:String):void {
+	setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1, format);
+}
+
 private function goToActiveElement():void {
 	goToUrl(activeElement.get('one') as String);
 }
@@ -122,7 +193,6 @@ private function createItemsArray(p:Object) : Array {
 		var item : Object = new Object();
 		item.itemID = i;		
 		item.photoSource = 'http://' + props.get('domain') + o.quad75_download;
-		item.videoSource = 'http://' + props.get('domain') + (h264()&&typeof(o.video_medium_download)!='undefined' ? o.video_medium_download : o.video_small_download);
 		item.photoWidth = new Number(o.large_width);
 		item.photoHeight = new Number(o.large_height);
 		item.aspectRatio = parseInt(o.large_width) / parseInt(o.large_height);

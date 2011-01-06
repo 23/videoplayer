@@ -33,6 +33,7 @@
 		width="{labelText.width + 6}" 
 		height="{labelText.height + 4}" 
 		top="-30" 
+		backgroundAlpha="{labelAlpha}"
 		horizontalCenter="0" 
 		clipContent="false"
 		visible="false"
