@@ -29,6 +29,8 @@
 			public function set imageSource(source:Object):void {
 				imageContainer.alpha = 0.95;
 				imageContainer.source = source;
+				imageContainer.verticalCenter = 0;
+				imageContainer.horizontalCenter = 0;
 				this.addChild(imageContainer);
 			}
 			public function set imageWidth(w:int):void {
