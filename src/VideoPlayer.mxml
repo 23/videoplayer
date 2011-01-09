@@ -3,6 +3,8 @@
   Squares for 23
   Benjamin Bernhard, benjamin@23company.com
   Steffen Tiedemann Christensen, steffen@23company.com
+
+  * Keyboard control
 -->
 <mx:Application 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 

@@ -5,6 +5,8 @@
 	height="100%"
 	initialize="{init();}"
 	resize="{resize();}"
+	verticalScrollPolicy="off"
+	horizontalScrollPolicy="off"
 	>
 	<mx:Script>
 		<![CDATA[
@@ -78,7 +80,7 @@
 				subtitleTimer.addEventListener(TimerEvent.TIMER, displaySubtitles);
 			}
 			private function resize():void {
-				var maxSize:int = 18;
+				var maxSize:int = 22;
 				var minSize:int = 10;
 				var varSize:int = this.width/30;
 				display.setStyle('fontSize', (varSize>maxSize ? maxSize : (varSize<minSize ? minSize : varSize)));
@@ -86,9 +88,10 @@
 		]]>
 	</mx:Script>	
 	
-	<mx:Label 
+	<mx:Text 
 		id="display"
 		bottom="60" 
+		textAlign="center"
 		horizontalCenter="0" 
 		color="white"
 		/>
