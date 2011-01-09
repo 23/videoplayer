@@ -110,7 +110,6 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	
 	// Link back to the video
 	activeElement.put('one', 'http://' + props.get('domain') + o.one); 
-	clickTarget = activeElement.getString('one');
   	
   	// Photo source
   	activeElement.put('photoSource', 'http://' + props.get('domain') + o.large_download);
@@ -132,6 +131,9 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	// We want the tray and possible the info box to show up when a new element starts playing
 	infoShow();
 	trayShow();
+
+	// Note that we've loaded the video 
+	reportEvent('load');
 
 	return(true);
 } 	
