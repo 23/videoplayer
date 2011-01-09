@@ -70,8 +70,6 @@
 			[Bindable] private var showPlayList: Boolean = false;
 			[Bindable] private var cleanVideoState:String = 'paused';
 			
-			[Bindable] public var clickTarget:String = '';  
-
 			public function init():void {
 				prepareTimers();
 				flash.system.Security.allowDomain('*');
@@ -95,7 +93,7 @@
 			public function unload():void {
 				// This function is triggered via ExternalInterface and some JavaScript because Flex is useless.
 				try {if(video.playing) video.pause();} catch(e:Error){}
-				try {if(video.playing) reportPlayTime(video.playheadTime)} catch(e:Error){}
+				try {if(video.playing) reportPlay('end', video.playheadTime)} catch(e:Error){}
 			}
 			public function load():void {
 				var domain:String = URLUtil.getServerName(FlexGlobals.topLevelApplication.url);
@@ -249,8 +247,10 @@
 				}
                 switch (evt.currentTarget.state) {
                 	case VideoEvent.PAUSED:
+						reportPlay('end', video.playheadTime);
+						break;
                 	case VideoEvent.PLAYING:
-                		reportPlayTime(video.playheadTime);
+						reportPlay('start', video.playheadTime);
                 		break;
                     case VideoEvent.CONNECTION_ERROR:
                         displayError('Unable to connect to video');
@@ -259,7 +259,7 @@
                 resizeTray();
             }
             private function onVideoComplete(ignoreIdentity:Boolean=false):void {
-     			reportPlayTime(video.playheadTime);
+				reportPlay('end', video.playheadTime);
      			if(!ignoreIdentity) return(handleIdentity('after', function():void {onVideoComplete(true);}));
             	if(props.get('loop')) {
             		var more:Boolean = nextElement();
@@ -367,7 +367,6 @@
 		maintainAspectRatio="{props.get('maintainIdentityAspectRatio')}"
 		buttonMode="true"
 		playheadUpdate="{var secs:int=Math.round(identityVideo.totalTime-identityVideo.playheadTime); var mess:String = (secs!=1 ? props.getString('identityCountdownTextPlural') : props.getString('identityCountdownTextSingular')); identityMessage.message = mess.replace(/%/, secs);}"
-		click="if(clickTarget.length) goToUrl(clickTarget);"
 		/>
 	<com:SmoothImage id="identityPhoto" 
 		visible="false" 
@@ -376,7 +375,6 @@
 		maxWidth="{contentContainer.width}" 
 		maxHeight="{contentContainer.height}" 
 		buttonMode="true"
-		click="if(clickTarget.length) goToUrl(clickTarget);"
 		/>
 	<com:OverlayMessage id="identityMessage"
 		fontFamily="{props.get('trayFont')}" 
@@ -384,7 +382,7 @@
 		backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 		visible="{props.get('identityCountdown') &amp;&amp; identityVideo.visible}"
 		allowClose="{props.get('identityAllowClose')}"
-		close="{identityVideo.stop(); identityVideo.dispatchEvent(new Event('complete', true));}"
+		close="{identityVideo.stop(); reportEvent(currentIdentityEvent=='after' ? 'postRollClose ' : 'preRollClose'); identityVideo.dispatchEvent(new Event('complete', true));}"
 		/>
 	<com:PlayerSubtitles id="subtitles"
 		 width="100%"
@@ -416,7 +414,6 @@
 			maxHeight="{(props.get('logoHeight') as Number)}" 
 			horizontalAlign="{props.get('logoAlign')}" 
 			verticalAlign="{props.get('logoVAlign')}"
-			click="if(clickTarget.length) goToUrl(clickTarget);"
 			/> 
 	</mx:Box>
 
@@ -465,6 +462,7 @@
 			verticalScrollPolicy="off" 
 			visible="false"
 			includeInLayout="{embedPanel.visible}"
+			show="{reportEvent('shareEngaged');}"
 			>
 			<mx:Text 
 				text="EMBED"
@@ -480,7 +478,7 @@
 				backgroundColor="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 				backgroundAlpha="0.15" 
 				text="{props.get('embedCode')}" 
-				click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
+				click="{reportEvent('embedEngaged'); embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
 				borderStyle="none" 
 				paddingTop="2" 
 				paddingLeft="2" 
@@ -688,6 +686,7 @@
 			color="white"
 			paddingTop="10" 
 			paddingBottom="20"
+			click="{reportEvent('callToActionClick');}"
 			/>
 		<mx:HBox 
 			visible="{(props.get('showShare') as Boolean)}"
