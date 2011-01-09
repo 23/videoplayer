@@ -5,6 +5,8 @@
 	height="100%"
 	initialize="{init();}"
 	resize="{resize();}"
+	verticalScrollPolicy="off"
+	horizontalScrollPolicy="off"
 	>
 	<mx:Script>
 		<![CDATA[
