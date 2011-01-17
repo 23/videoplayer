@@ -69,7 +69,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	
 	// Get sections and show, otherwise reset
 	if(!skip) {
-		if(o.subtitles_p) {
+		if(o.subtitles_p && props.get('enableSubtitles')) {
 			try {
 				doAPI('/api/photo/subtitle/list', {photo_id:o.photo_id, token:o.token, subtitle_format:'json', stripped_p:'1'}, function(sub:Object):void{
 					var locales:Object = {};

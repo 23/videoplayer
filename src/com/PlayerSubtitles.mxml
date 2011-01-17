@@ -80,9 +80,9 @@
 				subtitleTimer.addEventListener(TimerEvent.TIMER, displaySubtitles);
 			}
 			private function resize():void {
-				var maxSize:int = 22;
+				var maxSize:int = 35;
 				var minSize:int = 10;
-				var varSize:int = this.width/30;
+				var varSize:int = this.width/28;
 				display.setStyle('fontSize', (varSize>maxSize ? maxSize : (varSize<minSize ? minSize : varSize)));
 			}
 		]]>
