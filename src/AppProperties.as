@@ -37,7 +37,9 @@ public var propDefaults:Object = {
 	recommendationMethod: 'channel-popular',
 	lowBandwidthThresholdKbps: parseFloat('0'),
 	maintainIdentityAspectRatio: true,
+	enableSubtitles: true,
 	subtitlesOnByDefault: false,
+	subtitlesDesign: 'outline',
 	
 	start: parseFloat('0'),
 	player_id: parseFloat('0'),
@@ -95,7 +97,7 @@ private function initProperties(settings:Object):void {
 	var domain:String = URLUtil.getServerName(FlexGlobals.topLevelApplication.url);
 	if(domain=='localhost' || domain=='') domain=defaultDomain;
 	props.put('domain', domain);
-    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size'];
+    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size', 'rand'];
     for (var i:int=0; i<options.length; i++) {
 		var opt:String = options[i];
 		if (FlexGlobals.topLevelApplication.parameters[opt]) {
