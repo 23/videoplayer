@@ -345,13 +345,13 @@
  
  	 <!-- Big Play -->
 	<com:PlayerButton id="bigPlayImage" 
-		width="54" 
-		height="50"
+		width="64" 
+		height="60"
 		backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 		backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 		imageSource="@Embed(source='assets/buttons/play.swf')"
-		imageWidth="54" 
-		imageHeight="50"
+		imageWidth="34" 
+		imageHeight="30"
 		verticalCenter="0" 
 		horizontalCenter="0" 
 		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
