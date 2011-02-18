@@ -52,6 +52,7 @@
 		cornerRadius="2" 
 		borderStyle="solid" 
 		borderColor="white"
+		clipContent="false"
 		>
 		<mx:Label id="videoTimeLabel" 
 			selectable="false" 
