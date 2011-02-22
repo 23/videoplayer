@@ -10,11 +10,12 @@
 	click="seekVideoTo(timeFromPoint(this.contentMouseX));" 
 	resize="drawSections();"
 	initialize="init()"
+	clipContent="false"
 	>
 	<!-- VideoProgress -->
 	<mx:Canvas id="videoProgress" 
-	   horizontalScrollPolicy="off" 
-	   verticalScrollPolicy="off"
+	   	horizontalScrollPolicy="off" 
+	   	verticalScrollPolicy="off"
 		top="9" 
 		left="5" 
 		right="10" 
@@ -55,14 +56,13 @@
 	<!-- videoTime -->
 	<mx:HBox id="videoTime" 
 		right="7" 
-		bottom="2"
+		top="18"
 		clipContent="false"
 		>
 		<mx:Label id="videoTimeLabel" 
 			selectable="false" 
 			fontFamily="Helvetica, Arial" 
 			fontSize="9" 
-			height="12" 
 			color="#333333"
 			/>
 	</mx:HBox>

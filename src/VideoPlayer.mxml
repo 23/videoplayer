@@ -400,6 +400,7 @@
 		horizontalCenter="0"
 		>
 		<mx:VBox 
+			clipContent="false"
 			verticalGap="0"
 			>
 			<mx:VBox id="descriptions" 
@@ -453,8 +454,10 @@
 				paddingLeft="5"
 				paddingRight="5"
 				horizontalGap="5" 
+				clipContent="false"
 				>
 				<mx:Canvas 
+					clipContent="false"
 					width="{tray.width-12}">
 					<!-- Play and Pause -->
 					<mx:HBox id="videoControls" 
