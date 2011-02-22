@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
-  Demonic for 23 Video
+  Interton
   Benjamin Bernhard, benjamin@23company.com
-  Steffen Tiedemann Christensen , steffen@23company.com
+  Steffen Tiedemann Christensen, steffen@23company.com
 -->
 <mx:Application 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
@@ -15,7 +15,7 @@
 	width="100%" 
 	height="100%" 
 	creationComplete="init();" 
-	keyDown="trayShow()" 
+	keyDown="trayShow()"
 	>
  	<mx:Script source="Utility.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
@@ -25,23 +25,26 @@
  	<mx:Script source="doJSON.as"></mx:Script>
 	<mx:Script>
 		<![CDATA[
-			import com.PlayListEvent;
 			import com.PlayList;
-			import mx.events.VideoEvent;
-			import mx.controls.Alert;
-			import flash.display.StageDisplayState;
-			import com.philemonworks.flex.util.HashCollection;
-			import mx.core.mx_internal;
-			import flash.external.ExternalInterface;
-			import com.SmoothImage;
+			import com.PlayListEvent;
 			import com.PlayerButton;
+			import com.SmoothImage;
 			import com.adobe.serialization.json.JSONParseError;
+			import com.philemonworks.flex.util.HashCollection;
+			
+			import flash.display.StageDisplayState;
+			import flash.external.ExternalInterface;
+			
+			import mx.controls.Alert;
+			import mx.core.mx_internal;
+			import mx.events.VideoEvent;
 			
 			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = 'www.interton.tv';
+			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
+			private var playerId:String = '0';
 
 			private var context:Object = {};
 			private var recommendations:Object = {};
@@ -50,7 +53,7 @@
 			[Bindable] private var enablePlayList: Boolean = false;		
 			[Bindable] private var showPlayList: Boolean = false;
 			[Bindable] private var cleanVideoState:String = 'paused';
-
+			
 			public function init():void {
 				prepareTimers();
 				flash.system.Security.allowDomain('*');
@@ -61,7 +64,8 @@
 						ExternalInterface.addCallback('pauseVideo', function():void {pauseVideoElement();});
 						ExternalInterface.addCallback('playVideo', function():void {playVideoElement();});
 						ExternalInterface.addCallback('getPlayState', function():String {return(cleanVideoState);});
-						ExternalInterface.addCallback('getPlayheadTime', function():Object {return(video.playheadTime);});
+						ExternalInterface.addCallback('getPlayheadTime', function():Object {return(video.playheadTime + activeElement.getNumber('start'));});
+						ExternalInterface.addCallback('setPlayheadTime', function(time:int):void {progress.seekVideoTo(time);});
 						ExternalInterface.addCallback('getTotalTime', function():Object {return(video.totalTime);});
 						ExternalInterface.addCallback('getCurrentPhotoID', function():Object {return(activeElement.get('photo_id'));});
 						ExternalInterface.addCallback('getJSONSource', function():Object {return(props.get('jsonSource'));});
@@ -73,23 +77,24 @@
 			public function unload():void {
 				// This function is triggered via ExternalInterface and some JavaScript because Flex is useless.
 				try {if(video.playing) video.pause();} catch(e:Error){}
-				try {if(video.playing) reportPlayTime(video.playheadTime)} catch(e:Error){}
+				try {if(video.playing) reportPlay('end', video.playheadTime)} catch(e:Error){}
 			}
 			public function load():void {
-				var domain:String = URLUtil.getServerName(Application.application.url);
+				var domain:String = URLUtil.getServerName(FlexGlobals.topLevelApplication.url);
 				if(domain=='localhost' || domain=='') domain=defaultDomain;
 				
 				// Are we using a specific player, or just the default? (if so, we want to specify the player id to get the correct video settings)
-				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(Application.application.url);
+				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(FlexGlobals.topLevelApplication.url);
+				if (testCustomPlayer && testCustomPlayer.length>1) playerId = testCustomPlayer[1]; 
 				
 				// Mash up embed parameters, including .swf?..., Flashvars, width and height to get a good embed code   
 				var a:Array = []; var v:String;
-				for (v in Application.application.parameters) {a.push(encodeURIComponent(v) + '=' + encodeURIComponent(Application.application.parameters[v]));}
-				a.push('width=' + encodeURIComponent(Application.application.height));
-				a.push('height=' + encodeURIComponent(Application.application.height));
+				for (v in FlexGlobals.topLevelApplication.parameters) {a.push(encodeURIComponent(v) + '=' + encodeURIComponent(FlexGlobals.topLevelApplication.parameters[v]));}
+				a.push('width=' + encodeURIComponent(FlexGlobals.topLevelApplication.width));
+				a.push('height=' + encodeURIComponent(FlexGlobals.topLevelApplication.height));
 				
 				// Get settings for this player from 23 Video
-				var settings_endpoint:String = 'http://' + domain + '/js/video-settings?raw&parameters=' + encodeURIComponent(a.join('&')) + (testCustomPlayer && testCustomPlayer.length>1 ? '&player_id=' + testCustomPlayer[1] : '');
+				var settings_endpoint:String = 'http://' + domain + '/js/video-settings?raw&parameters=' + encodeURIComponent(a.join('&')) + (playerId ? '&player_id=' + playerId : '');
 				doJSON(settings_endpoint, function(o:Object):void{
 					initProperties(o.settings);
 					initActiveElement();
@@ -99,7 +104,8 @@
 			public function build():void {
 				if(!context || !context.photos || context.photos.length==0) {displayError('Empty video stream...'); return;}
 				video.mx_internal::videoPlayer.smoothing = true;
-				setActiveElement(0);
+				identityVideo.mx_internal::videoPlayer.smoothing = true;
+				setActiveElement(0, false, props.getNumber('start'));
 				
 				if (props.get('showTray') && props.get('showBrowse')) {
 					// Generate the recommendation playlist
@@ -118,7 +124,7 @@
 			
             private function createPlayList():void  {
             	var arr:Array = createItemsArray(recommendations);
-            	if(arr.length==0) return;
+            	if(arr.length<=1) return;
 				enablePlayList = true;
 				playListHolder.removeAllChildren(); // if we've done this before, clean up after ourselves.
             	playList = new PlayList();
@@ -129,9 +135,8 @@
 						// When clicking the recommendation playlist, we shift context -- it's no longer the initially selected video, but the playlist objects
 						context = recommendations;
             			if(evt.itemID>=0) {
-            				setElementByID(evt.itemID); 
             				playListHide();
-            				playVideoElement();
+            				setElementByID(evt.itemID, true); 
             			}
             		});
 				playListHolder.addChild(playList);
@@ -170,7 +175,7 @@
             	// Hide when the timer completes
 				trayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void {trayHide();});
 				// Reset timer when the mouse moves in the application
-				Application.application.addEventListener(MouseEvent.MOUSE_MOVE, function():void {trayShow();});
+				FlexGlobals.topLevelApplication.addEventListener(MouseEvent.MOUSE_MOVE, function():void {trayShow();});
             	
             	// INFORMATION BOX WITH TITLE AND DESCRIPTION
             	// Hide when the timer completes
@@ -226,8 +231,10 @@
 				}
                 switch (evt.currentTarget.state) {
                 	case VideoEvent.PAUSED:
+						reportPlay('end', video.playheadTime);
+						break;
                 	case VideoEvent.PLAYING:
-                		reportPlayTime(video.playheadTime);
+						reportPlay('start', video.playheadTime);
                 		break;
                     case VideoEvent.CONNECTION_ERROR:
                         displayError('Unable to connect to video');
@@ -235,9 +242,9 @@
                 }
             }
             private function onVideoComplete(ignoreIdentity:Boolean=false):void {
-     			reportPlayTime(video.playheadTime);
+				reportPlay('end', video.playheadTime);
      			if(!ignoreIdentity) return(handleIdentity('after', function():void {onVideoComplete(true);}));
-            	if(props.get('loop') || props.get('autoPlay')) {
+            	if(props.get('loop')) {
             		var more:Boolean = nextElement();
             		if(!more) onPlayListDone();
             	} else {
@@ -261,7 +268,7 @@
 	
 	<!-- Simple element to provide a backdrop when everything else fails -->
 	<mx:Box id="background" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}" 
+		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}" 
 		width="100%" 
 		height="100%" 
 		verticalCenter="0" 
@@ -274,8 +281,8 @@
 	<mx:Canvas id="contentContainer"
 		x="{props.getNumber('horizontalPadding')/2}"
 		y="0"
-		width="{Application.application.width-props.getNumber('horizontalPadding')}"
-		height="{Application.application.height-props.getNumber('verticalPadding')}"
+		width="{FlexGlobals.topLevelApplication.width-props.getNumber('horizontalPadding')}"
+		height="{FlexGlobals.topLevelApplication.height-props.getNumber('verticalPadding')}"
 		>
 	<!-- Image and Video -->
 	<mx:VideoDisplay id="video" 
@@ -285,7 +292,7 @@
 		volume="1" 
 		horizontalCenter="0" 
 		verticalCenter="0" 
-		bufferTime="3"
+		bufferTime="2"
 		width="{(contentContainer.width/contentContainer.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : contentContainer.width)}"
 		height="{(contentContainer.width/contentContainer.height>activeElement.get('aspectRatio') ? contentContainer.height : contentContainer.width/(activeElement.get('aspectRatio') as Number))}"
 		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" 
@@ -325,9 +332,12 @@
 		volume="1" 
 		horizontalCenter="0" 
 		verticalCenter="0" 
-		bufferTime="4" 
+		bufferTime="2" 
 		width="{video.width}" 
 		height="{video.height}"
+		maintainAspectRatio="{props.get('maintainIdentityAspectRatio')}"
+		buttonMode="true"
+		playheadUpdate="{var secs:int=Math.round(identityVideo.totalTime-identityVideo.playheadTime); var mess:String = (secs!=1 ? props.getString('identityCountdownTextPlural') : props.getString('identityCountdownTextSingular')); identityMessage.message = mess.replace(/%/, secs);}"
 		/>
 	<com:SmoothImage id="identityPhoto" 
 		visible="false" 
@@ -335,7 +345,24 @@
 		verticalCenter="0" 
 		maxWidth="{contentContainer.width}" 
 		maxHeight="{contentContainer.height}" 
+		buttonMode="true"
 		/>
+	<com:OverlayMessage id="identityMessage"
+		fontFamily="{props.get('trayFont')}" 
+		color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+		backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+		visible="{props.get('identityCountdown') &amp;&amp; identityVideo.visible}"
+		allowClose="{props.get('identityAllowClose')}"
+		close="{identityVideo.stop(); reportEvent(currentIdentityEvent=='after' ? 'postRollClose ' : 'preRollClose'); identityVideo.dispatchEvent(new Event('complete', true));}"
+		/>
+	<com:PlayerSubtitles id="subtitles"
+		 width="100%"
+		 height="100%"
+		 x="0"
+		 y="0"
+		 targetVideo="{video}"
+		 visible="{video.visible}" 
+		 />
 
 	<!-- Icon/Logo -->
 	<mx:Box 
@@ -349,6 +376,7 @@
 		verticalAlign="{props.get('logoVAlign')}" 
 		horizontalCenter="0" 
 		verticalCenter="0"
+		buttonMode="true"
 		>
 		<mx:Image 
 			source="{props.get('logoSource')}" 
@@ -365,17 +393,19 @@
 	<!-- Tray -->
 	<mx:Canvas id="tray" 
 		x="0" 
-		width="{Application.application.width}" 
+		width="{FlexGlobals.topLevelApplication.width}" 
 		horizontalScrollPolicy="off" 
 		verticalScrollPolicy="off"
 		visible="{(props.get('showTray') as Boolean)}" 
 		resize="onTrayResize();" 
 		horizontalCenter="0"
+		clipContent="false"
 		>
 		<mx:VBox 
 			verticalScrollPolicy="off" 
 			horizontalScrollPolicy="off" 
 			verticalGap="-1"
+			clipContent="false"
 			>
 			<mx:VBox id="descriptions" 
 				horizontalScrollPolicy="off" 
@@ -397,20 +427,20 @@
 					paddingRight="6"
 					>
 					<mx:Label id="trayTitle" 
-						fontSize="{(props.get('trayTitleFontSize') as Number)}" 
+						fontSize="{(props.get('trayTitleFontSize') as Number) || 10}" 
 						fontWeight="{props.get('trayTitleFontWeight')}" 
 						text="{activeElement.get('title')}" 
 						truncateToFit="true" 
-						maxWidth="{Application.application.width}" 
+						maxWidth="{FlexGlobals.topLevelApplication.width}" 
 						updateComplete="trayTitle.visible = (trayTitle.text.length>0);" 
 						width="{descBg.width - 15}"
 						/>
 					<mx:Text id="trayContent" 
-						fontSize="{(props.get('trayContentFontSize') as Number)}" 
+						fontSize="{(props.get('trayContentFontSize') as Number) || 10}" 
 						fontWeight="{props.get('trayContentFontWeight')}" 
 						htmlText="{activeElement.get('content')}" 
 						truncateToFit="true" 
-						maxWidth="{Application.application.width}" 
+						maxWidth="{FlexGlobals.topLevelApplication.width}" 
 						updateComplete="trayContent.visible = (trayContent.text.length>0);" 
 						height="{(props.get('trayContentFontSize') as Number)*3.2}" 
 						width="{descBg.width - 15}"
@@ -424,6 +454,7 @@
 				backgroundColor="#f0f0f0"
 				backgroundAlpha="{(descriptions.visible ? 1 : 0)}"
 				width="{tray.width}"
+				clipContent="false"
 				>			
 					<!-- Play and Pause -->
 					<mx:HBox id="videoControls"
@@ -455,17 +486,33 @@
 
 					    <!-- HDbutton-->
 			    		<com:PlayerButton id="hdBtn" 
-			    			imageSource="@Embed(source='assets/buttons/hd-off.swf')"
-			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; !playHD}" 
-			    			click="playHD=true; setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1)"
-			    			toolTip="Play video in HD"
-			    			/>
-			    		<com:PlayerButton id="hdOffBtn"
-			    			imageSource="@Embed(source='assets/buttons/hd-on.swf')"
-			    			visible="{(activeElement.get('hasHD') as Boolean) &amp;&amp; playHD}" 
-			    			click="playHD=false; setActiveElement(currentElementIndex, true, video.playheadTime+activeElement.getNumber('start'), 1)"
-			    			toolTip="Play video in standard quality"
-			    			/>
+			    			imageSource="@Embed(source='assets/buttons/hd.swf')"
+			    			>
+							<com:PlayerMenu 
+								id="formatsMenu"
+								value="{currentVideoFormat}"
+								change="{switchVideoFormat(new String(formatsMenu.value));}"
+								backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+								backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+								fontFamily="{props.get('trayFont')}" 
+								color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+								/>
+						</com:PlayerButton>
+
+						<!-- Subtitle button-->
+						<com:PlayerButton id="subtitlesBtn" 
+						  	imageSource="@Embed(source='assets/buttons/cc.swf')"
+							>
+							<com:PlayerMenu 
+								id="subtitlesMenu"
+								value="{subtitles.locale}"
+								change="{subtitles.locale=new String(subtitlesMenu.value);}"
+								backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+								backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+								fontFamily="{props.get('trayFont')}" 
+								color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+								/>
+						</com:PlayerButton>
 
 						<!-- Fullscreen -->
 			    		<com:PlayerButton id="fullscreenImage" 
@@ -498,6 +545,7 @@
 						height="25"
 						width="100%"
 						backgroundImage="@Embed(source='assets/buttons/tray-background-bottom.swf')"
+						clipContent="false"
 						>
 						<!-- Progress bar -->
 						<com:PlayerProgress id="progress"
@@ -510,14 +558,14 @@
 
 			    		<!-- PlayListBtn -->
 			    		<mx:Image id="playlistBtn" 
-			    			right="15"
+			    			right="0"
 			    			y="-3"
 			    			source="@Embed(source='assets/buttons/expand-on.swf')"
 			    			visible="{enablePlayList &amp;&amp; showPlayList}" 
 			    			click="playListHide()"
 			    			/>
 			    		<mx:Image id="playlistBtnOn" 
-			    			right="15"
+			    			right="0"
 			    			y="-3"
 			    			source="@Embed(source='assets/buttons/expand-off.swf')"
 			    			visible="{enablePlayList &amp;&amp; !showPlayList}" 
@@ -549,8 +597,9 @@
 
 	<!-- Embed panel -->
 	<com:TextPanel id="embedPanel" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}"
+		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}"
 		title="Share this video"
+		show="{reportEvent('shareEngaged');}"
 		>
 
 		<!-- Embed section -->		
@@ -581,8 +630,8 @@
 				paddingLeft="3"
 				height="24"
 				width="100%"
-				text="{props.get('embedCode')}" 
-				click="{embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
+				text="{props.get('currentVideoEmbedCode')}" 
+				click="{reportEvent('embedEngaged'); embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
 				backgroundColor="white" 
 				color="#333" 
 				fontSize="11" 
@@ -590,7 +639,7 @@
 			<com:ActionButton
 				text="Copy" 
 				iconSource="@Embed(source='assets/buttons/copy.swf')"
-				click="System.setClipboard(embedText.text);"
+				click="{reportEvent('embedEngaged'); System.setClipboard(embedText.text);}"
 				/>
 		</mx:HBox>
 		
@@ -649,7 +698,7 @@
 
 	<!-- Text panel for post-roll html identity text -->
 	<com:TextPanel id="identityPanel" 
-		backgroundColor="{(StyleManager.getColorName(props.get('backgroundColor')) as Number)}"
+		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}"
 		>
 		<mx:TextArea id="identityPanelText"
 			width="100%"
@@ -661,6 +710,7 @@
 			color="white"
 			paddingTop="10" 
 			paddingBottom="20"
+			click="{reportEvent('callToActionClick');}"
 			/>
 		<mx:HBox 
 			visible="{(props.get('showShare') as Boolean)}"
@@ -679,6 +729,4 @@
 		</mx:HBox>
 	</com:TextPanel> 
 	<!-- / Text panel for post-roll -->
-	
-	
 </mx:Application>

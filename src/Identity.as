@@ -1,14 +1,22 @@
+import flash.events.MouseEvent;
 import flash.utils.Timer;
 
 import mx.events.VideoEvent;
 
-public function showIdentityVideo(url:String, callback:Function):void {
+public var currentIdentityEvent = '';
+public function showIdentityVideo(event:String, url:String, link:String, callback:Function):void {
 	videoControls.visible = video.visible = false;
+	infoHide();
 	identityVideo.visible = true;
 	identityVideo.source = url;
 	identityVideo.play();
+	identityVideo.addEventListener(MouseEvent.CLICK, function():void{
+			reportEvent(event=='before' ? 'preRollClick' : 'postRollClick');
+			goToUrl(link);
+		});
 	var onComplete:Function = function():void {
 			if(!identityVideo.visible) return;
+			infoShow();
 			identityVideo.visible = false;
 			videoControls.visible = video.visible = true;
 			identityVideo.removeEventListener(VideoEvent.COMPLETE, onComplete);
@@ -17,11 +25,15 @@ public function showIdentityVideo(url:String, callback:Function):void {
 	identityVideo.addEventListener(VideoEvent.COMPLETE, onComplete);
 }
 
-public function showIdentityPhoto(url:String, callback:Function):void {
+public function showIdentityPhoto(event:String, url:String, link:String, callback:Function):void {
 	videoControls.visible = video.visible = false;
 	identityPhoto.visible = true;
 	identityPhoto.source = url;
 	var identityPhotoTimer:Timer = new Timer(5000, 1);
+	identityVideo.addEventListener(MouseEvent.CLICK, function():void{
+			reportEvent(event=='before' ? 'preRollClick' : 'postRollClick');
+			goToUrl(link);
+		});
     identityPhotoTimer.addEventListener("timer", function():void {
 			if(!identityPhoto.visible) return;
 			identityPhoto.visible = false;
@@ -33,10 +45,11 @@ public function showIdentityPhoto(url:String, callback:Function):void {
 
 public function handleIdentity(event:String, callback:Function):void {
 	var type:String, url:String, text:String = '';
+	currentIdentityEvent = event;
 	if (event=='before') {
 		switch (activeElement.get('beforeDownloadType')) {
-			case 'video': showIdentityVideo(new String(activeElement.get('beforeDownloadUrl')), callback); break;
-			case 'photo': showIdentityPhoto(new String(activeElement.get('beforeDownloadUrl')), callback); break;
+			case 'video': showIdentityVideo('before', activeElement.getString('beforeDownloadUrl'), activeElement.getString('beforeLink'), callback); break;
+			case 'photo': showIdentityPhoto('before', activeElement.getString('beforeDownloadUrl'), activeElement.getString('beforeLink'), callback); break;
 			default: callback();
 		}
 	} else {
@@ -50,8 +63,8 @@ public function handleIdentity(event:String, callback:Function):void {
 		   	}
 		}
 		switch (activeElement.get('afterDownloadType')) {
-			case 'video': showIdentityVideo(new String(activeElement.get('afterDownloadUrl')), textCallback); break;
-			case 'photo': showIdentityPhoto(new String(activeElement.get('afterDownloadUrl')), textCallback); break;
+			case 'video': showIdentityVideo('after', activeElement.getString('afterDownloadUrl'), activeElement.getString('afterLink'), textCallback); break;
+			case 'photo': showIdentityPhoto('after', activeElement.getString('afterDownloadUrl'), activeElement.getString('afterLink'), textCallback); break;
 			default: textCallback();
 		}
 	}

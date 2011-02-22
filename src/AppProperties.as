@@ -1,5 +1,7 @@
 // ActionScript file
+import mx.core.FlexGlobals;
 import mx.utils.URLUtil;
+
 [Bindable] public var props:HashCollection = new HashCollection()
 public var propDefaults:Object = {
 	backgroundColor: 'black',
@@ -13,7 +15,7 @@ public var propDefaults:Object = {
 	trayAlpha: parseFloat('0.8'),
 	showTray: true,
 	showDescriptions: true,
-	logoSource: 'no logo',
+	logoSource: '',
 	showBigPlay: true,
 	showLogo: true,
 	showShare: true,
@@ -28,13 +30,23 @@ public var propDefaults:Object = {
 	trayTimeout: parseFloat('0'),
 	infoTimeout: parseFloat('5000'),
 	recommendationHeadline: 'Also have a look at...',
+	identityCountdown: false,
+	identityAllowClose: true,
+	identityCountdownTextSingular: "This advertisement will end in % second",
+	identityCountdownTextPlural: "This advertisement will end in % seconds",
 	recommendationMethod: 'channel-popular',
 	lowBandwidthThresholdKbps: parseFloat('0'),
+	maintainIdentityAspectRatio: true,
+	enableSubtitles: true,
+	subtitlesOnByDefault: false,
+	subtitlesDesign: 'outline',
 	
+	start: parseFloat('0'),
 	player_id: parseFloat('0'),
 	rssLink: '',
 	podcastLink: '',
 	embedCode: '',
+	currentVideoEmbedCode: '',
 	socialSharing: true,
 	streaming: false,
 
@@ -67,44 +79,48 @@ private function initProperties(settings:Object):void {
 	}
 	// Read from FlashVars
 	for (name in propDefaults) {
-	  	if(typeof(Application.application.parameters[name])!='undefined') {
-	  		if(name!='showDescriptions' && name!='autoPlay') loadSettings.push(name + '=' + encodeURI(Application.application.parameters[name]));
+	  	if(typeof(FlexGlobals.topLevelApplication.parameters[name])!='undefined') {
+	  		if(name!='showDescriptions' && name!='autoPlay') loadSettings.push(name + '=' + encodeURI(FlexGlobals.topLevelApplication.parameters[name]));
 	  		if (typeof propDefaults[name]=='boolean') {
-			 	props.put(name, new Boolean(parseFloat(Application.application.parameters[name])));
+			 	props.put(name, new Boolean(parseFloat(FlexGlobals.topLevelApplication.parameters[name])));
 		 	} else {	
-	  	    	if (isNaN(Application.application.parameters[name]) || name=='logoSource') {
-			 		props.put(name, Application.application.parameters[name]);
+	  	    	if (isNaN(FlexGlobals.topLevelApplication.parameters[name]) || name=='logoSource') {
+			 		props.put(name, FlexGlobals.topLevelApplication.parameters[name]);
 	  	    	} else {
-				 	props.put(name, parseFloat(Application.application.parameters[name]));
+				 	props.put(name, parseFloat(FlexGlobals.topLevelApplication.parameters[name]));
 	  	    	}
 	  	    }
 	  	}
 	}
 
 	// Determine a load parameters
-	var domain:String = URLUtil.getServerName(Application.application.url);
+	var domain:String = URLUtil.getServerName(FlexGlobals.topLevelApplication.url);
 	if(domain=='localhost' || domain=='') domain=defaultDomain;
 	props.put('domain', domain);
-    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'video_encoded_p'];
+    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size', 'rand'];
     for (var i:int=0; i<options.length; i++) {
 		var opt:String = options[i];
-		if (Application.application.parameters[opt]) {
-			loadParameters.push(opt + '=' + encodeURI(Application.application.parameters[opt]));
-			loadSettings.push(opt + '=' + encodeURI(Application.application.parameters[opt]));
+		if (FlexGlobals.topLevelApplication.parameters[opt]) {
+			loadParameters.push(opt + '=' + encodeURI(FlexGlobals.topLevelApplication.parameters[opt]));
+			loadSettings.push(opt + '=' + encodeURI(FlexGlobals.topLevelApplication.parameters[opt]));
 		}
     }
 	if (defaultPhotoId.length) loadParameters.push('photo_id=' + encodeURI(defaultPhotoId)); 
-	if (defaultAlbumId.length) loadParameters.push('album_id=' + encodeURI(defaultAlbumId)); 
+	if (defaultAlbumId.length) loadParameters.push('album_id=' + encodeURI(defaultAlbumId));
+	loadParameters.push('player_id=' + encodeURI(playerId));
 
 	// Use load parameters to build JSON source
-	var jsonSource:String = 'http://' + domain + '/js/photos?raw&' + loadParameters.join('&');
+	var jsonSource:String = 'http://' + domain + '/api/photo/list?raw&format=json&' + loadParameters.join('&');
 	props.put('jsonSource', jsonSource);
 	
 	// Mail link from parameters 
 	props.put('mailLink', (props.get('socialSharing') ? "/send?popup_p=1&" + loadParameters.join('&') : ''));
 
 	// Test logoSource
-	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') props.put('showLogo', false);
+	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') {
+		props.put('showLogo', false);
+		props.put('logoSource', '');	
+	}
 	if(props.get('showLogo')) {
 		var logoRequest:URLRequest = new URLRequest((props.get('logoSource') as String));
 		var logoLoader:URLLoader = new URLLoader();
@@ -128,16 +144,19 @@ private function initProperties(settings:Object):void {
 	infoTimer.delay = props.getNumber('infoTimeout');
 	infoTimer.reset();
 	
+	// Make the embed code current
+	updateCurrentVideoEmbedCode();
+	
 	// If bandwidth or player doesn't allow h264 quality, we won't allow streaming
 	if (!h264()) props.put('streaming', 0);
 	
 	// Should we start by playing HD? 
-	if(props.get('playHD')) playHD = true;
+	if(props.get('playHD')) currentVideoFormat = 'video_hd';
 }
 
 private function getRecommendationSource():String {
 	var domain:String = new String(props.get('domain'));
-	if(!context || !context.photos) return('http://' + domain + '/js/photos?raw&size=20');
+	if(!context || !context.photos) return('http://' + domain + '/api/photo/list?raw&format=json&size=20');
 	
 	if(context.photos.length==1) {
 		// There's only one video to play, we'll need to construct recommendation in another fashion.
@@ -146,18 +165,36 @@ private function getRecommendationSource():String {
 		switch (method) {
 			case 'site-new':
 			case 'channel-new':
-				recommendationSource = 'http://' + domain + '/js/photos?raw&size=20&orderby=uploaded&order=desc';
+				recommendationSource = 'http://' + domain + '/api/photo/list?raw&format=json&size=20&orderby=uploaded&order=desc';
 				break;
 			case 'site-popular':
 			case 'channel-popular':
 			case 'similar':
 			default:
-				recommendationSource = 'http://' + domain + '/js/photos?raw&size=20&orderby=rank&order=desc';
+				recommendationSource = 'http://' + domain + '/api/photo/list?raw&format=json&size=20&orderby=rank&order=desc';
 				break;
 		}
+		if (playerId.length) recommendationSource += '&player_id=' + encodeURI(playerId);
 		if (context.photos[0].album_id!='' && (method=='channel-new' || method=='channel-popular')) recommendationSource += '&album_id=' + context.photos[0].album_id;
 		return(recommendationSource);
 	} else {
 		return(new String(props.get('jsonSource')));
 	}
+}
+
+private function updateCurrentVideoEmbedCode():void {
+	try {
+		var e:String = props.getString('embedCode');
+		if (!e.match(/photo\%5fid/)) {
+			// remove album_id and token
+			e = e.replace(new RegExp('(album\%5fid|token)=[a-zA-Z0-9]*', 'img'), '');
+			// set photo_id
+			e = e.replace(new RegExp('FlashVars="'), 'FlashVars="photo\%5fid=' + activeElement.getString('photo_id') + '&');
+			e = e.replace(new RegExp('FlashVars" value="', 'img'), 'FlashVars="photo\%5fid=' + activeElement.getString('photo_id') + '&');
+		}
+		props.put('currentVideoEmbedCode', e);
+	} catch(err:ErrorEvent) {
+		// A safety net for bad code
+		props.put('currentVideoEmbedCode', props.getString('embedCode'));
+	}  
 }

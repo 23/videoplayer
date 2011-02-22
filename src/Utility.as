@@ -28,14 +28,33 @@ public function h264():Boolean {
 	return(false);
 }
 
-public function reportPlayTime(time:Number):void {
-	var id:int = context.photos[currentElementIndex].photo_id;
-	var url:String = 'http://' + props.get('domain') + '/actions?action=report-play-time&uuid=' + encodeURIComponent(uuid) + '&id=' + encodeURIComponent(new String(id)) + '&time=' + encodeURIComponent(new String(time+activeElement.getNumber('start'))) + '&start=' + encodeURIComponent(activeElement.getString('start'));
-	var reportRequest:URLRequest = new URLRequest(url);
-	var reportLoader:URLLoader = new URLLoader();
-	reportLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):void {});
-	reportLoader.addEventListener(IOErrorEvent.IO_ERROR, function httpStatusHandler(e:Event):void {});
-	reportLoader.load(reportRequest);	
+public function expandReportObject(o:Object):Object {
+	o['user_player_type'] = 'flash';
+	o['user_player_resolution'] = Capabilities.screenResolutionX + "x" + Capabilities.screenResolutionY;
+	o['user_player_version'] = Capabilities.version;
+	return(o);
+}
+
+private var lastPlayTimeStart:String = '0';
+public function reportPlay(event:String, time:Number):void {
+	if(event=='start') {
+		var time_start:String = new String(time+activeElement.getNumber('start'));
+		lastPlayTimeStart = time_start;
+		var time_end:String = ''; 
+	} else {
+		var time_start:String = lastPlayTimeStart;
+		var time_end:String = new String(time+activeElement.getNumber('start'));
+	}
+	var photo_id:int = context.photos[currentElementIndex].photo_id;
+	try {
+		doAPI('/api/analytics/report/play', expandReportObject({photo_id:photo_id, time_start:time_start, time_end:time_end, uuid:uuid}), function():void{});
+	} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
+}
+public function reportEvent(event:String):void {
+	var photo_id:int = context.photos[currentElementIndex].photo_id;
+	try {
+		doAPI('/api/analytics/report/event', expandReportObject({photo_id:photo_id, event:event, uuid:uuid}), function():void{});
+	} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
 }
 
 public function goToUrl(url:String):void {

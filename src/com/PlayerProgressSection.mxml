@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="10" 
+	height="10"
+	backgroundColor="#D4B400"
+	borderColor="#333"
+	borderThickness="1"
+ 	borderStyle="solid"
+	cornerRadius="{this.width/2}"
+	clipContent="false"
+	mouseOver="{labelContainer.visible=true;}"	
+	mouseOut="{labelContainer.visible=false;}"
+	>
+
+	<mx:Script>
+		<![CDATA[
+			public var startTime:Number = 0;
+			[bindable] public var title:String = '';
+			[bindable] public var labelWidth:int = 150;
+			[bindable] public var labelBackgroundColor:Number = (styleManager.getColorName('black') as Number);
+			[bindable] public var labelTextColor:Number = (styleManager.getColorName('white') as Number);
+			[bindable] public var labelFontFamily:String = 'Helvetical, Arial';
+			[bindable] public var labelFontSize:Number = 10;
+			[bindable] public var labelFontWeight:String = 'bold';
+			[bindable] public var labelAlpha:Number = 1;
+		]]>
+	</mx:Script>	
+	
+	<mx:Canvas 
+		id="labelContainer"
+		backgroundColor="{labelBackgroundColor}"
+		color="{labelTextColor}"
+		width="{labelText.width + 10}" 
+		height="{labelText.height + 8}" 
+		top="-40" 
+		backgroundAlpha="{labelAlpha}"
+		horizontalCenter="0" 
+		cornerRadius="2" 
+		borderStyle="solid"
+		borderThickness="0" 
+		clipContent="false"
+		visible="false"
+		>
+		<mx:Label 
+			id="labelText" 
+			top="5"
+			left="5"
+			text="{title}" 
+			truncateToFit="true" 
+			maxWidth="{labelWidth}"
+			fontFamily="{labelFontFamily}"
+			fontSize="{labelFontSize}"
+			fontWeight="{labelFontWeight}"
+			/>
+	</mx:Canvas>
+	
+</mx:Canvas>

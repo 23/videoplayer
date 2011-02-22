@@ -6,7 +6,10 @@
 	useHandCursor="true" 
 	buttonMode="true" 
 	height="12"
-	click="seekVideoTo((this.contentMouseX-5)/videoProgress.width*activeElement.getNumber('length'));" 
+	click="seekVideoTo(timeFromPoint(this.contentMouseX));" 
+	resize="drawSections();"
+	initialize="init()"
+	clipContent="false"
 	>
 	<!-- VideoProgress -->
 	<mx:Canvas id="videoProgress" 
@@ -27,12 +30,17 @@
 			height="10" 
 			backgroundImage="@Embed(source='assets/buttons/progress-played.swf')" 
 			/>
-	</mx:Canvas>					
 
+	</mx:Canvas>					
+	<!-- Sections -->
+	<mx:Canvas id="sectionContainer" top="0" left="0" width="100%" height="100%">
+		
+	</mx:Canvas>
+	
 	<!-- videoTime -->
 	<mx:HBox id="videoTime" 
 		right="0"
-		y="-2" 
+		y="-1" 
 		>
 		<mx:Label id="videoTimeLabel" 
 			selectable="false"
@@ -42,18 +50,53 @@
 			color="white"
 			/>
 	</mx:HBox>
+
+	<mx:HBox id="videoDragHandle"
+		 visible="false" 
+		 y="{(this.height-videoTimeLabel.height)/2}" 
+		 width="{videoTimeLabel.width}"
+		 height="{videoTimeLabel.height}"
+		 backgroundColor="0xFFFFFF" 
+		 cornerRadius="2" 
+		 borderStyle="solid" 
+		 borderColor="white"
+		 clipContent="false"
+		 useHandCursor="true"
+		 buttonMode="true"
+		>
+	</mx:HBox>
 	
 	<mx:Script>
 		<![CDATA[
-			import mx.events.VideoEvent;
-			import mx.controls.VideoDisplay;
-
-			// Import props hash array from main application 
-			import mx.core.Application;
 			import com.philemonworks.flex.util.HashCollection;
-			[bindable] private var props:HashCollection = mx.core.Application.application.props;
-			[bindable] private var activeElement:HashCollection = mx.core.Application.application.activeElement;
 			
+			import mx.controls.VideoDisplay;
+			import mx.core.Application;
+			import mx.events.VideoEvent;
+			[bindable] private var props:HashCollection = mx.core.FlexGlobals.topLevelApplication.props;
+			[bindable] private var activeElement:HashCollection = mx.core.FlexGlobals.topLevelApplication.activeElement;
+
+			var scrubberStartX:int = -1;
+			var scrubberStartMouseX:int = -1;
+			private function init():void {
+				this.addEventListener(MouseEvent.MOUSE_MOVE, function(e:MouseEvent){
+					if(scrubberStartMouseX<0) return;
+					videoDragHandle.x = scrubberStartX + (e.stageX-scrubberStartMouseX);
+					var x = scrubberStartX + (e.stageX-scrubberStartMouseX);
+					videoTimeLabel.text = formatTime(timeFromPoint(x));
+				});
+				this.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent){
+					if(scrubberStartMouseX<0) return;
+					scrubberStartMouseX = scrubberStartX = -1;
+					var x = scrubberStartX + (e.stageX-scrubberStartMouseX);
+					seekVideoTo(timeFromPoint(x));
+				});
+				videoDragHandle.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent){
+					scrubberStartX = videoDragHandle.x;
+					scrubberStartMouseX = e.stageX;
+				});
+			}
+
 			// Component-specific functions and event-handlers
 			private function formatTime(time:int, totalTime:int = -1, join:String = ' / '):String {
 				if (time<0) return("");
@@ -63,20 +106,25 @@
 					return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());
 				}
 			}
-            private function seekVideoTo(time:int):void {
+			private function timeFromPoint(x:int):int {
+				return Math.round((x-5)/videoProgress.width*activeElement.getNumber('length'));
+			}
+            public function seekVideoTo(time:int):void {
             	if(!_targetVideo) return;
             	if(time>activeElement.getNumber('length')) return;
             	var approxBufferTime:Number = (_targetVideo.totalTime * (_targetVideo.bytesLoaded/_targetVideo.bytesTotal)) + activeElement.getNumber('start');
+        		_targetVideo.bufferTime = 2; // default buffer time is two secs
             	if(time>new Number(activeElement.get('start')) && time<approxBufferTime) {
             		_targetVideo.playheadTime = time-activeElement.getNumber('start');
-            		if(!_targetVideo.playing) _targetVideo.play();
+            		if(!_targetVideo.playing) this.parentApplication.playVideoElement();
             	} else {
             		if ((props.get('streaming') as Boolean)) {
-            			activeElement.put('start', time);
+            			activeElement.put('start', Math.floor(time));
             			activeElement.put('skip', '1');
-            			_targetVideo.stop();
+            			_targetVideo.bufferTime = 0; // when skipping we'll skip the buffer
+						if(_targetVideo.playing) _targetVideo.stop();
             			_targetVideo.source = getFullVideoSource();
-            			_targetVideo.play();
+						this.parentApplication.playVideoElement();
             		}
             	}
             }
@@ -89,13 +137,17 @@
             	if(!_targetVideo) return;
 				videoPlayProgress.x = activeElement.getNumber('start') / activeElement.getNumber('length') * videoProgress.width;
 				videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*(videoProgress.width-videoPlayProgress.x);
-				videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'), activeElement.getNumber('length'));
+				if(scrubberStartMouseX<0) {
+					videoDragHandle.x = 5 + videoPlayProgress.x + videoPlayProgress.width - (videoDragHandle.width/2);
+					videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'), activeElement.getNumber('length'));
+				}
             }
 
 			private function getFullVideoSource():String {
 				return(activeElement.getString('videoSource') + '?start=' + encodeURIComponent(activeElement.getString('start')) + '&skip=' + encodeURIComponent(activeElement.getString('skip')));
 			}            
-            
+            		
+
 			// Which video display are we binding to? (and attach to events)
 			private var _targetVideo:VideoDisplay;
 			public function set targetVideo(v:VideoDisplay):void {
@@ -104,6 +156,43 @@
 				v.addEventListener(ProgressEvent.PROGRESS, updateBuffer);
 			}
 			public function get targetVideo():VideoDisplay {return(_targetVideo);}
+			
+			private var _sections:Array = [];
+			public function setSections(s:Array):void{
+				_sections = s;
+				drawSections();
+			}			
+			private function drawSections():void{
+				// Clear current objects
+				sectionContainer.removeAllChildren();
+				// Add new ones
+				for (var i:int=0; i<_sections.length; i++) {
+					var s:Object = _sections[i];
+					var section:PlayerProgressSection = new com.PlayerProgressSection;
+					
+					// Position section indicator
+					section.labelBackgroundColor = (styleManager.getColorName(props.get('trayBackgroundColor')) as Number);
+					section.labelAlpha = props.getNumber('trayAlpha');
+					section.labelFontSize = (props.getNumber('trayTitleFontSize') || 12)-2; 
+					section.labelFontWeight = props.getString('trayTitleFontWeight'); 
+					
+					section.width = 12;
+					section.height = 12;
+					section.y = 0;
+					section.x = 8 + ((s.start_time/activeElement.getNumber('length')) * videoProgress.width);
+					section.title = s.title;
+					section.startTime = s.start_time;
+					
+					// Listen to clicks
+					section.addEventListener(MouseEvent.CLICK, function(e:Event):void{
+						e.stopPropagation();
+						seekVideoTo(e.currentTarget.startTime);
+					});
+					
+					// Add to progress bar
+					sectionContainer.addChild(section);
+				}
+			}
 		]]>
 	</mx:Script>	
 </mx:Canvas>
