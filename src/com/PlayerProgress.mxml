@@ -144,7 +144,7 @@
 				videoPlayProgress.x = activeElement.getNumber('start') / activeElement.getNumber('length') * videoProgress.width;
 				videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*(videoProgress.width-videoPlayProgress.x);
 				if(scrubberStartMouseX<0) {
-					videoDragHandle.x = videoPlayProgress.x + videoPlayProgress.width - (videoDragHandle.width/2);
+					videoDragHandle.x = 5 + videoPlayProgress.x + videoPlayProgress.width - (videoDragHandle.width/2);
 					videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'));
 				}
             }
