@@ -12,10 +12,11 @@
 	borderThickness="0" 
 	backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 	backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-	mouseOver="videoTime.visible=true" 
-	mouseOut="videoTime.visible=false" 
-	click="seekVideoTo((this.contentMouseX-5)/videoProgress.width*activeElement.getNumber('length'));" 
+	mouseOver="videoDragHandle.visible=true" 
+	mouseOut="videoDragHandle.visible=false" 
+	click="seekVideoTo(timeFromPoint(this.contentMouseX));" 
 	resize="drawSections();"
+	initialize="init()"
 	>
 	<!-- VideoProgress -->
 	<mx:Canvas id="videoProgress" 
@@ -45,22 +46,30 @@
 	</mx:Canvas>
 	
 	<!-- videoTime -->
-	<mx:HBox id="videoTime" 
-		visible="false" 
-		y="{(this.height-videoTime.height)/2}" 
-		backgroundColor="0xFFFFFF" 
-		cornerRadius="2" 
-		borderStyle="solid" 
-		borderColor="white"
-		clipContent="false"
+	<mx:HBox id="videoDragHandle"
+		 visible="false" 
+		 y="{(this.height-videoTimeLabel.height)/2}" 
+		 width="{videoTimeLabel.width}"
+		 height="{videoTimeLabel.height}"
+		 backgroundColor="0xFFFFFF" 
+		 cornerRadius="2" 
+		 borderStyle="solid" 
+		 borderColor="white"
+		 clipContent="false"
+		 useHandCursor="true"
+		 buttonMode="true"
 		>
-		<mx:Label id="videoTimeLabel" 
-			selectable="false" 
-			fontFamily="Helvetica, Arial" 
-			fontSize="9" 
-			height="12" 
-			color="black"
-			/>
+		<mx:VBox id="videoTime"
+			 clipContent="false"
+			>
+			<mx:Label id="videoTimeLabel" 
+				selectable="false" 
+				fontFamily="Helvetica, Arial" 
+				fontSize="9" 
+				height="12" 
+				color="black"
+				/>
+		</mx:VBox>	
 	</mx:HBox>
 	
 	<mx:Script>
@@ -72,7 +81,28 @@
 			import mx.events.VideoEvent;
 			[bindable] private var props:HashCollection = mx.core.FlexGlobals.topLevelApplication.props;
 			[bindable] private var activeElement:HashCollection = mx.core.FlexGlobals.topLevelApplication.activeElement;
-			
+
+			var scrubberStartX:int = -1;
+			var scrubberStartMouseX:int = -1;
+			private function init():void {
+				this.addEventListener(MouseEvent.MOUSE_MOVE, function(e:MouseEvent){
+					if(scrubberStartMouseX<0) return;
+					videoDragHandle.x = scrubberStartX + (e.stageX-scrubberStartMouseX);
+					var x = scrubberStartX + (e.stageX-scrubberStartMouseX);
+					videoTimeLabel.text = formatTime(timeFromPoint(x));
+				});
+				this.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent){
+					if(scrubberStartMouseX<0) return;
+					scrubberStartMouseX = scrubberStartX = -1;
+					var x = scrubberStartX + (e.stageX-scrubberStartMouseX);
+					seekVideoTo(timeFromPoint(x));
+				});
+				videoDragHandle.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent){
+					scrubberStartX = videoDragHandle.x;
+					scrubberStartMouseX = e.stageX;
+				});
+			}
+
 			// Component-specific functions and event-handlers
 			private function formatTime(time:int, totalTime:int = -1, join:String = ' / '):String {
 				if (time<0) return("");
@@ -81,6 +111,9 @@
 				} else {
 					return(Math.floor(time/60).toString() +':'+ (time%60<10?'0':'') + Math.round(time%60).toString());
 				}
+			}
+			private function timeFromPoint(x:int):int {
+				return Math.round((x-5)/videoProgress.width*activeElement.getNumber('length'));
 			}
             public function seekVideoTo(time:int):void {
             	if(!_targetVideo) return;
@@ -110,14 +143,17 @@
             	if(!_targetVideo) return;
 				videoPlayProgress.x = activeElement.getNumber('start') / activeElement.getNumber('length') * videoProgress.width;
 				videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*(videoProgress.width-videoPlayProgress.x);
-				videoTime.x = videoPlayProgress.x + videoPlayProgress.width - (videoTime.width/2);
-				videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'));
+				if(scrubberStartMouseX<0) {
+					videoDragHandle.x = videoPlayProgress.x + videoPlayProgress.width - (videoDragHandle.width/2);
+					videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'));
+				}
             }
 
 			private function getFullVideoSource():String {
 				return(activeElement.getString('videoSource') + '?start=' + encodeURIComponent(activeElement.getString('start')) + '&skip=' + encodeURIComponent(activeElement.getString('skip')));
 			}            
-            
+            		
+
 			// Which video display are we binding to? (and attach to events)
 			private var _targetVideo:VideoDisplay;
 			public function set targetVideo(v:VideoDisplay):void {
