@@ -18,7 +18,7 @@
 	width="100%" 
 	height="100%" 
 	creationComplete="init();" 
-	keyDown="trayShow()" 
+	keyDown="trayShow()"
 	>
  	<mx:Script source="Utility.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
@@ -107,6 +107,7 @@
 			public function build():void {
 				if(!context || !context.photos || context.photos.length==0) {displayError('Empty video stream...'); return;}
 				video.mx_internal::videoPlayer.smoothing = true;
+				identityVideo.mx_internal::videoPlayer.smoothing = true;
 				setActiveElement(0, false, props.getNumber('start'));
 				
 				if (props.get('showTray') && props.get('showBrowse')) {
@@ -460,7 +461,8 @@
 						bottom="2" 
 						top="2" 
 						left="2" 
-						width="{playImage.width}" 
+						width="{playImage.width}"
+						hasFocusableChildren="true"
 						resize="resizeProgressBar();">
 			    		<com:PlayerButton id="playImage" 
 			    			imageSource="@Embed(source='assets/buttons/play.swf')"

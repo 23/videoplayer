@@ -7,6 +7,7 @@
 	buttonMode="true" 
 	focusEnabled="true" 
 	tabEnabled="true"
+	tabFocusEnabled="true"
 	keyDown="if (event.keyCode==Keyboard.ENTER) event.target.dispatchEvent(new MouseEvent(MouseEvent.CLICK));"
 	height="28"
  	verticalScrollPolicy="off"
