@@ -261,6 +261,7 @@ private function pauseVideoElement():void {
 }
 
 private function getFullVideoSource():String {
-	return(activeElement.getString('videoSource') + '?start=' + encodeURIComponent(activeElement.getString('start')) + '&skip=' + encodeURIComponent(activeElement.getString('skip')));
+	var joinChar:String = (/\?/.test(activeElement.getString('videoSource')) ? '&' : '?');
+	return(activeElement.getString('videoSource') + joinChar + 'start=' + encodeURIComponent(activeElement.getString('start')) + '&skip=' + encodeURIComponent(activeElement.getString('skip')));
 }            
 

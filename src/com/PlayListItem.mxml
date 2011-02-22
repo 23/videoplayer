@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:com="com.*" width="75" height="106" creationComplete="init()">
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:com="com.*" 
+	width="75" 
+	height="106"
+	implements="mx.managers.IFocusManagerComponent" 
+	focusEnabled="true" 
+	tabEnabled="true"
+	tabFocusEnabled="true"
+	keyDown="if (event.keyCode==Keyboard.ENTER) event.target.dispatchEvent(new MouseEvent(MouseEvent.CLICK));"
+	creationComplete="init()">
 	<mx:Script>
 		<![CDATA[
 			import com.SmoothImage;

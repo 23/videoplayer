@@ -49,7 +49,7 @@
 			private var subtitles:Array;
 			private function loadSubtitles():void{
 				if(!_localeObject.href)return;
-				clearSubtitles()
+				clearSubtitles();
 				try {
 					var loader:URLLoader = new URLLoader();
 					loader.addEventListener(Event.COMPLETE, function(e:Event):void {
@@ -60,6 +60,7 @@
 						});
 					loader.load(new URLRequest(_localeObject.href));
 				}catch(e:ErrorEvent){}
+				this.parentApplication.reportEvent('subtitlesActived');
 			}
 			private function clearSubtitles():void {
 				display.text = '';

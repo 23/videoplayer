@@ -19,6 +19,7 @@
 	height="100%" 
 	creationComplete="init(); resizeTray();" 
 	resize="resizeTray();" 
+	keyDown="trayShow()"
 	>
 	<mx:Style>
      @font-face {
@@ -123,6 +124,7 @@
 			public function build():void {
 				if(!context || !context.photos || context.photos.length==0) {displayError('Empty video stream...'); return;}
 				video.mx_internal::videoPlayer.smoothing = true;
+				identityVideo.mx_internal::videoPlayer.smoothing = true;
 				setActiveElement(0, false, props.getNumber('start'));
 				
 				tray.visible=true;
@@ -551,6 +553,7 @@
 					backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
 					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 	    			/>  
+
 
 				<mx:VBox 
 					id="progressContainer"
