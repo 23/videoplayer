@@ -7,7 +7,6 @@
 	buttonMode="true" 
 	height="11"
 	click="seekVideoTo(timeFromPoint(this.contentMouseX+30));" 
-	resize="drawSections();"
 	clipContent="true"
 	initialize="init()"
 	>
@@ -18,6 +17,7 @@
 		top="5"
 		left="0"
 		right="{(videoTimeLabel.visible&amp;&amp;videoTimeLabel.text.length>0 ? Math.round((videoTimeLabel.width+5)/10)*10 : 0)}"
+		resize="drawSections();"
 		backgroundColor="white" 
 		backgroundAlpha="0.3">
 		<!-- mx:Image
@@ -62,9 +62,7 @@
 	</mx:HBox>
 
 	<!-- Sections -->
-	<mx:Canvas id="sectionContainer" top="0" left="0" width="100%" height="100%">
-		
-	</mx:Canvas>
+	<mx:Canvas id="sectionContainer" top="0" left="0" width="100%" height="100%" horizontalScrollPolicy="off"></mx:Canvas>
 	
 	
 	<mx:Script>
