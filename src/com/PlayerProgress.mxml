@@ -15,15 +15,15 @@
 	mouseOver="videoDragHandle.visible=true" 
 	mouseOut="videoDragHandle.visible=false" 
 	click="seekVideoTo(timeFromPoint(this.contentMouseX));" 
-	resize="drawSections();"
 	initialize="init()"
 	>
 	<!-- VideoProgress -->
-	<mx:Canvas id="videoProgress" 
+	<mx:Canvas id="videoProgress"
 		top="11" 
 		left="10" 
 		right="10" 
 		height="6" 
+		resize="drawSections();"
 		backgroundColor="0xCCCCCC" 
 		backgroundAlpha="0.6">
 		<mx:Canvas id="videoBufferProgress" 
@@ -41,9 +41,7 @@
 	</mx:Canvas>					
 
 	<!-- Sections -->
-	<mx:Canvas id="sectionContainer" top="0" left="0" width="100%" height="100%">
-		
-	</mx:Canvas>
+	<mx:Canvas id="sectionContainer" top="0" left="0" width="100%" height="100%" horizontalScrollPolicy="off"></mx:Canvas>
 	
 	<!-- videoTime -->
 	<mx:HBox id="videoDragHandle"
