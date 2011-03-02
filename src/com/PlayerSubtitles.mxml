@@ -83,7 +83,7 @@
 			private function resize():void {
 				var maxSize:int = 35;
 				var minSize:int = 10;
-				var varSize:int = this.width/28;
+				var varSize:int = this.width/37;
 				display.setStyle('fontSize', (varSize>maxSize ? maxSize : (varSize<minSize ? minSize : varSize)));
 			}
 		]]>
