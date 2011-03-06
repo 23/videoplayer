@@ -52,6 +52,9 @@
 			import com.adobe.serialization.json.JSONParseError;
 			private var subtitleTimer:Timer = new Timer(100);
 			private var subtitles:Array;
+			
+			// Outline filter
+			private var outlineFilter:GlowFilter = null;
 			private function loadSubtitles():void{
 				if(!_localeObject.href)return;
 				clearSubtitles();
@@ -74,6 +77,16 @@
 			}
 			private function displaySubtitles(e:Event):void{
 				if(!subtitles.length || !_targetVideo.playing) return;
+
+				// Possibly prepare glow filter for outlining subtitles
+				if(design!=='bars' && !outlineFilter) { 
+					outlineFilter = new GlowFilter;
+					outlineFilter.color = 0x000000;
+					outlineFilter.alpha = 1;
+					outlineFilter.blurX = 3;
+					outlineFilter.blurY = 3;
+				}
+				
 				var playheadTime:Number = _targetVideo.playheadTime + this.parentApplication.activeElement.getNumber('start') + 0.05;
 				for (var i:Object in subtitles) {
 					if(subtitles[i].timestamp_begin<=playheadTime && subtitles[i].timestamp_end>=playheadTime) {
@@ -92,6 +105,8 @@
 							if (design==='bars') {
 								h.setStyle('backgroundColor', 'black');
 								h.setStyle('backgroundAlpha', 0.8);
+							} else {
+								l.filters = [outlineFilter];
 							}
 						}
 						break;
