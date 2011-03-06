@@ -16,7 +16,7 @@ public var propDefaults:Object = {
 	showTray: true,
 	showDescriptions: false,
 	logoSource: '',
-	showBigPlay: true,
+	showBigPlay: false,
 	showLogo: true,
 	showShare: true,
 	showBrowse: true,
