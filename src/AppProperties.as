@@ -39,7 +39,7 @@ public var propDefaults:Object = {
 	maintainIdentityAspectRatio: true,
 	enableSubtitles: true,
 	subtitlesOnByDefault: false,
-	subtitlesDesign: 'outline',
+	subtitlesDesign: 'bars',
 	
 	start: parseFloat('0'),
 	player_id: parseFloat('0'),
