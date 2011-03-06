@@ -124,7 +124,8 @@
 				identityVideo.mx_internal::videoPlayer.smoothing = true;
 				setActiveElement(0, false, props.getNumber('start'));
 				
-				tray.visible=true;
+				if (props.get('showTray')) tray.visible=true;
+				bigPlayImage.imageContainer.horizontalCenter = 5;
 				resizeTray();
 
  				if (props.get('showTray') && props.get('showBrowse')) {
