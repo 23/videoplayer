@@ -1,58 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>                                                                                                                                    
-<mx:Canvas 
+<mx:HBox 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
-	implements="mx.managers.IFocusManagerComponent" 
-	width="32" 
-	height="28"  
+	implements="mx.managers.IFocusManagerComponent"
+	width="40"
+	height="40"
 	focusEnabled="true" 
 	tabEnabled="true"
 	tabFocusEnabled="true"
 	buttonMode="true"  
 	keyDown="if (event.keyCode==Keyboard.ENTER) event.target.dispatchEvent(new MouseEvent(MouseEvent.CLICK));"
-	backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"  
-	backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-	borderStyle="solid" 
-	borderThickness="0" 
-	cornerRadius="2" 
-	mouseOver="onButtonMouseOver(event)" 
-	mouseOut="onButtonMouseOut(event)"
-	hide="onVisibilityChange()"
-	show="onVisibilityChange()"
-	added="onVisibilityChange()"
 	clipContent="false"
+	includeInLayout="{this.visible}"
 	>
 	<mx:Script>
 		<![CDATA[
-			import com.philemonworks.flex.util.HashCollection;
-			
 			import mx.controls.Image;
-			import mx.core.Application;
-			import mx.core.FlexGlobals;
-			[bindable] private var props:HashCollection = mx.core.FlexGlobals.topLevelApplication.props;
-			public var imageContainer:Image = new Image();
-			private var _imageWidth:int, _imageHeight:int;
-			public function set imageSource(source:Object):void {
-				imageContainer.alpha = 0.7;
-				imageContainer.source = source;
+			import mx.controls.Label;
+			private var imageContainer:Image = new Image();
+			private var titleContainer:Label = new Label();
+			public function init():void{
 				this.addChild(imageContainer);					
+				this.addChild(titleContainer);					
 			}
-			public function set imageWidth(w:int):void {
-				imageContainer.width = w;
+			public function set imageSource(source:Object):void {
+				imageContainer.source = source;
 			}
-			public function set imageHeight(h:int):void {
-				imageContainer.height = h;
+			public function set title(title:String):void {
+				titleContainer.text = title;
 			}
-			private function onVisibilityChange():void {
-				this.includeInLayout = this.visible;
-			}
-			private function onButtonMouseOver(e:Event):void {
-    	    	e.currentTarget.setStyle('backgroundAlpha', 1);
-        	    e.currentTarget.getChildren()[0].alpha = 1;         	
-			}
-	        private function onButtonMouseOut(e:Event):void {
-    	    	e.currentTarget.setStyle('backgroundAlpha', props.get('trayAlpha'));
-        	    e.currentTarget.getChildren()[0].alpha = 0.7;
-	        }
 		]]>
 	</mx:Script>
-</mx:Canvas> 
+</mx:HBox> 
