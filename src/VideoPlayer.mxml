@@ -106,13 +106,11 @@
             private function trayShow():void {
             	if(!props.get('showTray')) {tray.visible=false; return;}
             	trayTimer.reset(); trayTimer.start();
-		        tray.y = FlexGlobals.topLevelApplication.height - tray.height; // ... to just inside, depending on context
             	tray.visible = true;
             }            
             private function trayHide():void {
             	trayTimer.stop();
             	if(props.getNumber('trayTimeout')<=0) return;
-				tray.y = FlexGlobals.topLevelApplication.height; // ... to outside of frame
                 tray.visible = false;
             }            
 			private var trayTimer:Timer = new Timer(3000,1);
@@ -308,15 +306,16 @@
 	</mx:Canvas> 
 
 	<!-- Tray -->
-	<mx:Canvas id="tray" 
-		y="{FlexGlobals.topLevelApplication.height-tray.height-20}" 
-		x="0" 
-		width="{FlexGlobals.topLevelApplication.width}" 
+	<mx:Canvas id="tray"
+	    x="{video.x}"
+		bottom="20"
+		width="{Math.max(500, video.width*0.8)}"
+		backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
+		backgroundAlpha="{(props.get('trayAlpha') as Number)}"
 		horizontalScrollPolicy="off" 
 		verticalScrollPolicy="off" 
 		visible="{(props.get('showTray') as Boolean)}" 
 		resize="onTrayResize();" 
-		horizontalCenter="0"
 		>
 		<mx:VBox 
 			verticalGap="0"

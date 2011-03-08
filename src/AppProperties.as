@@ -5,8 +5,8 @@ import mx.utils.URLUtil;
 [Bindable] public var props:HashCollection = new HashCollection()
 public var propDefaults:Object = {
 	backgroundColor: 'black',
-	trayBackgroundColor: 'black',
-	trayTextColor: 'white',
+	trayBackgroundColor: 'white',
+	trayTextColor: 'black',
 	trayFont: 'Helvetica, Arial, sans-serif',
 	trayTitleFontSize: parseFloat('13'),
 	trayTitleFontWeight: 'bold',
