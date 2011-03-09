@@ -10,15 +10,24 @@
 	initialize="{init()}"
 	color="#333333"
 	fontFamily="TheSans"
-	fontSize="12"
+	fontSize="13"
 	horizontalGap="2"
+	hide="onVisibilityChange()"
+	show="onVisibilityChange()"
+	added="onVisibilityChange()"
+	width="{imageContainer.width + titleContainer.width + 3}"
+	height="20"
+	clipContent="true"
+	verticalScrollPolicy="off"
+	horizontalScrollPolicy="off"
+	verticalAlign="middle"
 	>
 	<mx:Script>
 		<![CDATA[
 			import mx.controls.Image;
-			import mx.controls.Label;
+			import mx.controls.Text;
 			private var imageContainer:Image = new Image();
-			private var titleContainer:Label = new Label();
+			private var titleContainer:Text = new Text();
 			public function init():void{
 				this.addChild(imageContainer);					
 				this.addChild(titleContainer);					
@@ -28,6 +37,12 @@
 			}
 			public function set title(title:String):void {
 				titleContainer.text = title;
+				titleContainer.setStyle('paddingTop', 2);
+				titleContainer.selectable = false;
+				titleContainer.buttonMode = true;
+			}
+			private function onVisibilityChange():void {
+				this.includeInLayout = this.visible;
 			}
 		]]>
 	</mx:Script>

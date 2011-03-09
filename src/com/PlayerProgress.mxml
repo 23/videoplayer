@@ -42,8 +42,8 @@
 			 />
 
 	<mx:Label id="videoTimeLabel"
-		  right="0"
-		  bottom="1"
+		  right="-2"
+		  bottom="2"
 		  selectable="false" 
 		  fontSize="10" 
 		  height="12" 

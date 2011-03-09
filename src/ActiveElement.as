@@ -163,7 +163,7 @@ private function prepareSupportedFormats(o:Object):void {
 	for (var i:Object in supportedFormats) {
 		_formats.push({value:supportedFormats[i].format, label:supportedFormats[i].label});
 	}
-	formatsMenu.options = _formats;	
+	//disable HD// formatsMenu.options = _formats;	
 }
 public function setVideoFormat(format:String):void {
 	var o:Object = null;

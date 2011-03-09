@@ -3,14 +3,8 @@
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	verticalScrollPolicy="off" 
 	horizontalScrollPolicy="off"
-	x="0"
-	y="0"
 	visible="false"
 	includeInLayout="false"
-	width="100%" 
-	height="100%"
-	backgroundColor="black" 
-	backgroundAlpha="0.8"
 	creationComplete="addComponents()" 
 	>
 	
@@ -44,24 +38,21 @@
 			}
 		]]>
 	</mx:Script>
-	<mx:VBox id="textPanelScreen" 
+	<mx:VBox id="textPanelScreen"
+	    paddingTop="20"
+		paddingRight="8"
+		paddingBottom="10"
+		paddingLeft="10"
 		horizontalScrollPolicy="off" 
 		verticalScrollPolicy="off" 
-		verticalCenter="0" 
-		horizontalCenter="0"
-		verticalGap="10" 
-		width="95%" 
-		maxWidth="700"
+		verticalGap="10"
+		width="{this.width}"
 		>
 
 		<!-- Title and close section -->		
 		<mx:Canvas 
 			height="26" 
 			width="100%"
-			borderColor="#666666"
-			borderStyle="solid"
-			borderSides="bottom"
-			borderThickness="1"
 			>
 			<mx:Image
 				buttonMode="true" 
@@ -73,9 +64,7 @@
 				top="0" 
 				left="0" 
 				fontSize="20" 
-				fontWeight="bold" 
-				color="white" 
-				fontFamily="Helvetica, Arial, sans-serif"
+				color="black" 
 				text="{_title}"
 				/>
 		</mx:Canvas>

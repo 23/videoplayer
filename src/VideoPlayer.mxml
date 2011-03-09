@@ -114,6 +114,7 @@
 			}
 			
             private function trayShow():void {
+				if(embedPanel.visible) {tray.visible=false; return;}
             	if(!props.get('showTray')) {tray.visible=false; return;}
             	trayTimer.reset(); trayTimer.start();
             	tray.visible = true;
@@ -309,11 +310,11 @@
 		resize="onTrayResize();" 
 		>
 		<mx:VBox 
-			verticalGap="20"
+			verticalGap="15"
 			>
 			<mx:Label id="descriptions"
-			  	paddingTop="28"
-			  	paddingRight="8"
+			  	paddingTop="20"
+			  	paddingRight="5"
 			  	paddingLeft="10"
 			  	fontSize="{(props.get('trayTitleFontSize') as Number) || 10}" 
 			  	text="{activeElement.get('title')}" 
@@ -324,28 +325,29 @@
 			  	width="{tray.width - 15}"
 			  	/>
 			
-			<mx:HBox id="videoControls" horizontalGap="5">
+			<mx:HBox id="videoControls" 
+				horizontalGap="10"
+				paddingLeft="10"
+				>
 				<!-- Play-->
 	    		<com:PlayerButton id="playImage" 
 	    			imageSource="@Embed(source='assets/buttons/play.swf')"
 					title="Play"
 	    			visible="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}" 
 	    			click="playVideoElement()"
-					includeInLayout="{playImage.visible}"
 	    			/>
 	    		<com:PlayerButton id="pauseImage" 
 					title="Pause"
 	    			imageSource="@Embed(source='assets/buttons/play.swf')"
 	    			visible="{(cleanVideoState!='paused' &amp;&amp; !identityVideo.visible)}" 
 	    			click="pauseVideoElement()"
-					includeInLayout="{pauseImage.visible}"
 	    			/>
 
 				<!-- HDbutton-->
 				<com:PlayerButton id="hdBtn" 
 					title="Videokvalitet"
 				  	imageSource="@Embed(source='assets/buttons/hd.swf')"
-					includeInLayout="{hdBtn.visible}"
+					visible="false"
 					>
 					<com:PlayerMenu 
 						id="formatsMenu"
@@ -358,10 +360,10 @@
 				</com:PlayerButton>
 				
 				<!-- Subtitle button-->
-				<com:PlayerButton id="subtitlesBtn"
+				<com:PlayerButton id="subtitlesBtns"
 					title="Undertekster"
 					imageSource="@Embed(source='assets/buttons/cc.swf')"
-					includeInLayout="{subtitlesBtn.visible}"
+					visible="false"
 					>
 					<com:PlayerMenu 
 						id="subtitlesMenu"
@@ -377,16 +379,14 @@
 				<com:PlayerButton id="muteImage"
 					title="Slå lyden fra"
 				  	imageSource="@Embed(source='assets/buttons/mute.swf')"
-				  	visible="{videoControls.visible &amp;&amp; video.volume>0}" 
+				  	visible="{video.width>500 &amp;&amp; videoControls.visible &amp;&amp; video.volume>0}" 
 				  	click="video.volume=0"
-					includeInLayout="{muteImage.visible}"
 				  	/>
 				<com:PlayerButton id="unmuteImage"
 					title="Slå lyden til"
 					imageSource="@Embed(source='assets/buttons/mute.swf')"
 					click="video.volume=1"
-					visible="{videoControls.visible &amp;&amp; video.volume==0}" 
-					includeInLayout="{videoControls.visible &amp;&amp; video.volume==0}"
+					visible="{video.width>500 &amp;&amp; videoControls.visible &amp;&amp; video.volume==0}" 
 					/>
 				
 				<!-- Fullscreen -->
@@ -395,24 +395,29 @@
 					imageSource="@Embed(source='assets/buttons/fullscreen.swf')"
 					visible="{!inFullScreen}" 
 					click="toggleFullScreen()"
-					includeInLayout="{fullscreenImage.visible}"
 					/>
 				<com:PlayerButton id="smallscreenImage" 
 					title="Almindelig visning"
 					imageSource="@Embed(source='assets/buttons/fullscreen.swf')"
 					visible="{inFullScreen}" 
 					click="toggleFullScreen()"
-					includeInLayout="{smallscreenImage.visible}"
 					/>
 				
 				<!-- FeedPanel -->
 				<com:PlayerButton id="feedpanelBtn" 
-					title="Del video"
-					imageSource="@Embed(source='assets/buttons/share.swf')"
-					visible="{(props.get('showShare') as Boolean)}" 
-					click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible;"
-					includeInLayout="{feedpanelBtn.visible}"
-					/>
+					  title="Del video"
+					  imageSource="@Embed(source='assets/buttons/share.swf')"
+					  visible="{(props.get('showShare') as Boolean)}" 
+					  click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible;"
+					  />
+
+				<!-- rate -->
+				<com:PlayerButton id="rateBtn" 
+					  title="Anbefal"
+					  imageSource="@Embed(source='assets/buttons/rate.swf')"
+					  click="{}"
+					  visible="{video.width>500}"
+					  />
 			</mx:HBox>					
 						
 			<!-- Progress bar -->
@@ -426,9 +431,16 @@
 
 	<!-- Embed panel -->
 	<com:TextPanel id="embedPanel" 
-		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}"
+	   	x="{video.x}"
+	   	y="{video.y+video.height-embedPanel.height-20}"
+	   	width="{Math.min(350, video.width-50)}"
+	   	backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
+	   	backgroundAlpha="{(props.get('trayAlpha') as Number)}"
+	   	horizontalScrollPolicy="off" 
+	   	verticalScrollPolicy="off" 
 		title="Share this video"
-		show="{reportEvent('shareEngaged');}"
+		show="{trayHide(); reportEvent('shareEngaged');}"
+		hide="{trayShow();}"
 		>
 
 		<!-- Embed section -->		
@@ -442,13 +454,12 @@
 				/>
 			<mx:Label 
 				text="Embed:" 
-				fontSize="13" 
-				fontWeight="bold" 
-				color="white"
+				fontSize="12"
+				color="#333333"
 				/>
 		</mx:HBox>
 		<mx:HBox 
-			horizontalGap="10" 
+			horizontalGap="2" 
 			width="100%"
 			paddingBottom="10"
 			>
@@ -466,62 +477,50 @@
 				fontSize="11" 
 				/>
 			<com:ActionButton
-				text="Copy" 
-				iconSource="@Embed(source='assets/buttons/copy.swf')"
+				text="Kopier" 
 				click="{reportEvent('embedEngaged'); System.setClipboard(embedText.text);}"
 				/>
 		</mx:HBox>
 		
 		<!-- Share section -->		
-		<mx:VBox
+		<mx:HBox
 			visible="{(props.get('showShare') as Boolean)}"
-			verticalGap="5"
+			horizontalGap="15"
 			width="100%"
-			paddingTop="10" 
-			borderColor="#666666"
-			borderStyle="solid"
-			borderSides="top"
-			borderThickness="1"
 			>
-			<mx:HBox 
-				horizontalGap="3"
+			<mx:VBox 
+				verticalGap="5"
 				>
-				<com:ActionButton
-					text="Mail video" 
-					iconSource="@Embed(source='assets/buttons/mail.swf')"
-					visible="{props.get('mailLink')!=''}"
-					click="{goToUrl(props.get('mailLink') as String)}"
-					/>
-				<com:ActionButton
-					text="Post to Facebook" 
-					iconSource="@Embed(source='assets/buttons/facebook.swf')"
+				<com:PlayerButton
+					title="Del på Facebook" 
+					imageSource="@Embed(source='assets/buttons/facebook.swf')"
 					visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link')!=''}"
 					click="{goToUrl(activeElement.get('link') + '/facebook?player_id=' + props.get('player_id'))}"
 					/>
-				<com:ActionButton
-					text="Post to Twitter" 
-					iconSource="@Embed(source='assets/buttons/twitter.swf')"
+				<com:PlayerButton
+					title="Del på Twitter" 
+					imageSource="@Embed(source='assets/buttons/twitter.swf')"
 					visible="{props.get('socialSharing') &amp;&amp; activeElement.get('link')!=''}"
 					click="{goToUrl(activeElement.get('link') + '/twitter?player_id=' + props.get('player_id'))}"
 					/>
-			</mx:HBox>
-			<mx:HBox
-				horizontalGap="5"
+			</mx:VBox>
+			<mx:VBox
+				verticalGap="5"
 				>
-				<com:ActionButton
-					text="Get as RSS" 
-					iconSource="@Embed(source='assets/buttons/rss.swf')"
-					visible="{props.get('rssLink')!=''}"
-					click="{goToUrl(props.get('rssLink') as String)}"
+				<com:PlayerButton
+					title="Del på e-mail" 
+					imageSource="@Embed(source='assets/buttons/mail.swf')"
+					visible="{props.get('mailLink')!=''}"
+					click="{goToUrl(props.get('mailLink') as String)}"
 					/>
-				<com:ActionButton
-					text="Get as Podcast" 
-					iconSource="@Embed(source='assets/buttons/podcast.swf')"
+				<com:PlayerButton
+					title="Få som podcast" 
+					imageSource="@Embed(source='assets/buttons/podcast.swf')"
 					visible="{props.get('podcastLink')!=''}"
 					click="{goToUrl(props.get('podcastLink') as String)}"
 					/>
-			</mx:HBox>
-		</mx:VBox> 
+			</mx:VBox>
+		</mx:HBox> 
 	</com:TextPanel>
 	<!-- /Embed panel -->
 
@@ -552,7 +551,6 @@
 			>
 			<com:ActionButton
 				text="Share this video" 
-				iconSource="@Embed(source='assets/buttons/share.swf')"
 				click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible; identityPanel.close();"
 				/>
 		</mx:HBox>

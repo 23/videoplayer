@@ -9,34 +9,23 @@
 	tabEnabled="true"
 	tabFocusEnabled="true"
 	keyDown="if (event.keyCode==Keyboard.ENTER) event.target.dispatchEvent(new MouseEvent(MouseEvent.CLICK));"
-	height="30"
+	height="24"
  	verticalScrollPolicy="off"
   	horizontalScrollPolicy="off"
+	backgroundColor="#C21717"
+	cornerRadius="5"
+	borderStyle="solid"
+	borderThickness="0" 
 	>
-		<mx:Image id="buttonBackground"
-			buttonMode="true"
-			useHandCursor="true"
-			scaleContent="true"
-			maintainAspectRatio="false"
-			width="{this.width}"
-			height="{this.height}"
-			source="@Embed(source='assets/buttons/action-button.png', scaleGridTop=8, scaleGridBottom=20, scaleGridLeft=8, scaleGridRight=50)"
-			/>
-		<mx:Image id="buttonIcon"
-			buttonMode="true" 
-			useHandCursor="true"
-			verticalCenter="-1"
-			x="5"
-			visible="{buttonIcon.source!=null}"
-			source="{_iconSource}"
-			/>
 		<mx:Label id="buttonText"
 			selectable="false"
 			buttonMode="true"
 			useHandCursor="true"
-			verticalCenter="0" 
-			x="{(buttonIcon.visible ? 10+buttonIcon.width : 5)}"
-			paddingRight="5"
+			verticalCenter="0"
+			paddingTop="4"
+			paddingRight="6"
+			paddingBottom="2"
+			paddingLeft="6"
 			fontSize="12" 
 			fontFamily="Arial"
 			color="white"
@@ -46,11 +35,8 @@
 	<mx:Script>
 		<![CDATA[
 			[bindable] private var _buttonText:String;
-			[bindable] private var _iconSource:Object;
 			public function set text(t:String):void {_buttonText = t;}
 			public function get text():String {return(_buttonText);}
-			public function set iconSource(s:Object):void {_iconSource = s;}
-			public function get iconSource():Object {return(_iconSource);}
 		]]>
 	</mx:Script>
 </mx:Canvas>
