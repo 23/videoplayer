@@ -2,16 +2,16 @@
 <mx:HBox 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	implements="mx.managers.IFocusManagerComponent"
-	width="100"
-	height="40"
-	backgroundColor="green"
 	focusEnabled="true" 
 	tabEnabled="true"
 	tabFocusEnabled="true"
 	buttonMode="true"  
 	keyDown="if (event.keyCode==Keyboard.ENTER) event.target.dispatchEvent(new MouseEvent(MouseEvent.CLICK));"
-	clipContent="false"
-	includeInLayout="{this.visible}"
+	initialize="{init()}"
+	color="#333333"
+	fontFamily="TheSans"
+	fontSize="12"
+	horizontalGap="2"
 	>
 	<mx:Script>
 		<![CDATA[

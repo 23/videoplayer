@@ -324,30 +324,28 @@
 			  	width="{tray.width - 15}"
 			  	/>
 			
-			<mx:HBox id="videoControls">
+			<mx:HBox id="videoControls" horizontalGap="5">
 				<!-- Play-->
 	    		<com:PlayerButton id="playImage" 
 	    			imageSource="@Embed(source='assets/buttons/play.swf')"
 					title="Play"
 	    			visible="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}" 
 	    			click="playVideoElement()"
+					includeInLayout="{playImage.visible}"
 	    			/>
 	    		<com:PlayerButton id="pauseImage" 
 					title="Pause"
-	    			imageSource="@Embed(source='assets/buttons/pause.swf')"
-	    			visible="{(cleanVideoState=='playing' &amp;&amp; !identityVideo.visible)}" 
+	    			imageSource="@Embed(source='assets/buttons/play.swf')"
+	    			visible="{(cleanVideoState!='paused' &amp;&amp; !identityVideo.visible)}" 
 	    			click="pauseVideoElement()"
-	    			/>
-	    		<com:PlayerButton id="bufferImage"  
-					title="Play"
-	    			imageSource="@Embed(source='assets/buttons/buffering.swf')"
-	    			visible="{(cleanVideoState=='buffering' &amp;&amp; !identityVideo.visible)}" 
+					includeInLayout="{pauseImage.visible}"
 	    			/>
 
 				<!-- HDbutton-->
 				<com:PlayerButton id="hdBtn" 
 					title="Videokvalitet"
 				  	imageSource="@Embed(source='assets/buttons/hd.swf')"
+					includeInLayout="{hdBtn.visible}"
 					>
 					<com:PlayerMenu 
 						id="formatsMenu"
@@ -363,6 +361,7 @@
 				<com:PlayerButton id="subtitlesBtn"
 					title="Undertekster"
 					imageSource="@Embed(source='assets/buttons/cc.swf')"
+					includeInLayout="{subtitlesBtn.visible}"
 					>
 					<com:PlayerMenu 
 						id="subtitlesMenu"
@@ -377,29 +376,33 @@
 				<!-- Mute and Unmute -->
 				<com:PlayerButton id="muteImage"
 					title="Slå lyden fra"
-				  	imageSource="@Embed(source='assets/buttons/mute-on.swf')"
+				  	imageSource="@Embed(source='assets/buttons/mute.swf')"
 				  	visible="{videoControls.visible &amp;&amp; video.volume>0}" 
 				  	click="video.volume=0"
+					includeInLayout="{muteImage.visible}"
 				  	/>
 				<com:PlayerButton id="unmuteImage"
 					title="Slå lyden til"
-					imageSource="@Embed(source='assets/buttons/mute-off.swf')"
-					visible="{videoControls.visible &amp;&amp; video.volume==0}" 
+					imageSource="@Embed(source='assets/buttons/mute.swf')"
 					click="video.volume=1"
+					visible="{videoControls.visible &amp;&amp; video.volume==0}" 
+					includeInLayout="{videoControls.visible &amp;&amp; video.volume==0}"
 					/>
 				
 				<!-- Fullscreen -->
 				<com:PlayerButton id="fullscreenImage"
 					title="Fuld skærm"
-					imageSource="@Embed(source='assets/buttons/fullscreen-on.swf')"
+					imageSource="@Embed(source='assets/buttons/fullscreen.swf')"
 					visible="{!inFullScreen}" 
 					click="toggleFullScreen()"
+					includeInLayout="{fullscreenImage.visible}"
 					/>
 				<com:PlayerButton id="smallscreenImage" 
 					title="Almindelig visning"
-					imageSource="@Embed(source='assets/buttons/fullscreen-off.swf')"
+					imageSource="@Embed(source='assets/buttons/fullscreen.swf')"
 					visible="{inFullScreen}" 
 					click="toggleFullScreen()"
+					includeInLayout="{smallscreenImage.visible}"
 					/>
 				
 				<!-- FeedPanel -->
@@ -408,6 +411,7 @@
 					imageSource="@Embed(source='assets/buttons/share.swf')"
 					visible="{(props.get('showShare') as Boolean)}" 
 					click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible;"
+					includeInLayout="{feedpanelBtn.visible}"
 					/>
 			</mx:HBox>					
 						
