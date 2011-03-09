@@ -317,8 +317,10 @@
 		backgroundAlpha="{(props.get('trayAlpha') as Number)}"
 		horizontalScrollPolicy="off" 
 		verticalScrollPolicy="off" 
-		visible="{(props.get('showTray') as Boolean)}" 
-		resize="onTrayResize();" 
+		visible="false" 
+		resize="onTrayResize();"
+		mouseOver="{tray.setStyle('backgroundAlpha', 0.9);}"
+		mouseOut="{tray.setStyle('backgroundAlpha', 0.7);}"
 		>
 		<mx:VBox 
 			verticalGap="15"
@@ -390,14 +392,14 @@
 				<com:PlayerButton id="muteImage"
 					title="Slå lyden fra"
 				  	imageSource="@Embed(source='assets/buttons/mute.swf')"
-				  	visible="{video.width>500 &amp;&amp; videoControls.visible &amp;&amp; video.volume>0}" 
+				  	visible="{video.width>550 &amp;&amp; videoControls.visible &amp;&amp; video.volume>0}" 
 				  	click="video.volume=0"
 				  	/>
 				<com:PlayerButton id="unmuteImage"
 					title="Slå lyden til"
 					imageSource="@Embed(source='assets/buttons/mute.swf')"
 					click="video.volume=1"
-					visible="{video.width>500 &amp;&amp; videoControls.visible &amp;&amp; video.volume==0}" 
+					visible="{video.width>550 &amp;&amp; videoControls.visible &amp;&amp; video.volume==0}" 
 					/>
 				
 				<!-- Fullscreen -->
@@ -424,10 +426,10 @@
 
 				<!-- rate -->
 				<com:PlayerButton id="rateBtn" 
-					  title="Anbefal"
+					  title="{(activeElement.get('number_of_ratings')==1 ? '1 anbefaling' : activeElement.get('number_of_ratings') + ' anbefalinger')}"
 					  imageSource="@Embed(source='assets/buttons/rate.swf')"
 					  click="{vote();}"
-					  visible="{video.width>500}"
+					  visible="{video.width>550}"
 					  />
 			</mx:HBox>					
 						

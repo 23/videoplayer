@@ -32,6 +32,7 @@ private function resetActiveElement():void {
 	activeElement.put('length', '0');
 	activeElement.put('start', '0');
 	activeElement.put('skip', '0');
+	activeElement.put('number_of_ratings', new Number(0));
 }
 
 private function setActiveElement(i:int, startPlaying:Boolean=false, start:Number=0, skip:int=0, format:String=null):Boolean {
@@ -55,6 +56,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
   	activeElement.put('content', content);
   	activeElement.put('hasInfo', hasInfo);
   	activeElement.put('link', o.one);
+	activeElement.put('number_of_ratings', o.number_of_ratings);
   	activeElement.put('length', o.video_length); 
   	activeElement.put('start', start);
   	activeElement.put('skip', skip);
