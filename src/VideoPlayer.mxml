@@ -17,7 +17,17 @@
 	creationComplete="init();" 
 	keyDown="trayShow()"
 	>
- 	<mx:Script source="Utility.as"></mx:Script>
+	<mx:Style>
+		@font-face {
+			src:url("assets/buttons/TheSans.ttf");
+			fontFamily: TheSans;
+			advancedAntiAliasing: true;
+		}		
+		Application {
+			fontFamily: TheSans;
+		}
+	</mx:Style> 	
+	<mx:Script source="Utility.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
  	<mx:Script source="Identity.as"></mx:Script>
  	<mx:Script source="AppProperties.as"></mx:Script>
@@ -121,25 +131,7 @@
 				trayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void {trayHide();});
 				// Reset timer when the mouse moves in the application
 				FlexGlobals.topLevelApplication.addEventListener(MouseEvent.MOUSE_MOVE, function():void {trayShow();});
-            	
-            	// INFORMATION BOX WITH TITLE AND DESCRIPTION
-            	// Hide when the timer completes
-				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void{infoHide();});
             }             
-            private function infoHide():void {
-            	if(props.getNumber('infoTimeout')<=0) return;
-				descriptions.visible = false;
-            }
-            private function infoShow(timeout:Boolean=true):void {
-            	if(!activeElement.get('hasInfo')) {descriptions.visible = false; return;}
-				infoTimer.stop();
-				descriptions.visible = true;
-				if(timeout) infoTimer.start();
-            }
-            private function infoToggle():void {				
-				if(descriptions.visible) infoHide();
-				else infoShow(false); // no timeout, since this a manual action
-            }
 			private function onVideoStateChange(evt:VideoEvent):void {
 				// Flex VideoDisplay shows weird stuff during seek; to avoid this,
 				// we show a bitmap snapshot from the video during seek and wait for playing
@@ -262,7 +254,6 @@
 		buttonMode="true"
 		/>
 	<com:OverlayMessage id="identityMessage"
-		fontFamily="{props.get('trayFont')}" 
 		color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 		backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 		visible="{props.get('identityCountdown') &amp;&amp; identityVideo.visible}"
@@ -308,8 +299,8 @@
 	<!-- Tray -->
 	<mx:Canvas id="tray"
 	    x="{video.x}"
-		bottom="20"
-		width="{Math.max(500, video.width*0.8)}"
+		y="{video.y+video.height-tray.height-20}"
+		width="{Math.max(250, video.width*0.7)}"
 		backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
 		backgroundAlpha="{(props.get('trayAlpha') as Number)}"
 		horizontalScrollPolicy="off" 
@@ -318,12 +309,15 @@
 		resize="onTrayResize();" 
 		>
 		<mx:VBox 
-			verticalGap="0"
+			verticalGap="20"
 			>
-			<mx:Label id="descriptions" 
+			<mx:Label id="descriptions"
+			  	paddingTop="28"
+			  	paddingRight="8"
+			  	paddingLeft="10"
 			  	fontSize="{(props.get('trayTitleFontSize') as Number) || 10}" 
-			  	fontWeight="{props.get('trayTitleFontWeight')}" 
 			  	text="{activeElement.get('title')}" 
+				color="black"
 			  	truncateToFit="true" 
 			  	maxWidth="{FlexGlobals.topLevelApplication.width}" 
 			  	updateComplete="descriptions.visible = (descriptions.text.length>0);" 
@@ -361,7 +355,6 @@
 						change="{switchVideoFormat(new String(formatsMenu.value));}"
 						backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 						backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-						fontFamily="{props.get('trayFont')}" 
 						color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 						/>
 				</com:PlayerButton>
@@ -377,7 +370,6 @@
 						change="{subtitles.locale=new String(subtitlesMenu.value);}"
 						backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 						backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-						fontFamily="{props.get('trayFont')}" 
 						color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 						/>
 				</com:PlayerButton>

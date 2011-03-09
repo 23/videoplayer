@@ -2,8 +2,9 @@
 <mx:HBox 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	implements="mx.managers.IFocusManagerComponent"
-	width="40"
+	width="100"
 	height="40"
+	backgroundColor="green"
 	focusEnabled="true" 
 	tabEnabled="true"
 	tabFocusEnabled="true"

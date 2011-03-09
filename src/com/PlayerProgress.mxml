@@ -14,7 +14,8 @@
 	<mx:Canvas id="videoProgress"
 		top="0" 
 		left="0" 
-		right="30" 
+		right="30"
+		width="0"
 		height="5" 
 		resize="drawSections();"
 		>
@@ -31,9 +32,9 @@
 	</mx:Canvas>					
 
 	<mx:HBox id="videoDragHandle"
-			 x="-20"
+			 x="0"
 			 y="0" 
-			 width="20"
+			 width="{Math.min(videoPlayProgress.width,20)}"
 			 height="5"
 			 backgroundColor="#D42526" 
 			 useHandCursor="true"
@@ -42,9 +43,8 @@
 
 	<mx:Label id="videoTimeLabel"
 		  right="0"
-		  bottom="-2"
+		  bottom="1"
 		  selectable="false" 
-		  fontFamily="Helvetica, Arial" 
 		  fontSize="10" 
 		  height="12" 
 		  color="#D42526"
