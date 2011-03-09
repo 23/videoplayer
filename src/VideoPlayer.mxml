@@ -79,6 +79,17 @@
 		        } catch (e:SecurityError) {} catch(e:Error) {}
 				load();
 			}
+			var voted:Boolean = false;
+			public function vote():void {
+				if(voted) return;
+				voted = true;
+				try {
+					activeElement.put('number_of_ratings', 1 + new Number(activeElement.get('number_of_ratings')));
+					var req:URLRequest = new URLRequest('http://' + props.get('domain') + '/actions?action=photo-rate&photo_id=' + activeElement.get('photo_id') + '&rating=1&num_units=1');
+					var loader:URLLoader = new URLLoader();
+					loader.load(req);
+				} catch(e:Error){}
+			}
 			public function unload():void {
 				// This function is triggered via ExternalInterface and some JavaScript because Flex is useless.
 				try {if(video.playing) video.pause();} catch(e:Error){}
@@ -415,7 +426,7 @@
 				<com:PlayerButton id="rateBtn" 
 					  title="Anbefal"
 					  imageSource="@Embed(source='assets/buttons/rate.swf')"
-					  click="{}"
+					  click="{vote();}"
 					  visible="{video.width>500}"
 					  />
 			</mx:HBox>					
