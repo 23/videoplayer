@@ -136,7 +136,6 @@
                 tray.visible = false;
             }            
 			private var trayTimer:Timer = new Timer(3000,1);
-			private var infoTimer:Timer = new Timer(3000,1);
             private function prepareTimers():void {
             	// TRAY AND POSSIBLY PLAYLIST
             	// Hide when the timer completes
@@ -160,6 +159,7 @@
 				
 				if(evt.currentTarget.state==VideoEvent.PLAYING || evt.currentTarget.state==VideoEvent.SEEKING) {
 					cleanVideoState = 'playing';
+					trayHide();
 				} else if(evt.currentTarget.state==VideoEvent.LOADING || evt.currentTarget.state==VideoEvent.BUFFERING) {
 					cleanVideoState = 'buffering';
 				} else if(evt.currentTarget.state==VideoEvent.DISCONNECTED || evt.currentTarget.state==VideoEvent.COMPLETE || evt.currentTarget.state==VideoEvent.PAUSED || evt.currentTarget.state==VideoEvent.STOPPED) {
@@ -321,6 +321,8 @@
 		resize="onTrayResize();"
 		mouseOver="{tray.setStyle('backgroundAlpha', 0.9);}"
 		mouseOut="{tray.setStyle('backgroundAlpha', 0.7);}"
+		hideEffect="{fadeOut}" 
+		showEffect="{fadeIn}"
 		>
 		<mx:VBox 
 			verticalGap="15"
@@ -351,7 +353,7 @@
 	    			/>
 	    		<com:PlayerButton id="pauseImage" 
 					title="Pause"
-	    			imageSource="@Embed(source='assets/buttons/play.swf')"
+	    			imageSource="@Embed(source='assets/buttons/pause.swf')"
 	    			visible="{(cleanVideoState!='paused' &amp;&amp; !identityVideo.visible)}" 
 	    			click="pauseVideoElement()"
 	    			/>
@@ -569,4 +571,7 @@
 		</mx:HBox>
 	</com:TextPanel> 
 	<!-- / Text panel for post-roll -->
+	
+	<mx:Fade id="fadeOut" duration="800" alphaFrom="1.0" alphaTo="0.0"/>
+	<mx:Fade id="fadeIn" duration="300" alphaFrom="0.0" alphaTo="1.0"/>
 </mx:Application>
