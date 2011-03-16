@@ -10,7 +10,10 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import mx.containers.HBox;
+			import mx.controls.Label;
 			import mx.controls.VideoDisplay;
+			
 			private var _targetVideo:VideoDisplay;
 			public function set targetVideo(v:VideoDisplay):void {
 				_targetVideo = v;
@@ -42,11 +45,16 @@
 			}
 			public function get locale():String {return(_locale);}
 			
+			public var design:String = 'bars';
+			
 			// The actual subtitles + parsing
 			import com.adobe.serialization.json.JSON;
 			import com.adobe.serialization.json.JSONParseError;
 			private var subtitleTimer:Timer = new Timer(100);
 			private var subtitles:Array;
+			
+			// Outline filter
+			private var outlineFilter:GlowFilter = null;
 			private function loadSubtitles():void{
 				if(!_localeObject.href)return;
 				clearSubtitles();
@@ -63,16 +71,44 @@
 				this.parentApplication.reportEvent('subtitlesActived');
 			}
 			private function clearSubtitles():void {
-				display.text = '';
+				display.removeAllChildren();
 				subtitles = [];
 				subtitleTimer.stop();
 			}
 			private function displaySubtitles(e:Event):void{
 				if(!subtitles.length || !_targetVideo.playing) return;
+
+				// Possibly prepare glow filter for outlining subtitles
+				if(design!=='bars' && !outlineFilter) { 
+					outlineFilter = new GlowFilter;
+					outlineFilter.color = 0x000000;
+					outlineFilter.alpha = 1;
+					outlineFilter.blurX = 3;
+					outlineFilter.blurY = 3;
+				}
+				
 				var playheadTime:Number = _targetVideo.playheadTime + this.parentApplication.activeElement.getNumber('start') + 0.05;
 				for (var i:Object in subtitles) {
 					if(subtitles[i].timestamp_begin<=playheadTime && subtitles[i].timestamp_end>=playheadTime) {
-						display.text = subtitles[i].text.join('\n');
+						display.removeAllChildren();
+						for(var ix:String in subtitles[i].text) {
+							var h:HBox = new HBox();
+							var l:Label = new Label();
+							display.addChild(h);
+							h.addChild(l);
+							
+							l.text = subtitles[i].text[ix];
+							h.setStyle('paddingTop', 1);
+							h.setStyle('paddingRight', 4);
+							h.setStyle('paddingBottom', 1);
+							h.setStyle('paddingLeft', 4);
+							if (design==='bars') {
+								h.setStyle('backgroundColor', 'black');
+								h.setStyle('backgroundAlpha', 0.8);
+							} else {
+								l.filters = [outlineFilter];
+							}
+						}
 						break;
 					}
 				}
@@ -81,19 +117,22 @@
 				subtitleTimer.addEventListener(TimerEvent.TIMER, displaySubtitles);
 			}
 			private function resize():void {
-				var maxSize:int = 35;
-				var minSize:int = 10;
-				var varSize:int = this.width/28;
+				var maxSize:int = 25;
+				var minSize:int = 11;
+				var varSize:int = this.width/40;
 				display.setStyle('fontSize', (varSize>maxSize ? maxSize : (varSize<minSize ? minSize : varSize)));
 			}
 		]]>
 	</mx:Script>	
 	
-	<mx:Text 
+	<mx:VBox 
 		id="display"
 		bottom="30" 
-		textAlign="center"
-		horizontalCenter="0" 
+		horizontalCenter="0"
+		horizontalAlign="center"
+		verticalGap="3"
 		color="white"
-		/>
+		>
+	</mx:VBox>
+
 </mx:Canvas>
