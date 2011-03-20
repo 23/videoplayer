@@ -35,6 +35,8 @@
  	<mx:Script source="doJSON.as"></mx:Script>
 	<mx:Script>
 		<![CDATA[
+			import com.PlayList;
+			import com.PlayListEvent;
 			import com.PlayerButton;
 			import com.SmoothImage;
 			import com.adobe.serialization.json.JSONParseError;
@@ -57,6 +59,9 @@
 			private var context:Object = {};
 			private var recommendations:Object = {};
 			
+			private var playList: PlayList;
+			[Bindable] private var enablePlayList: Boolean = false;		
+			[Bindable] private var showPlayList: Boolean = false;
 			[Bindable] private var cleanVideoState:String = 'paused';
 			
 			public function init():void {
@@ -122,6 +127,51 @@
 				video.mx_internal::videoPlayer.smoothing = true;
 				identityVideo.mx_internal::videoPlayer.smoothing = true;
 				setActiveElement(0, false, props.getNumber('start'));
+
+				if (props.get('showTray') && props.get('showBrowse')) {
+					// Generate the recommendation playlist
+					var recommendationSource:String = getRecommendationSource();
+					if(recommendationSource==props.get('jsonSource')) {
+						// The list displays all the items in the feed
+						recommendations=context; createPlayList();
+					} else {
+						// The list consists of recommendations, we'll need to load them 
+						try {
+							doJSON(recommendationSource, function(o:Object):void{recommendations=o; createPlayList();});
+						} catch(e:JSONParseError) {enablePlayList = false; props.put('showShare', false);}
+					}
+				}
+			}
+			private function createPlayList():void  {
+				var arr:Array = createItemsArray(recommendations);
+				if(arr.length<=1) return;
+				enablePlayList = true;
+				playListHolder.removeAllChildren(); // if we've done this before, clean up after ourselves.
+				playList = new PlayList();
+				playList.width = playListContainer.width;
+				playList.verticalScrollPolicy = "off";
+				playList.itemArray = arr;
+				playList.addEventListener(PlayListEvent.SELECT_ITEM, function(evt:PlayListEvent):void {
+					// When clicking the recommendation playlist, we shift context -- it's no longer the initially selected video, but the playlist objects
+					context = recommendations;
+					if(evt.itemID>=0) {
+						playListHide();
+						setElementByID(evt.itemID, true); 
+					}
+				});
+				playListHolder.addChild(playList);
+				
+				if(props.get('browseMode')) {
+					showPlayList = true;
+					trayShow();
+				}
+			}
+			private function playListShow():void {
+				if (!props.get('showTray') || !props.get('showBrowse')) return;
+				showPlayList = true;
+			}
+			private function playListHide():void {
+				showPlayList = false;
 			}
 			
             private function trayShow():void {
@@ -131,6 +181,7 @@
             	tray.visible = true;
             }            
             private function trayHide():void {
+				if (showPlayList) return;
             	trayTimer.stop();
             	if(props.getNumber('trayTimeout')<=0) return;
                 tray.visible = false;
@@ -143,6 +194,16 @@
 				// Reset timer when the mouse moves in the application
 				FlexGlobals.topLevelApplication.addEventListener(MouseEvent.MOUSE_MOVE, function():void {trayShow();});
             }             
+			private function onPlayListDone():void {
+				if(props.get('loop')) { 
+					load();
+				} else {
+					if (playList) {
+						playList.headline = new String(props.get('recommendationHeadline'));
+						playListShow();
+					}
+				}
+			}
 			private function onVideoStateChange(evt:VideoEvent):void {
 				// Flex VideoDisplay shows weird stuff during seek; to avoid this,
 				// we show a bitmap snapshot from the video during seek and wait for playing
@@ -182,8 +243,15 @@
      			if(!ignoreIdentity) return(handleIdentity('after', function():void {onVideoComplete(true);}));
             	if(props.get('loop')) {
             		var more:Boolean = nextElement();
+					if(!more) onPlayListDone();
+				} else {
+					onPlayListDone();
             	}
             }
+			private function onPlayListResize():void {
+				var c:Array = playListHolder.getChildren();
+				if (c.length) c[0].width = playListContainer.width;
+			}
             private function onTrayResize():void {
             	if(tray.visible) trayShow(); // if the tray is displayed and changes size, force a replacement
             	resizeProgressBar();
@@ -224,7 +292,7 @@
 		bufferTime="2"
 		width="{(contentContainer.width/contentContainer.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : contentContainer.width)}"
 		height="{(contentContainer.width/contentContainer.height>activeElement.get('aspectRatio') ? contentContainer.height : contentContainer.width/(activeElement.get('aspectRatio') as Number))}"
-		click="if(video.playing) pauseVideoElement(); else playVideoElement();" 
+		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" 
 		stateChange="onVideoStateChange(event);"
 		complete="onVideoComplete();"
 		/>
@@ -241,7 +309,7 @@
 		height="{video.height}" 
 		horizontalCenter="0" 
 		verticalCenter="0"
-		click="{playVideoElement()}" 
+		click="{playListHide(); playVideoElement()}" 
 		/>
  
 	<!-- Extra displays for identity video and photo -->
@@ -308,6 +376,29 @@
 		
 	</mx:Canvas> 
 
+	<!-- PlayList -->
+	<mx:Canvas id="playListContainer" 
+			   x="{tray.x}"
+			   y="{tray.y - tray.height + 10}"
+			   width="{Math.max(250, video.width*0.7)}"
+			   backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
+			   backgroundAlpha="{(props.get('trayAlpha') as Number)}"
+			   horizontalScrollPolicy="off" 
+			   verticalScrollPolicy="off" 
+			   visible="{tray.visible &amp;&amp; showPlayList}" 
+			   hideEffect="{fadeOut}" 
+			   showEffect="{fadeIn}"
+			   height="{playListHolder.height}" 
+			   >
+		<mx:Canvas id="playListHolder" 
+				   bottom="0" 
+				   width="{tray.width}" 
+				   verticalScrollPolicy="off" 
+				   horizontalScrollPolicy="off" 
+				   resize="onPlayListResize()"
+				   />
+	</mx:Canvas>					
+	
 	<!-- Tray -->
 	<mx:Canvas id="tray"
 	    x="{video.x}"
@@ -319,8 +410,6 @@
 		verticalScrollPolicy="off" 
 		visible="false" 
 		resize="onTrayResize();"
-		mouseOver="{tray.setStyle('backgroundAlpha', 0.9);}"
-		mouseOut="{tray.setStyle('backgroundAlpha', 0.7);}"
 		hideEffect="{fadeOut}" 
 		showEffect="{fadeIn}"
 		>
@@ -437,10 +526,10 @@
 						
 			<!-- Progress bar -->
 			<com:PlayerProgress id="progress"
-				targetVideo="{video}"
-				visible="{video.visible}" 
-				/>
-
+								targetVideo="{video}"
+								visible="{video.visible}" 
+								/>
+			
 		</mx:VBox>	
 	</mx:Canvas>
 

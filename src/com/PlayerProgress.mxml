@@ -14,7 +14,7 @@
 	<mx:Canvas id="videoProgress"
 		top="0" 
 		left="0" 
-		right="30"
+		right="55"
 		width="0"
 		height="5" 
 		resize="drawSections();"
@@ -43,9 +43,9 @@
 
 	<mx:Label id="videoTimeLabel"
 		  right="-2"
-		  bottom="2"
+		  bottom="1"
 		  selectable="false" 
-		  fontSize="10" 
+		  fontSize="9" 
 		  height="12" 
 		  color="#D42526"
 		  />
@@ -71,7 +71,7 @@
 					if(scrubberStartMouseX<0) return;
 					videoDragHandle.x = scrubberStartX + (e.stageX-scrubberStartMouseX);
 					var x = scrubberStartX + (e.stageX-scrubberStartMouseX);
-					videoTimeLabel.text = formatTime(timeFromPoint(x));
+					videoTimeLabel.text = formatTime(timeFromPoint(x), _targetVideo.totalTime);
 				});
 				this.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent){
 					if(scrubberStartMouseX<0) return;
@@ -127,7 +127,7 @@
 				videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*(videoProgress.width-videoPlayProgress.x);
 				if(scrubberStartMouseX<0) {
 					videoDragHandle.x = videoPlayProgress.width - videoDragHandle.width;
-					videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'));
+					videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'), _targetVideo.totalTime);
 				}
             }
 

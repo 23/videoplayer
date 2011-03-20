@@ -255,10 +255,12 @@ public function playVideoElement():void {
 		handleIdentity('before', function():void {playVideoElement();});
 		return;
 	}
+	playListHide();
 	video.play();
 }
 private function pauseVideoElement():void {
 	playVideoElement();
+	playListShow();
 	video.pause();
 }
 
