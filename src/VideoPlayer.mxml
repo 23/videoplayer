@@ -351,12 +351,13 @@
 		close="{identityVideo.stop(); reportEvent(currentIdentityEvent=='after' ? 'postRollClose ' : 'preRollClose'); identityVideo.dispatchEvent(new Event('complete', true));}"
 		/>
 	<com:PlayerSubtitles id="subtitles"
-		 width="100%"
-		 height="100%"
+		 width="{this.width}"
+		 height="{this.height}"
 		 x="0"
 		 y="0"
 		 targetVideo="{video}"
-		 visible="{video.visible}" 
+		 visible="{video.visible}"
+		 design="{props.get('subtitlesDesign')}"
 		 />
 
 	<!-- Icon/Logo -->
