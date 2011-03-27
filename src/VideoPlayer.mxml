@@ -416,6 +416,8 @@
 		resize="onTrayResize();"
 		hideEffect="{fadeOut}" 
 		showEffect="{fadeIn}"
+		mouseOver="{volumeSlider.value=video.volume; muteImage.includeTitle=unmuteImage.includeTitle=false; volumeSlider.includeInLayout=volumeSlider.visible=true}"
+		mouseOut="{volumeSlider.value=video.volume; muteImage.includeTitle=unmuteImage.includeTitle=true; volumeSlider.includeInLayout=volumeSlider.visible=false}"
 		>
 		<mx:VBox 
 			verticalGap="15"
@@ -487,21 +489,19 @@
 				<mx:HBox 
 					height="18" 
 					clipContent="true"
-					mouseOver="{muteImage.includeTitle=unmuteImage.includeTitle=false; volumeSlider.includeInLayout=volumeSlider.visible=true}"
-					mouseOut="{muteImage.includeTitle=unmuteImage.includeTitle=true; volumeSlider.includeInLayout=volumeSlider.visible=false}"
-					 paddingRight="10"
+					paddingRight="10"
 					>
 					<com:PlayerButton id="muteImage" 
 									  title="Slå lyden fra"
 									  imageSource="@Embed(source='assets/buttons/mute.swf')"
 									  visible="{video.volume>0}" 
-									  click="{video.volume=0}"
+									  click="{volumeSlider.value=video.volume=0}"
 									  />
 					<com:PlayerButton id="unmuteImage" 
 									  title="Slå lyden til"
 									  imageSource="@Embed(source='assets/buttons/unmute.swf')"
 									  visible="{video.volume==0}" 
-									  click="{video.volume=1}"
+									  click="{volumeSlider.value=video.volume=1}"
 									  />
 					<mx:HSlider id="volumeSlider"
 							themeColor="0x000000"
@@ -510,7 +510,7 @@
 							width="50"
 							liveDragging="true"
 							showDataTip="false"
-							value="{video.volume}"
+							value="1"
 							change="{video.volume = volumeSlider.value;}" 
 							trackSkin="{SliderTrack}"
 							sliderThumbClass="{CSpSliderThumb}"
