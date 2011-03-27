@@ -43,9 +43,9 @@
 
 	<mx:Label id="videoTimeLabel"
 		  right="-2"
-		  bottom="1"
+		  bottom="2"
 		  selectable="false" 
-		  fontSize="9" 
+		  fontSize="10" 
 		  height="12" 
 		  color="#D42526"
 		  />
@@ -60,6 +60,8 @@
 			
 			import mx.controls.VideoDisplay;
 			import mx.core.Application;
+			import mx.events.FlexEvent;
+			import mx.events.ResizeEvent;
 			import mx.events.VideoEvent;
 			[bindable] private var props:HashCollection = mx.core.FlexGlobals.topLevelApplication.props;
 			[bindable] private var activeElement:HashCollection = mx.core.FlexGlobals.topLevelApplication.activeElement;
@@ -71,7 +73,7 @@
 					if(scrubberStartMouseX<0) return;
 					videoDragHandle.x = scrubberStartX + (e.stageX-scrubberStartMouseX);
 					var x = scrubberStartX + (e.stageX-scrubberStartMouseX);
-					videoTimeLabel.text = formatTime(timeFromPoint(x), _targetVideo.totalTime);
+					videoTimeLabel.text = formatTime(timeFromPoint(x), activeElement.getNumber('length'));
 				});
 				this.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent){
 					if(scrubberStartMouseX<0) return;
@@ -85,6 +87,10 @@
 				});
 			}
 
+			public function updateTime():void{
+				videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'), activeElement.getNumber('length'));
+			}
+			
 			// Component-specific functions and event-handlers
 			private function formatTime(time:int, totalTime:int = -1, join:String = ' / '):String {
 				if (time<0) return("");
@@ -127,7 +133,7 @@
 				videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*(videoProgress.width-videoPlayProgress.x);
 				if(scrubberStartMouseX<0) {
 					videoDragHandle.x = videoPlayProgress.width - videoDragHandle.width;
-					videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'), _targetVideo.totalTime);
+					updateTime();
 				}
             }
 
