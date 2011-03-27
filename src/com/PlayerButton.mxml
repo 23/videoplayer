@@ -15,7 +15,7 @@
 	hide="onVisibilityChange()"
 	show="onVisibilityChange()"
 	added="onVisibilityChange()"
-	width="{imageContainer.width + titleContainer.width + 3}"
+	width="{imageContainer.width + (titleContainer.visible ? titleContainer.width : 0) + 3}"
 	height="20"
 	clipContent="true"
 	verticalScrollPolicy="off"
@@ -43,6 +43,9 @@
 			}
 			private function onVisibilityChange():void {
 				this.includeInLayout = this.visible;
+			}
+			public function set includeTitle(i:Boolean):void{
+				titleContainer.visible = titleContainer.includeInLayout = i;
 			}
 		]]>
 	</mx:Script>
