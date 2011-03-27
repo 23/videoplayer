@@ -199,8 +199,8 @@
 					load();
 				} else {
 					if (playList) {
-						playList.headline = new String(props.get('recommendationHeadline'));
 						playListShow();
+						trayShow();
 					}
 				}
 			}

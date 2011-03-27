@@ -7,7 +7,7 @@
 			
 			private var _items : Array;
 			
-			public function set headline(value:String):void {playlistHeadline.text = value;}
+			public function set headline(value:String):void {}
 
 			public function set itemArray(value : Array) : void
 			{
@@ -80,10 +80,6 @@
 			
 		]]>
 	</mx:Script>
-	<mx:Label id="playlistHeadline" paddingTop="15" paddingLeft="25" text="" visible="{playlistHeadline.text!=''}" includeInLayout="{playlistHeadline.visible}" 
-		fontFamily="{this.parentApplication.props.get('trayFont')}" color="{(styleManager.getColorName(this.parentApplication.props.get('trayTextColor')) as Number)}" 
-		fontSize="{(this.parentApplication.props.get('trayTitleFontSize') as Number) || 10}" fontWeight="{this.parentApplication.props.get('trayTitleFontWeight')}" truncateToFit="true"/>
-	
 	<mx:Canvas width="100%" height="100">
 		<mx:Canvas id="previousBtn" click="{scrollBack()}" width="25" backgroundImage="@Embed('assets/buttons/previous.swf')" top="0" left="0" bottom="0" />
 		<mx:Canvas verticalCenter="0" verticalScrollPolicy="off" horizontalScrollPolicy="off" left="{previousBtn.width+5}" right="{nextBtn.width+5}" id="playListCanvas">
