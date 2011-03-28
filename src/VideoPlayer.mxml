@@ -489,7 +489,7 @@
 				<mx:HBox 
 					height="18" 
 					clipContent="true"
-					paddingRight="10"
+					paddingRight="3"
 					>
 					<com:PlayerButton id="muteImage" 
 									  title="Volumen"
@@ -507,7 +507,7 @@
 							themeColor="0x000000"
 							minimum="0"
 							maximum="1"
-							width="50"
+							width="46"
 							liveDragging="true"
 							showDataTip="false"
 							value="1"
