@@ -27,7 +27,7 @@ package com.GuN.UI.customUIComponent.slider
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void{
             super.updateDisplayList(unscaledWidth,unscaledHeight);
-            this.graphics.beginFill(0x333333,1);
+            this.graphics.beginFill(0xBBBBBB,1);
             this.graphics.drawCircle(2,-8,4);
            	this.graphics.endFill();
         }

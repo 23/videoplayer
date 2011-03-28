@@ -19,7 +19,7 @@
 	>
 	<mx:Style>
 		@font-face {
-			src:url("assets/buttons/TheSans.ttf");
+			src:url("assets/buttons/TheSansOT6.otf");
 			fontFamily: TheSans;
 			advancedAntiAliasing: true;
 		}		
@@ -189,7 +189,7 @@
             	if(props.getNumber('trayTimeout')<=0) return;
                 tray.visible = false;
             }            
-			private var trayTimer:Timer = new Timer(3000,1);
+			private var trayTimer:Timer = new Timer(1500,1);
             private function prepareTimers():void {
             	// TRAY AND POSSIBLY PLAYLIST
             	// Hide when the timer completes
@@ -492,14 +492,14 @@
 					paddingRight="10"
 					>
 					<com:PlayerButton id="muteImage" 
-									  title="Slå lyden fra"
-									  imageSource="@Embed(source='assets/buttons/mute.swf')"
+									  title="Volumen"
+									  imageSource="@Embed(source='assets/buttons/unmute.swf')"
 									  visible="{video.volume>0}" 
 									  click="{volumeSlider.value=video.volume=0}"
 									  />
 					<com:PlayerButton id="unmuteImage" 
-									  title="Slå lyden til"
-									  imageSource="@Embed(source='assets/buttons/unmute.swf')"
+									  title="Volumen"
+									  imageSource="@Embed(source='assets/buttons/mute.swf')"
 									  visible="{video.volume==0}" 
 									  click="{volumeSlider.value=video.volume=1}"
 									  />

@@ -11,13 +11,13 @@ package com.GuN.UI.customUIComponent.slider
         
         override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void{
             super.updateDisplayList(unscaledWidth, unscaledHeight);
-            this.graphics.beginFill(0x444444,1);
+            this.graphics.beginFill(0x333333,1);
             this.graphics.drawCircle(0,0,5);
             this.graphics.drawCircle(unscaledWidth,0,5);
             this.graphics.endFill();
             
             this.graphics.moveTo(0,0);
-            this.graphics.lineStyle(10,0xFFFFFF);
+            this.graphics.lineStyle(10,0x333333);
             this.graphics.lineTo(unscaledWidth,0);
            
         }
