@@ -88,6 +88,7 @@
 				}
 				
 				var playheadTime:Number = _targetVideo.playheadTime + this.parentApplication.activeElement.getNumber('start') + 0.05;
+				var matched:Boolean = false;
 				for (var i:Object in subtitles) {
 					if(subtitles[i].timestamp_begin<=playheadTime && subtitles[i].timestamp_end>=playheadTime) {
 						display.removeAllChildren();
@@ -109,9 +110,11 @@
 								l.filters = [outlineFilter];
 							}
 						}
+						matched = true;
 						break;
 					}
 				}
+				if(!matched) display.removeAllChildren();
 			}
 			private function init():void {
 				subtitleTimer.addEventListener(TimerEvent.TIMER, displaySubtitles);
