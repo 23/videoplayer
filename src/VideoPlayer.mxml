@@ -80,9 +80,6 @@
 				try {if(video.playing) reportPlay('end', video.playheadTime)} catch(e:Error){}
 			}
 			public function load():void {
-				var domain:String = URLUtil.getServerName(FlexGlobals.topLevelApplication.url);
-				if(domain=='localhost' || domain=='') domain=defaultDomain;
-				
 				// Are we using a specific player, or just the default? (if so, we want to specify the player id to get the correct video settings)
 				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(FlexGlobals.topLevelApplication.url);
 				if (testCustomPlayer && testCustomPlayer.length>1) playerId = testCustomPlayer[1]; 
@@ -94,8 +91,7 @@
 				a.push('height=' + encodeURIComponent(FlexGlobals.topLevelApplication.height));
 				
 				// Get settings for this player from 23 Video
-				var settings_endpoint:String = 'http://' + domain + '/js/video-settings?raw&parameters=' + encodeURIComponent(a.join('&')) + (playerId ? '&player_id=' + playerId : '');
-				doJSON(settings_endpoint, function(o:Object):void{
+				doAPI('/api/player/settings', {player_id:(playerId?playerId:''), parameters:encodeURIComponent(a.join('&'))}, function(o:Object):void{
 					initProperties(o.settings);
 					initActiveElement();
 					doJSON((props.get('jsonSource') as String), function(o:Object):void{context=o; build();});
@@ -412,6 +408,7 @@
 				paddingLeft="2" 
 				paddingRight="2" 
 				width="{tray.width}"
+				visible="false"
 				>
 				<!-- Title and Words -->
 				<mx:Box id="descBg" 
@@ -514,6 +511,7 @@
 					    <!-- HDbutton-->
 			    		<com:PlayerButton id="hdBtn" 
 			    			imageSource="@Embed(source='assets/buttons/hd.swf')"
+							visible="false"
 			    			>
 							<com:PlayerMenu 
 								id="formatsMenu"
@@ -529,6 +527,7 @@
 						<!-- Subtitle button-->
 						<com:PlayerButton id="subtitlesBtn" 
 						  	imageSource="@Embed(source='assets/buttons/cc.swf')"
+							visible="false"
 							>
 							<com:PlayerMenu 
 								id="subtitlesMenu"
