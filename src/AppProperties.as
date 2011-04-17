@@ -54,7 +54,16 @@ public var propDefaults:Object = {
 	loop: false,
 	playHD: false
 }
+private function initLoadURL():void{
+	var domain:String = URLUtil.getServerName(FlexGlobals.topLevelApplication.url);
+	if(domain=='localhost' || domain=='') domain=defaultDomain;
+	var protocol:String = URLUtil.getProtocol(FlexGlobals.topLevelApplication.url);
+	if(protocol!='https') protocol='http';
+	props.put('domain', domain);
+	props.put('site_url', protocol + '://' + domain);
+}
 private function initProperties(settings:Object):void {
+	initLoadURL();
 	var loadParameters:Array = new Array();
 	var loadSettings:Array = new Array();
 
@@ -94,9 +103,6 @@ private function initProperties(settings:Object):void {
 	}
 
 	// Determine a load parameters
-	var domain:String = URLUtil.getServerName(FlexGlobals.topLevelApplication.url);
-	if(domain=='localhost' || domain=='') domain=defaultDomain;
-	props.put('domain', domain);
     var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size', 'rand'];
     for (var i:int=0; i<options.length; i++) {
 		var opt:String = options[i];
@@ -110,7 +116,7 @@ private function initProperties(settings:Object):void {
 	loadParameters.push('player_id=' + encodeURI(playerId));
 
 	// Use load parameters to build JSON source
-	var jsonSource:String = 'http://' + domain + '/api/photo/list?raw&format=json&' + loadParameters.join('&');
+	var jsonSource:String = props.get('site_url') + '/api/photo/list?raw&format=json&' + loadParameters.join('&');
 	props.put('jsonSource', jsonSource);
 	
 	// Mail link from parameters 
@@ -155,8 +161,7 @@ private function initProperties(settings:Object):void {
 }
 
 private function getRecommendationSource():String {
-	var domain:String = new String(props.get('domain'));
-	if(!context || !context.photos) return('http://' + domain + '/api/photo/list?raw&format=json&size=20');
+	if(!context || !context.photos) return(props.get('site_url') + '/api/photo/list?raw&format=json&size=20');
 	
 	if(context.photos.length==1) {
 		// There's only one video to play, we'll need to construct recommendation in another fashion.
@@ -165,13 +170,13 @@ private function getRecommendationSource():String {
 		switch (method) {
 			case 'site-new':
 			case 'channel-new':
-				recommendationSource = 'http://' + domain + '/api/photo/list?raw&format=json&size=20&orderby=uploaded&order=desc';
+				recommendationSource = props.get('site_url') + '/api/photo/list?raw&format=json&size=20&orderby=uploaded&order=desc';
 				break;
 			case 'site-popular':
 			case 'channel-popular':
 			case 'similar':
 			default:
-				recommendationSource = 'http://' + domain + '/api/photo/list?raw&format=json&size=20&orderby=rank&order=desc';
+				recommendationSource = props.get('site_url') + '/api/photo/list?raw&format=json&size=20&orderby=rank&order=desc';
 				break;
 		}
 		if (playerId.length) recommendationSource += '&player_id=' + encodeURI(playerId);

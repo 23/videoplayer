@@ -59,10 +59,10 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
   	activeElement.put('skip', skip);
 
 	activeElement.put('beforeDownloadType', o.before_download_type);
-	activeElement.put('beforeDownloadUrl', 'http://' + props.get('domain') + o.before_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
+	activeElement.put('beforeDownloadUrl', props.get('site_url') + o.before_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
 	activeElement.put('beforeLink', o.before_link); 
 	activeElement.put('afterDownloadType', o.after_download_type); 
-	activeElement.put('afterDownloadUrl', 'http://' + props.get('domain') + o.after_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
+	activeElement.put('afterDownloadUrl', props.get('site_url') + o.after_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
 	activeElement.put('afterLink', o.after_link);
 	activeElement.put('afterText', o.after_text); 
 	
@@ -76,7 +76,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 					var localeMenu:Array = [];
 					localeMenu.push({value:'', label:'No subtitles'});
 					for (var i:int=0; i<sub.subtitles.length; i++) {
-						locales[sub.subtitles[i].locale] = {href:'http://' + props.get('domain') + sub.subtitles[i].href, language:sub.subtitles[i].language, locale:sub.subtitles[i].locale};
+						locales[sub.subtitles[i].locale] = {href:props.get('site_url') + sub.subtitles[i].href, language:sub.subtitles[i].language, locale:sub.subtitles[i].locale};
 						localeMenu.push({value:sub.subtitles[i].locale, label:sub.subtitles[i].language});
 						if(sub.subtitles[i].default_p) defaultLocale = sub.subtitles[i].locale; 
 					}
@@ -108,10 +108,10 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	setVideoFormat(format || currentVideoFormat);
 	
 	// Link back to the video
-	activeElement.put('one', 'http://' + props.get('domain') + o.one); 
+	activeElement.put('one', props.get('site_url') + o.one); 
   	
   	// Photo source
-  	activeElement.put('photoSource', 'http://' + props.get('domain') + o.large_download);
+  	activeElement.put('photoSource', props.get('site_url') + o.large_download);
   	activeElement.put('photoWidth', new Number(o.large_width));
   	activeElement.put('photoHeight', new Number(o.large_height));
   	activeElement.put('aspectRatio', parseInt(o.large_width) / parseInt(o.large_height));
@@ -143,19 +143,19 @@ private function prepareSupportedFormats(o:Object):void {
 
 	// Build list of supported formats and their URLs
 	if (!h264() && typeof(o.video_small_download)!='undefined'&&o.video_small_download.length>0) {
-		supportedFormats.push({format:'video_small', pseudo:false, label: 'Low (180p)', source:'http://' + props.get('domain') + o.video_small_download});
+		supportedFormats.push({format:'video_small', pseudo:false, label: 'Low (180p)', source:props.get('site_url') + o.video_small_download});
 	}
 	if (h264()&&typeof(o.video_mobile_high_download)!='undefined'&&o.video_mobile_high_download.length>0) {
-		supportedFormats.push({format:'video_mobile_high', pseudo:true, label: 'Low (180p)', source:'http://' + props.get('domain') + o.video_mobile_high_download}); 
+		supportedFormats.push({format:'video_mobile_high', pseudo:true, label: 'Low (180p)', source:props.get('site_url') + o.video_mobile_high_download}); 
 	}
 	if (h264()&&typeof(o.video_medium_download)!='undefined'&&o.video_medium_download.length>0) {
-		supportedFormats.push({format:'video_medium', pseudo:true, label: 'Standard (360p)', source:'http://' + props.get('domain') + o.video_medium_download}); 
+		supportedFormats.push({format:'video_medium', pseudo:true, label: 'Standard (360p)', source:props.get('site_url') + o.video_medium_download}); 
 	}
 	if (h264()&&typeof(o.video_hd_download)!='undefined'&&o.video_hd_download.length>0) {
-		supportedFormats.push({format:'video_hd', pseudo:true, label: 'HD (720p)', source:'http://' + props.get('domain') + o.video_hd_download}); 
+		supportedFormats.push({format:'video_hd', pseudo:true, label: 'HD (720p)', source:props.get('site_url') + o.video_hd_download}); 
 	}
 	if (h264()&&typeof(o.video_1080p_download)!='undefined'&&o.video_1080p_download.length>0) {
-		supportedFormats.push({format:'video_1080p', pseudo:true, label: 'Full HD (1080p)', source:'http://' + props.get('domain') + o.video_1080p_download}); 
+		supportedFormats.push({format:'video_1080p', pseudo:true, label: 'Full HD (1080p)', source:props.get('site_url') + o.video_1080p_download}); 
 	}
 	
 	// We'll want a menu for this
@@ -194,7 +194,7 @@ private function createItemsArray(p:Object) : Array {
 		var o:Object = p.photos[i];
 		var item : Object = new Object();
 		item.itemID = i;		
-		item.photoSource = 'http://' + props.get('domain') + o.quad75_download;
+		item.photoSource = props.get('site_url') + o.quad75_download;
 		item.photoWidth = new Number(o.large_width);
 		item.photoHeight = new Number(o.large_height);
 		item.aspectRatio = parseInt(o.large_width) / parseInt(o.large_height);

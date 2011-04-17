@@ -59,6 +59,6 @@ public function reportEvent(event:String):void {
 }
 
 public function goToUrl(url:String):void {
-	if(!new RegExp('\:\/\/').test(url)) url = 'http://' + props.get('domain') + url;
+	if(!new RegExp('\:\/\/').test(url)) url = props.get('site_url') + url;
     navigateToURL(new URLRequest(url),"_blank");
 }
