@@ -282,7 +282,7 @@
 	<com:PlayerButton id="bigPlayImage" 
 		width="54" 
 		height="50"
-		imageSource="@Embed(source='assets/buttons/play.swf')"
+		imageSource="@Embed(source='assets/buttons/bigplay.png')"
 		imageWidth="54" 
 		imageHeight="50"
 		verticalCenter="0" 
@@ -384,12 +384,12 @@
 						hasFocusableChildren="true"
 						resize="resizeProgressBar();">
 			    		<com:PlayerButton id="playImage" 
-			    			imageSource="@Embed(source='assets/buttons/play.swf')"
+			    			imageSource="@Embed(source='assets/buttons/play.png')"
 			    			visible="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}" 
 			    			click="playVideoElement()"
 			    			/>
 			    		<com:PlayerButton id="pauseImage" 
-			    			imageSource="@Embed(source='assets/buttons/pause.swf')"
+			    			imageSource="@Embed(source='assets/buttons/pause.png')"
 			    			visible="{(cleanVideoState=='playing' &amp;&amp; !identityVideo.visible)}" 
 			    			click="pauseVideoElement()"
 			    			/>
@@ -416,13 +416,7 @@
 			    		> 
 						<!-- Fullscreen -->
 			    		<com:PlayerButton id="fullscreenImage" 
-			    			imageSource="@Embed(source='assets/buttons/fullscreen-on.swf')"
-			    			visible="{!inFullScreen}" 
-			    			click="toggleFullScreen()"
-			    			/>
-			    		<com:PlayerButton id="smallscreenImage" 
-			    			imageSource="@Embed(source='assets/buttons/fullscreen-off.swf')"
-			    			visible="{inFullScreen}" 
+			    			imageSource="@Embed(source='assets/buttons/fullscreen.png')"
 			    			click="toggleFullScreen()"
 			    			/>
 					</mx:HBox>
