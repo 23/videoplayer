@@ -4,22 +4,22 @@ import mx.utils.URLUtil;
 
 [Bindable] public var props:HashCollection = new HashCollection()
 public var propDefaults:Object = {
-	backgroundColor: 'black',
-	trayBackgroundColor: 'black',
+	backgroundColor: '#1b1a1b',
+	trayBackgroundColor: '#1b1a1b',
 	trayTextColor: 'white',
 	trayFont: 'Helvetica, Arial, sans-serif',
 	trayTitleFontSize: parseFloat('13'),
 	trayTitleFontWeight: 'bold',
 	trayContentFontSize: parseFloat('11'),
 	trayContentFontWeight: 'normal',
-	trayAlpha: parseFloat('0.8'),
+	trayAlpha: parseFloat('1.0'),
 	showTray: true,
 	showDescriptions: true,
 	logoSource: '',
 	showBigPlay: true,
 	showLogo: true,
 	showShare: true,
-	showBrowse: true,
+	showBrowse: false,
 	browseMode: false,
 	logoPosition: 'top right',
 	logoAlpha: parseFloat('0.7'),
@@ -144,12 +144,6 @@ private function initProperties(settings:Object):void {
 	props.put('logoAlign', (new RegExp('left').test(pos) ? 'left' : 'right'));
 	props.put('logoVAlign', (new RegExp('top').test(pos) ? 'top' : 'bottom'));
 
-	// Tray and information timeout
-	trayTimer.delay = props.getNumber('trayTimeout');
-	trayTimer.reset();
-	infoTimer.delay = props.getNumber('infoTimeout');
-	infoTimer.reset();
-	
 	// Make the embed code current
 	updateCurrentVideoEmbedCode();
 	

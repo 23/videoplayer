@@ -68,33 +68,6 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	activeElement.put('afterText', o.after_text); 
 	
 	// Get sections and show, otherwise reset
-	if(!skip) {
-		if(o.subtitles_p && props.get('enableSubtitles')) {
-			try {
-				doAPI('/api/photo/subtitle/list', {photo_id:o.photo_id, token:o.token, subtitle_format:'json', stripped_p:'1'}, function(sub:Object):void{
-					var locales:Object = {};
-					var defaultLocale:String = '';
-					var localeMenu:Array = [];
-					localeMenu.push({value:'', label:'No subtitles'});
-					for (var i:int=0; i<sub.subtitles.length; i++) {
-						locales[sub.subtitles[i].locale] = {href:props.get('site_url') + sub.subtitles[i].href, language:sub.subtitles[i].language, locale:sub.subtitles[i].locale};
-						localeMenu.push({value:sub.subtitles[i].locale, label:sub.subtitles[i].language});
-						if(sub.subtitles[i].default_p) defaultLocale = sub.subtitles[i].locale; 
-					}
-					// Let the subtitles component know about this
-					subtitles.suppportedLocales = locales;
-					subtitles.locale = (props.get('subtitlesOnByDefault') ? defaultLocale : '');
-					// Create a menu from the same options
-					subtitlesMenu.options = localeMenu;
-					subtitlesMenu.value = subtitles.locale;
-				});
-			} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
-		} else {
-			subtitles.suppportedLocales = {}; subtitlesMenu.options = [];
-		}
-	}
-	
-	// Get subtitles and show, otherwise reset
 	if(o.sections_p) {
 		try {
 			doAPI('/api/photo/section/list', {photo_id:o.photo_id, token:o.token}, function(sec:Object):void{progress.setSections(sec.sections);});
@@ -129,7 +102,6 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	updateCurrentVideoEmbedCode();
 
 	// We want the tray and possible the info box to show up when a new element starts playing
-	infoShow();
 	trayShow();
 
 	// Note that we've loaded the video 
@@ -158,13 +130,6 @@ private function prepareSupportedFormats(o:Object):void {
 	if (h264()&&typeof(o.video_1080p_download)!='undefined'&&o.video_1080p_download.length>0) {
 		supportedFormats.push({format:'video_1080p', pseudo:true, label: 'Full HD (1080p)', source:props.get('site_url') + o.video_1080p_download}); 
 	}
-	
-	// We'll want a menu for this
-	var _formats:Array = [];
-	for (var i:Object in supportedFormats) {
-		_formats.push({value:supportedFormats[i].format, label:supportedFormats[i].label});
-	}
-	formatsMenu.options = _formats;	
 }
 public function setVideoFormat(format:String):void {
 	var o:Object = null;

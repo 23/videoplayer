@@ -49,13 +49,13 @@ public function reportPlay(event:String, time:Number):void {
 	var photo_id:int = context.photos[currentElementIndex].photo_id;
 	try {
 		doAPI('/api/analytics/report/play', expandReportObject({photo_id:photo_id, time_start:time_start, time_end:time_end, time_total:time_total, uuid:uuid}), function():void{});
-	} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
+	} catch(e:Error) {}
 }
 public function reportEvent(event:String):void {
 	var photo_id:int = context.photos[currentElementIndex].photo_id;
 	try {
 		doAPI('/api/analytics/report/event', expandReportObject({photo_id:photo_id, event:event, uuid:uuid}), function():void{});
-	} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
+	} catch(e:Error) {}
 }
 
 public function goToUrl(url:String):void {
