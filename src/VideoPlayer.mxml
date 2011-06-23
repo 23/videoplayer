@@ -16,6 +16,8 @@
 	height="100%" 
 	creationComplete="init();" 
 	keyDown="trayShow()"
+	mouseMove="{trayShow();}"
+	mouseOut="{if(cleanVideoState!=='paused') trayHide();}"
 	>
 	<mx:Style>
 		@font-face {
@@ -193,9 +195,9 @@
             private function prepareTimers():void {
             	// TRAY AND POSSIBLY PLAYLIST
             	// Hide when the timer completes
-				trayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void {trayHide();});
+				//trayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void {trayHide();});
 				// Reset timer when the mouse moves in the application
-				FlexGlobals.topLevelApplication.addEventListener(MouseEvent.MOUSE_MOVE, function():void {trayShow();});
+				//FlexGlobals.topLevelApplication.addEventListener(MouseEvent.MOUSE_MOVE, function():void {trayShow();});
             }             
 			private function onPlayListDone():void {
 				if(props.get('loop')) { 
