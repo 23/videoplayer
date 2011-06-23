@@ -283,12 +283,11 @@
 		width="54" 
 		height="50"
 		imageSource="@Embed(source='assets/buttons/bigplay.png')"
-		imageWidth="54" 
-		imageHeight="50"
+		imageHoverSource="@Embed(source='assets/buttons/bigplay-hover.png')"
 		verticalCenter="0" 
 		horizontalCenter="0" 
-		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
-		click="playVideoElement()"
+		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState!='buffering' &amp;&amp; !identityVideo.playing)}" 
+		click="if(cleanVideoState=='playing') {pauseVideoElement();} else {playVideoElement();}"
 		/>
  	
 	<!-- Extra displays for identity video and photo -->
@@ -385,16 +384,19 @@
 						resize="resizeProgressBar();">
 			    		<com:PlayerButton id="playImage" 
 			    			imageSource="@Embed(source='assets/buttons/play.png')"
+							imageHoverSource="@Embed(source='assets/buttons/play-hover.png')"
 			    			visible="{(cleanVideoState=='paused' &amp;&amp; !identityVideo.visible)}" 
 			    			click="playVideoElement()"
 			    			/>
 			    		<com:PlayerButton id="pauseImage" 
 			    			imageSource="@Embed(source='assets/buttons/pause.png')"
+							imageHoverSource="@Embed(source='assets/buttons/pause-hover.png')"
 			    			visible="{(cleanVideoState=='playing' &amp;&amp; !identityVideo.visible)}" 
 			    			click="pauseVideoElement()"
 			    			/>
 			    		<com:PlayerButton id="bufferImage"  
-			    			imageSource="@Embed(source='assets/buttons/buffering.swf')"
+						    imageSource="@Embed(source='assets/buttons/pause.png')"
+						    imageHoverSource="@Embed(source='assets/buttons/pause-hover.png')"
 			    			visible="{(cleanVideoState=='buffering' &amp;&amp; !identityVideo.visible)}" 
 			    			/>  
 			    	</mx:HBox>					
@@ -417,6 +419,7 @@
 						<!-- Fullscreen -->
 			    		<com:PlayerButton id="fullscreenImage" 
 			    			imageSource="@Embed(source='assets/buttons/fullscreen.png')"
+							imageHoverSource="@Embed(source='assets/buttons/fullscreen-hover.png')"
 			    			click="toggleFullScreen()"
 			    			/>
 					</mx:HBox>

@@ -2,12 +2,11 @@
 <mx:Canvas 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	implements="mx.managers.IFocusManagerComponent" 
-	width="32" 
-	height="28"  
 	focusEnabled="true" 
 	tabEnabled="true"
 	tabFocusEnabled="true"
-	buttonMode="true"  
+	buttonMode="true"
+	useHandCursor="true"
 	keyDown="if (event.keyCode==Keyboard.ENTER) event.target.dispatchEvent(new MouseEvent(MouseEvent.CLICK));"
 	mouseOver="onButtonMouseOver(event)" 
 	mouseOut="onButtonMouseOut(event)"
@@ -18,36 +17,22 @@
 	>
 	<mx:Script>
 		<![CDATA[
-			import com.philemonworks.flex.util.HashCollection;
-			
-			import mx.controls.Image;
-			import mx.core.Application;
-			import mx.core.FlexGlobals;
-			[bindable] private var props:HashCollection = mx.core.FlexGlobals.topLevelApplication.props;
-			public var imageContainer:Image = new Image();
-			private var _imageWidth:int, _imageHeight:int;
-			public function set imageSource(source:Object):void {
-				imageContainer.alpha = 0.7;
-				imageContainer.source = source;
-				this.addChild(imageContainer);					
-			}
-			public function set imageWidth(w:int):void {
-				imageContainer.width = w;
-			}
-			public function set imageHeight(h:int):void {
-				imageContainer.height = h;
-			}
+			public var imageSource:Object = null;
+			public var imageHoverSource:Object = null;
 			private function onVisibilityChange():void {
 				this.includeInLayout = this.visible;
 			}
 			private function onButtonMouseOver(e:Event):void {
-    	    	e.currentTarget.setStyle('backgroundAlpha', 1);
-        	    e.currentTarget.getChildren()[0].alpha = 1;         	
+				image.source = imageHoverSource;
 			}
 	        private function onButtonMouseOut(e:Event):void {
-    	    	e.currentTarget.setStyle('backgroundAlpha', props.get('trayAlpha'));
-        	    e.currentTarget.getChildren()[0].alpha = 0.7;
+				image.source = imageSource;
 	        }
 		]]>
 	</mx:Script>
+	<mx:Image id="image"
+		 source="{imageSource}"
+		 verticalCenter="0"
+		 horizontalCenter="0"
+		 />
 </mx:Canvas> 
