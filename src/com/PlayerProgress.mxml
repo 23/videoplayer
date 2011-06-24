@@ -5,33 +5,37 @@
 	verticalScrollPolicy="off"
 	useHandCursor="true" 
 	buttonMode="true" 
-	height="28"
-	top="2" 
+	height="14"
+	width="257"
 	mouseOver="videoDragHandle.visible=true" 
-	mouseOut="videoDragHandle.visible=false" 
+	mouseOut="{if(scrubberStartMouseX&lt;0) videoDragHandle.visible=false;}" 
 	click="seekVideoTo(timeFromPoint(this.contentMouseX));" 
 	initialize="init()"
 	>
+	<mx:Image
+		top="3"
+		source="@Embed(source='assets/buttons/progress-background.png')" 
+		/>
+	
 	<!-- VideoProgress -->
 	<mx:Canvas id="videoProgress"
-		top="11" 
-		left="10" 
-		right="10" 
-		height="6" 
+		top="5" 
+		left="2" 
+		width="217" 
 		resize="drawSections();"
-		backgroundColor="0xCCCCCC" 
-		backgroundAlpha="0.6">
-		<mx:Canvas id="videoBufferProgress" 
-			x="0" 
-			height="6" 
-			backgroundColor="white" 
-			backgroundAlpha="0.2" 
+		>
+		<mx:Image id="videoBufferProgress" 
+			x="0"
+			y="0"
+			height="2"
+			width="0"
+			source="@Embed(source='assets/buttons/progress-buffer.png')"
 			/>
 		<mx:Canvas id="videoPlayProgress" 
 			x="0"
-			height="6" 
-			backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
-			backgroundAlpha="0.6" 
+			y="0"
+			height="2" 
+			backgroundColor="white" 
 			/>
 	</mx:Canvas>					
 
@@ -39,31 +43,23 @@
 	<mx:Canvas id="sectionContainer" top="0" left="0" width="100%" height="100%" horizontalScrollPolicy="off"></mx:Canvas>
 	
 	<!-- videoTime -->
-	<mx:HBox id="videoDragHandle"
+	<mx:Image id="videoDragHandle"
+		 source="@Embed(source='assets/buttons/progress-handle.png')"
 		 visible="false" 
-		 y="{(this.height-videoTimeLabel.height)/2}" 
-		 width="{videoTimeLabel.width}"
-		 height="{videoTimeLabel.height}"
-		 backgroundColor="0xFFFFFF" 
-		 cornerRadius="2" 
-		 borderStyle="solid" 
-		 borderColor="white"
-		 clipContent="false"
 		 useHandCursor="true"
 		 buttonMode="true"
-		>
-		<mx:VBox id="videoTime"
-			 clipContent="false"
-			>
-			<mx:Label id="videoTimeLabel" 
-				selectable="false" 
-				fontFamily="Helvetica, Arial" 
-				fontSize="9" 
-				height="12" 
-				color="black"
-				/>
-		</mx:VBox>	
-	</mx:HBox>
+		/>
+	
+	<mx:Label id="videoTimeLabel"
+		left="228"
+		top="0"
+	  	selectable="false" 
+	  	fontFamily="Helvetica, Arial" 
+	  	fontSize="10" 
+	  	height="12" 
+	  	color="white"
+		text="0:00"
+	  	/>
 	
 	<mx:Script>
 		<![CDATA[
@@ -87,8 +83,9 @@
 				this.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent){
 					if(scrubberStartMouseX<0) return;
 					scrubberStartMouseX = scrubberStartX = -1;
+					videoDragHandle.visible = false;
 					var x = scrubberStartX + (e.stageX-scrubberStartMouseX);
-					seekVideoTo(timeFromPoint(x));
+					seekVideoTo(timeFromPoint(x+5));
 				});
 				videoDragHandle.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent){
 					scrubberStartX = videoDragHandle.x;

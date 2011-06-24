@@ -85,11 +85,11 @@
 		fontSize="{(this.parentApplication.props.get('trayTitleFontSize') as Number) || 10}" fontWeight="{this.parentApplication.props.get('trayTitleFontWeight')}" truncateToFit="true"/>
 	
 	<mx:Canvas width="100%" height="100">
-		<mx:Canvas id="previousBtn" click="{scrollBack()}" width="25" backgroundImage="@Embed('assets/buttons/previous.swf')" top="0" left="0" bottom="0" alpha="0.7" mouseOver="previousBtn.alpha=1;" mouseOut="previousBtn.alpha=0.7;"/>
+		<mx:Canvas id="previousBtn" click="{scrollBack()}" width="25" backgroundImage="@Embed('assets/buttons/prev.png')" top="0" left="0" bottom="0" alpha="0.7" mouseOver="previousBtn.alpha=1;" mouseOut="previousBtn.alpha=0.7;"/>
 		<mx:Canvas verticalCenter="0" verticalScrollPolicy="off" horizontalScrollPolicy="off" left="{previousBtn.width+5}" right="{nextBtn.width+5}" id="playListCanvas">
 			<mx:HBox id="playListBox" verticalScrollPolicy="off" verticalCenter="0"/>
 		</mx:Canvas>
-		<mx:Canvas id="nextBtn" click="{scrollForward()}" width="25" backgroundImage="@Embed('assets/buttons/next.swf')" top="0" right="0" bottom="0" alpha="0.7" mouseOver="nextBtn.alpha=1;" mouseOut="nextBtn.alpha=0.7;"/>
+		<mx:Canvas id="nextBtn" click="{scrollForward()}" width="25" backgroundImage="@Embed('assets/buttons/next.png')" top="0" right="0" bottom="0" alpha="0.7" mouseOver="nextBtn.alpha=1;" mouseOut="nextBtn.alpha=0.7;"/>
 	</mx:Canvas>
 	<mx:Move id="mover" target="{playListBox}"/>
 </mx:VBox>

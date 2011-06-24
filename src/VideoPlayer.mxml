@@ -14,7 +14,8 @@
 	width="100%" 
 	height="100%" 
 	creationComplete="init();" 
-	keyDown="trayShow()"
+	keyDown="{if(!playListContainer.visible) trayShow();}"
+	mouseMove="{trayTimer.reset(); trayTimer.start(); if(!playListContainer.visible) trayShow();}"
 	>
  	<mx:Script source="Utility.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
@@ -54,6 +55,7 @@
 			[Bindable] private var cleanVideoState:String = 'paused';
 			
 			public function init():void {
+				trayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void{trayHide();});
 				flash.system.Security.allowDomain('*');
 				try {
 					var objectID:String = new String(ExternalInterface.objectID);
@@ -118,6 +120,7 @@
 			
             private function createPlayList():void  {
             	var arr:Array = createItemsArray(recommendations);
+				trace(arr.length);
             	if(arr.length<=1) return;
 				enablePlayList = true;
 				playListHolder.removeAllChildren(); // if we've done this before, clean up after ourselves.
@@ -141,29 +144,26 @@
 				}
             }
 			private function playListShow():void {
-				if (!props.get('showTray') || !props.get('showBrowse')) return;
-				showPlayList = true;
-				trayShow();
+				playListContainer.visible = true;
+				tray.visible = false;
             }
 			private function playListHide():void {
 				showPlayList = false;
-				trayShow();
+				playListContainer.visible = false;
             }
+			private var trayTimer:Timer = new Timer(3000,1);
             private function trayShow():void {
-            	if(!props.get('showTray')) {tray.visible=false; return;}
-            	//stc// tray.visible = true;
+            	tray.visible = true;
             }            
             private function trayHide():void {
-            	if (showPlayList) return;
-            	if(props.getNumber('trayTimeout')<=0) return;
-				//stc// tray.visible = false;
-            }            
+				if(cleanVideoState!=='playing') return;
+				tray.visible = false;
+			}            
             private function onPlayListDone():void {
             	if(props.get('loop')) { 
             		load();
             	} else {
             		if (playList) {
-            			playList.headline = new String(props.get('recommendationHeadline'));
             			playListShow();
             		}
             	}
@@ -217,11 +217,6 @@
             }
             private function onTrayResize():void {
             	if(tray.visible) trayShow(); // if the tray is displayed and changes size, force a replacement
-            	resizeProgressBar();
-            }
-            private function resizeProgressBar():void {
-            	var x:int = progress.x = (videoControls.visible ? videoControls.width : 0) + 4; 
-            	progress.width = tray.width - (rightPanel.width + 4) - x; 
             }
 		]]>
 	</mx:Script>	
@@ -278,18 +273,37 @@
 		click="{playListHide(); playVideoElement()}" 
 		/>
  
- 	 <!-- Big Play -->
-	<com:PlayerButton id="bigPlayImage" 
-		width="54" 
-		height="50"
-		imageSource="@Embed(source='assets/buttons/bigplay.png')"
-		imageHoverSource="@Embed(source='assets/buttons/bigplay-hover.png')"
+	<mx:HBox 
 		verticalCenter="0" 
 		horizontalCenter="0" 
-		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState!='buffering' &amp;&amp; !identityVideo.playing)}" 
-		click="if(cleanVideoState=='playing') {pauseVideoElement();} else {playVideoElement();}"
-		/>
- 	
+		visible="{tray.visible}">
+		<!-- Big Play -->
+		<com:PlayerButton id="bigPlayImage" 
+			imageSource="@Embed(source='assets/buttons/bigplay.png')"
+			imageHoverSource="@Embed(source='assets/buttons/bigplay-hover.png')"
+			visible="{(!playListContainer.visible &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
+			click="{playVideoElement();}"
+			/>
+		<!-- Big Pause -->
+		<com:PlayerButton id="bigPauseImage" 
+			  imageSource="@Embed(source='assets/buttons/bigpause.png')"
+			  imageHoverSource="@Embed(source='assets/buttons/bigpause-hover.png')"
+			  visible="{(!playListContainer.visible &amp;&amp; cleanVideoState=='playing' &amp;&amp; !identityVideo.playing)}" 
+			  click="{pauseVideoElement();}"
+			  />
+	</mx:HBox>
+	<mx:HBox 
+		verticalCenter="0" 
+		horizontalCenter="0" 
+		visible="{playListContainer.visible}">
+		<!-- Big Replay -->
+		<com:PlayerButton id="bigReplayImage" 
+			  imageSource="@Embed(source='assets/buttons/replay.png')"
+			  imageHoverSource="@Embed(source='assets/buttons/replay-hover.png')"
+			  click="{activeElement.put('start', 0); playVideoElement();}"
+			  />
+	</mx:HBox>
+
 	<!-- Extra displays for identity video and photo -->
 	<mx:VideoDisplay id="identityVideo" 
 		visible="false" 
@@ -357,9 +371,9 @@
 
 	<!-- Tray -->
 	<mx:Canvas id="tray" 
-		y="{FlexGlobals.topLevelApplication.height-tray.height}" 
+		y="{FlexGlobals.topLevelApplication.height-tray.height-5}" 
 		x="0" 
-		width="370" 
+		width="{controlBox.width}" 
 		horizontalScrollPolicy="off" 
 		verticalScrollPolicy="off" 
 		visible="{(props.get('showTray') as Boolean)}" 
@@ -371,17 +385,17 @@
 		borderThickness="0" 
 		cornerRadius="2" 
 		>
-			<mx:HBox id="controlBox">
-				<mx:Canvas 
-					width="{tray.width}">
+			<mx:HBox id="controlBox"
+					 paddingLeft="8"
+					 paddingRight="8"
+					 paddingTop="5"
+					 paddingBottom="5"
+					 >
 					<!-- Play and Pause -->
 					<mx:HBox id="videoControls" 
-						bottom="2" 
-						top="2" 
-						left="2" 
 						width="{playImage.width}"
 						hasFocusableChildren="true"
-						resize="resizeProgressBar();">
+						>
 			    		<com:PlayerButton id="playImage" 
 			    			imageSource="@Embed(source='assets/buttons/play.png')"
 							imageHoverSource="@Embed(source='assets/buttons/play-hover.png')"
@@ -410,11 +424,7 @@
 					<!-- Right Panel -->
 			    	<mx:HBox id="rightPanel" 
 			    		visible="true" 
-			    		bottom="2" 
-			    		top="2" 
-			    		right="2" 
 			    		horizontalGap="2" 
-			    		resize="resizeProgressBar();"
 			    		> 
 						<!-- Fullscreen -->
 			    		<com:PlayerButton id="fullscreenImage" 
@@ -423,17 +433,17 @@
 			    			click="toggleFullScreen()"
 			    			/>
 					</mx:HBox>
-				</mx:Canvas>
 			</mx:HBox>
 			
 	</mx:Canvas>
 
 	
 	<!-- PlayList -->
-	<mx:Canvas id="playListContainer" 
+	<mx:Canvas id="playListContainer"
+			   visible="false"
 			   height="{playListHolder.height}" 
-			   y="{FlexGlobals.topLevelApplication.height-playListHolder.height}" 
-			   x="0" 
+			   bottom="0" 
+			   left="0" 
 			   width="100%"
 			   backgroundColor="#1b1a1b" 
 			   borderColor="#1b1a1b" 
@@ -442,7 +452,7 @@
 			   borderThickness="5">
 		<mx:Canvas id="playListHolder" 
 				   bottom="0" 
-				   width="{tray.width}" 
+				   width="100%" 
 				   verticalScrollPolicy="off" 
 				   horizontalScrollPolicy="off" 
 				   resize="onPlayListResize()"

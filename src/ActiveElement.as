@@ -93,6 +93,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
  	if(video_p) {
  		image.source = null;
   		showVideoElement();
+		trayShow();
   		if (props.get('autoPlay') || props.get('loop') || startPlaying) playVideoElement();
   	} else {
   		showImageElement();
@@ -205,6 +206,8 @@ private function showVideoElement():void {
 }
 
 public function playVideoElement():void {
+	trayHide();
+	playListHide();
 	if(!activeElement.get('video_p')) return;
 	image.visible=false;
 	video.visible=true;
@@ -224,6 +227,7 @@ public function playVideoElement():void {
 private function pauseVideoElement():void {
 	playVideoElement();
 	video.pause();
+	trayShow();
 }
 
 private function getFullVideoSource():String {
