@@ -2,6 +2,11 @@
 <!-- 
   Kilroy Player for 23 Video
   Steffen Tiedemann Christensen, steffen@23company.com
+
+  TODO:
+  - Volume
+  - Design (outline+playknap) til playlist
+  - Pixels & Padding 
 -->
 <mx:Application 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
@@ -390,6 +395,7 @@
 					 paddingRight="8"
 					 paddingTop="5"
 					 paddingBottom="5"
+					  horizontalGap="12"
 					 >
 					<!-- Play and Pause -->
 					<mx:HBox id="videoControls" 

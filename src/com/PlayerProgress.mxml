@@ -6,7 +6,7 @@
 	useHandCursor="true" 
 	buttonMode="true" 
 	height="14"
-	width="257"
+	width="254"
 	mouseOver="videoDragHandle.visible=true" 
 	mouseOut="{if(scrubberStartMouseX&lt;0) videoDragHandle.visible=false;}" 
 	click="seekVideoTo(timeFromPoint(this.contentMouseX));" 
