@@ -4,8 +4,7 @@
   Steffen Tiedemann Christensen, steffen@23company.com
 
   TODO:
-  - Volume
-  - Pixels & Padding
+  - Animation	
 -->
 <mx:Application 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
@@ -76,6 +75,7 @@
 						ExternalInterface.addCallback('echo', function(x:Object):Object {return(x);});
 					}
 		        } catch (e:SecurityError) {} catch(e:Error) {}
+				handleVolume('set', 5);
 				load();
 			}
 			public function unload():void {
@@ -222,6 +222,24 @@
             private function onTrayResize():void {
             	if(tray.visible) trayShow(); // if the tray is displayed and changes size, force a replacement
             }
+			
+
+			[Embed(source="assets/buttons/volume-selected.png")] [Bindable] public var volumeSelectedImage:Class;
+			[Embed(source="assets/buttons/volume-hover.png")] [Bindable] public var volumeHoverImage:Class;
+			private function handleVolume(event:String, level:int=-1):void {
+				if(level<0) level = Math.floor(video.volume*5.0);
+				var status:String = 'normal';
+				switch(event) {
+					case 'set':
+						video.volume = level/5.0;
+						break;
+					case 'over':
+						status = 'over';
+						break;
+				}
+				volumeImage.source = (status==='over' ? volumeHoverImage : volumeSelectedImage);
+				volumeBlind.width = (level * 7) - 1;
+			}
 		]]>
 	</mx:Script>	
 	
@@ -394,12 +412,13 @@
 					 paddingRight="8"
 					 paddingTop="5"
 					 paddingBottom="5"
-					  horizontalGap="12"
+					 horizontalGap="12"
 					 >
 					<!-- Play and Pause -->
 					<mx:HBox id="videoControls" 
 						width="{playImage.width}"
 						hasFocusableChildren="true"
+						paddingTop="2"
 						>
 			    		<com:PlayerButton id="playImage" 
 			    			imageSource="@Embed(source='assets/buttons/play.png')"
@@ -420,23 +439,54 @@
 			    			/>  
 			    	</mx:HBox>					
 						
-					<!-- Progress bar -->
-					<com:PlayerProgress id="progress"
-						targetVideo="{video}"
-						visible="{video.visible}" 
-						/>
+					<mx:HBox paddingTop="2">
+						<!-- Progress bar -->
+						<com:PlayerProgress id="progress"
+							targetVideo="{video}"
+							visible="{video.visible}" 
+							/>
+					</mx:HBox>
 
 					<!-- Right Panel -->
 			    	<mx:HBox id="rightPanel" 
 			    		visible="true" 
-			    		horizontalGap="2" 
-			    		> 
-						<!-- Fullscreen -->
-			    		<com:PlayerButton id="fullscreenImage" 
+			    		horizontalGap="8" 
+			    		> 						
+						<mx:Canvas
+							backgroundImage="@Embed(source='assets/buttons/volume-background.png')"
+							width="33"
+							height="17"
+							>
+							<mx:Canvas 
+								id="volumeBlind"
+								x="0"
+								y="1"
+								width="0"
+								height="16"
+								horizontalScrollPolicy="off"
+								verticalScrollPolicy="off"
+								>
+							    <mx:Image 
+									id="volumeImage"
+									/>
+							</mx:Canvas>
+							<mx:HBox horizontalGap="0">
+								<mx:Canvas useHandCursor="true" buttonMode="true" width="6" height="16" backgroundColor="black" backgroundAlpha="0.01" mouseOver="handleVolume('over', 1);" mouseOut="handleVolume('out');" click="handleVolume('set', 1);" />
+								<mx:Canvas useHandCursor="true" buttonMode="true" width="7" height="16" backgroundColor="black" backgroundAlpha="0.01" mouseOver="handleVolume('over', 2);" mouseOut="handleVolume('out');" click="handleVolume('set', 2);" />
+								<mx:Canvas useHandCursor="true" buttonMode="true" width="7" height="16" backgroundColor="black" backgroundAlpha="0.01" mouseOver="handleVolume('over', 3);" mouseOut="handleVolume('out');" click="handleVolume('set', 3);" />
+								<mx:Canvas useHandCursor="true" buttonMode="true" width="7" height="16" backgroundColor="black" backgroundAlpha="0.01" mouseOver="handleVolume('over', 4);" mouseOut="handleVolume('out');" click="handleVolume('set', 4);" />
+								<mx:Canvas useHandCursor="true" buttonMode="true" width="6" height="16" backgroundColor="black" backgroundAlpha="0.01" mouseOver="handleVolume('over', 5);" mouseOut="handleVolume('out');" click="handleVolume('set', 5);" />
+							</mx:HBox>
+						</mx:Canvas>
+						
+						<mx:HBox paddingTop="2">
+							<!-- Fullscreen -->
+			    			<com:PlayerButton id="fullscreenImage" 
 			    			imageSource="@Embed(source='assets/buttons/fullscreen.png')"
 							imageHoverSource="@Embed(source='assets/buttons/fullscreen-hover.png')"
 			    			click="toggleFullScreen()"
 			    			/>
+						</mx:HBox>
 					</mx:HBox>
 			</mx:HBox>
 			
