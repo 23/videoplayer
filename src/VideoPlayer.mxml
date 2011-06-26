@@ -2,9 +2,6 @@
 <!-- 
   Kilroy Player for 23 Video
   Steffen Tiedemann Christensen, steffen@23company.com
-
-  TODO:
-  - Animation	
 -->
 <mx:Application 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
@@ -298,6 +295,8 @@
 	<mx:HBox 
 		horizontalCenter="0" 
 		bottom="{Math.max((this.height-50)/2, (playListContainer.visible ? playListContainer.height+10 :0))}" 
+		hideEffect="{fadeOut}"
+		showEffect="{fadeIn}"
 		visible="{tray.visible}">
 		<!-- Big Play -->
 		<com:PlayerButton id="bigPlayImage" 
@@ -317,6 +316,8 @@
 	<mx:HBox 
 		bottom="{Math.max((this.height-50)/2, (playListContainer.visible ? playListContainer.height+10 :0))}" 
 		horizontalCenter="0" 
+		hideEffect="{fadeOut}"
+		showEffect="{fadeIn}"
 		visible="{playListContainer.visible}">
 		<!-- Big Replay -->
 		<com:PlayerButton id="bigReplayImage" 
@@ -406,6 +407,8 @@
 		borderStyle="solid" 
 		borderThickness="0" 
 		cornerRadius="2" 
+		hideEffect="{fadeOut}"
+		showEffect="{fadeIn}"
 		>
 			<mx:HBox id="controlBox"
 					 paddingLeft="8"
@@ -496,6 +499,8 @@
 	<!-- PlayList -->
 	<mx:Canvas id="playListContainer"
 			   visible="false"
+			   hideEffect="{fadeOut}"
+			   showEffect="{fadeIn}"
 			   height="{playListHolder.height}" 
 			   bottom="0" 
 			   left="0" 
@@ -533,4 +538,7 @@
 			/>
 	</com:TextPanel> 
 	<!-- / Text panel for post-roll -->
+	
+	<mx:Fade id="fadeOut" duration="800" alphaFrom="1.0" alphaTo="0.0"/>
+	<mx:Fade id="fadeIn" duration="300" alphaFrom="0.0" alphaTo="1.0"/>
 </mx:Application>
