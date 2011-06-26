@@ -7,6 +7,7 @@
 	tabFocusEnabled="true"
 	buttonMode="true"
 	useHandCursor="true"
+	mouseChildren="false"
 	keyDown="if (event.keyCode==Keyboard.ENTER) event.target.dispatchEvent(new MouseEvent(MouseEvent.CLICK));"
 	mouseOver="onButtonMouseOver(event)" 
 	mouseOut="onButtonMouseOut(event)"

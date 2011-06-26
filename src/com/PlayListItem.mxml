@@ -2,13 +2,22 @@
 <mx:Canvas 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
 	xmlns:com="com.*" 
-	width="100" 
-	height="100" 
+	width="114" 
+	height="103" 
 	implements="mx.managers.IFocusManagerComponent" 
 	focusEnabled="true" 
 	tabEnabled="true"
 	tabFocusEnabled="true"
 	keyDown="if (event.keyCode==Keyboard.ENTER) event.target.dispatchEvent(new MouseEvent(MouseEvent.CLICK));"
+	borderThickness="1"
+	borderSides="top right bottom left"
+	borderStyle="solid"
+	borderColor="#1b1a1b"
+	mouseOut="{this.setStyle('borderColor', '#1b1a1b'); playImage=playNormalImage;}"
+	mouseOver="{this.setStyle('borderColor', '#444444'); playImage=playHoverImage;}"
+	mouseChildren="false"
+	useHandCursor="true"
+	buttonMode="true"
 	creationComplete="init()">
 	<mx:Script>
 		<![CDATA[
@@ -24,6 +33,9 @@
 			private var _photoSource : String;
 			private var _title : String;
 			
+			[Embed(source="assets/buttons/playlist-play.png")] [Bindable] public var playImage:Class;
+			[Embed(source="assets/buttons/playlist-play.png")] [Bindable] public var playNormalImage:Class;
+			[Embed(source="assets/buttons/playlist-play-hover.png")] [Bindable] public var playHoverImage:Class;
 			
 			public function set sourceURL(value : String) : void 
 			{
@@ -56,7 +68,6 @@
 					moviePreview.source = _defaultURL;
 				}
 				moviePreview.maintainAspectRatio = true;
-				loadLabel.visible = false;
 				moviePreview.visible = true;
 				nameLabel.visible = true;
 			}
@@ -64,8 +75,8 @@
 			
 		]]>
 	</mx:Script>
-	<com:SmoothImage id="moviePreview" top="0" width="100" height="75" scaleContent="true" visible="false" verticalAlign="bottom"/>
-	<mx:Label id="nameLabel" color="0xFFFFFF" fontSize="10" width="100" truncateToFit="true"  bottom="2" visible="false" fontFamily="Arial"/>
-	<mx:Label id="loadLabel" color="0xFFFFFF" fontSize="10" verticalCenter="0" horizontalCenter="0" text="LOADING" fontFamily="Arial"/>
-	<mx:Canvas id="clickHolder" width="100" height="100" verticalCenter="0" horizontalCenter="0" backgroundColor="black" backgroundAlpha="0.01" useHandCursor="true" buttonMode="true"/>
+	<com:SmoothImage id="moviePreview" left="4" top="4" width="106" height="60" scaleContent="true" visible="false" verticalAlign="bottom"/>
+	<mx:Image source="{playImage}"  horizontalCenter="0" top="23" /> 
+	<mx:Text id="nameLabel" color="#cccccc" fontSize="10" width="106" truncateToFit="true"  bottom="2" visible="false" fontFamily="Arial" height="30" />
+	<mx:Canvas id="clickHolder" width="114" height="103" verticalCenter="0" horizontalCenter="0" backgroundColor="black" backgroundAlpha="0.01" useHandCursor="true" buttonMode="true"/>
 </mx:Canvas>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" resize="this.parent.height=this.height;" creationComplete="createPlayList()">
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:com="com.*" resize="this.parent.height=this.height;" creationComplete="createPlayList()" verticalGap="-5">
 	<mx:Script>
 		<![CDATA[
 			import mx.effects.Move;
@@ -14,7 +14,11 @@
 				_items = value;
 			}
 			
-            
+			private function handleNextPrevDisplay():void{
+				previousBtn.visible= (playListBox.x < 0);
+				nextBtn.visible= (playListBox.x>(playListCanvas.width-playListBox.width));
+			}
+			
 			private function scrollBack() : void
 			{
 				if(playListBox.width > playListCanvas.width)
@@ -31,6 +35,7 @@
 						mover.play();
 					}
 				}
+				handleNextPrevDisplay();
 				
 			}
 			
@@ -50,6 +55,7 @@
 						mover.play();
 					}
 				}
+				handleNextPrevDisplay();
 				dispatchEvent(new PlayListEvent(-1));
 			}
 			
@@ -63,8 +69,6 @@
 						playlistElement.itemID = _items[i].itemID;
 						playlistElement.movieName = _items[i].title;
 						playlistElement.sourceURL = _items[i].photoSource;
-						playlistElement.width = 100;
-						playlistElement.height = 100;
 						playlistElement.verticalScrollPolicy = "off";
 						playlistElement.horizontalScrollPolicy = "off";
 						playListBox.addChild(playlistElement);
@@ -75,21 +79,40 @@
 			
 			private function selectHandler(evt:MouseEvent) : void
 			{
-				dispatchEvent(new PlayListEvent(evt.target.parent.itemID));
+				dispatchEvent(new PlayListEvent(evt.target.itemID));
 			}
 			
 		]]>
 	</mx:Script>
-	<mx:Label id="playlistHeadline" paddingTop="15" paddingLeft="25" text="" visible="{playlistHeadline.text!=''}" includeInLayout="{playlistHeadline.visible}" 
-		fontFamily="{this.parentApplication.props.get('trayFont')}" color="{(styleManager.getColorName(this.parentApplication.props.get('trayTextColor')) as Number)}" 
-		fontSize="{(this.parentApplication.props.get('trayTitleFontSize') as Number) || 10}" fontWeight="{this.parentApplication.props.get('trayTitleFontWeight')}" truncateToFit="true"/>
+	<mx:Label id="playlistHeadline" paddingTop="8" paddingLeft="38" text="Related videos" visible="true"  
+		fontFamily="Arial" color="#cccccc" 
+		fontSize="11" fontWeight="normal" truncateToFit="true"/>
 	
-	<mx:Canvas width="100%" height="100">
-		<mx:Canvas id="previousBtn" click="{scrollBack()}" width="25" backgroundImage="@Embed('assets/buttons/prev.png')" top="0" left="0" bottom="0" alpha="0.7" mouseOver="previousBtn.alpha=1;" mouseOut="previousBtn.alpha=0.7;"/>
-		<mx:Canvas verticalCenter="0" verticalScrollPolicy="off" horizontalScrollPolicy="off" left="{previousBtn.width+5}" right="{nextBtn.width+5}" id="playListCanvas">
-			<mx:HBox id="playListBox" verticalScrollPolicy="off" verticalCenter="0"/>
+	<mx:Canvas width="100%" height="115">
+		<com:PlayerButton id="previousBtn" 
+			click="{scrollBack()}"
+			width="30"
+			top="0" 
+			left="0" 
+			bottom="0" 
+			imageSource="@Embed(source='assets/buttons/prev.png')"
+			imageHoverSource="@Embed(source='assets/buttons/prev-hover.png')"
+			visible="false"
+			/>  
+
+		<mx:Canvas verticalCenter="0" verticalScrollPolicy="off" horizontalScrollPolicy="off" left="35" right="35" id="playListCanvas">
+			<mx:HBox id="playListBox" verticalScrollPolicy="off" verticalCenter="0" horizontalGap="0" />
 		</mx:Canvas>
-		<mx:Canvas id="nextBtn" click="{scrollForward()}" width="25" backgroundImage="@Embed('assets/buttons/next.png')" top="0" right="0" bottom="0" alpha="0.7" mouseOver="nextBtn.alpha=1;" mouseOut="nextBtn.alpha=0.7;"/>
+
+		<com:PlayerButton id="nextBtn" 
+			click="{scrollForward()}"
+			width="30"
+			top="0" 
+			right="0" 
+			bottom="0" 
+			imageSource="@Embed(source='assets/buttons/next.png')"
+			imageHoverSource="@Embed(source='assets/buttons/next-hover.png')"
+			/>  
 	</mx:Canvas>
-	<mx:Move id="mover" target="{playListBox}"/>
+	<mx:Move id="mover" target="{playListBox}" effectEnd="handleNextPrevDisplay();" />
 </mx:VBox>

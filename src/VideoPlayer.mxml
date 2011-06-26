@@ -5,8 +5,7 @@
 
   TODO:
   - Volume
-  - Design (outline+playknap) til playlist
-  - Pixels & Padding 
+  - Pixels & Padding
 -->
 <mx:Application 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
@@ -279,8 +278,8 @@
 		/>
  
 	<mx:HBox 
-		verticalCenter="0" 
 		horizontalCenter="0" 
+		bottom="{Math.max((this.height-50)/2, (playListContainer.visible ? playListContainer.height+10 :0))}" 
 		visible="{tray.visible}">
 		<!-- Big Play -->
 		<com:PlayerButton id="bigPlayImage" 
@@ -298,7 +297,7 @@
 			  />
 	</mx:HBox>
 	<mx:HBox 
-		verticalCenter="0" 
+		bottom="{Math.max((this.height-50)/2, (playListContainer.visible ? playListContainer.height+10 :0))}" 
 		horizontalCenter="0" 
 		visible="{playListContainer.visible}">
 		<!-- Big Replay -->
@@ -451,7 +450,7 @@
 			   bottom="0" 
 			   left="0" 
 			   width="100%"
-			   backgroundColor="#1b1a1b" 
+			   backgroundColor="#1b1a1b"
 			   borderColor="#1b1a1b" 
 			   borderSides="top" 
 			   borderStyle="solid" 

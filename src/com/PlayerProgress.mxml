@@ -5,7 +5,7 @@
 	verticalScrollPolicy="off"
 	useHandCursor="true" 
 	buttonMode="true" 
-	height="14"
+	height="16"
 	width="254"
 	mouseOver="videoDragHandle.visible=true" 
 	mouseOut="{if(scrubberStartMouseX&lt;0) videoDragHandle.visible=false;}" 
@@ -24,13 +24,13 @@
 		width="217" 
 		resize="drawSections();"
 		>
-		<mx:Image id="videoBufferProgress" 
-			x="0"
-			y="0"
-			height="2"
-			width="0"
-			source="@Embed(source='assets/buttons/progress-buffer.png')"
-			/>
+		<mx:Canvas id="videoBufferProgress"
+  		 	backgroundImage="@Embed(source='assets/buttons/progress-buffer.png')"
+		 	y="0"
+		 	x="0"
+		 	width="0"
+		 	height="2"
+		 	/>
 		<mx:Canvas id="videoPlayProgress" 
 			x="0"
 			y="0"
@@ -58,6 +58,8 @@
 	  	fontSize="10" 
 	  	height="12" 
 	  	color="white"
+		fontAntiAliasType="advanced"
+		fontThickness="1"
 		text="0:00"
 	  	/>
 	
