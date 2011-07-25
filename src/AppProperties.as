@@ -40,6 +40,7 @@ public var propDefaults:Object = {
 	enableSubtitles: true,
 	subtitlesOnByDefault: false,
 	subtitlesDesign: 'bars',
+	playlistClickMode:'link',
 	
 	start: parseFloat('0'),
 	player_id: parseFloat('0'),
