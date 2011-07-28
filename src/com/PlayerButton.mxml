@@ -46,12 +46,10 @@
 			private function onButtonMouseOver(e:Event):void {
 				if(e.currentTarget.getStyle('backgroundAlpha')==0) return;
     	    	e.currentTarget.setStyle('backgroundAlpha', 0.8);
-        	    e.currentTarget.getChildren()[0].alpha = 1;         	
 			}
 	        private function onButtonMouseOut(e:Event):void {
 				if(e.currentTarget.getStyle('backgroundAlpha')==0) return;
-    	    	e.currentTarget.setStyle('backgroundAlpha', 0.8);
-        	    e.currentTarget.getChildren()[0].alpha = 0.95;
+    	    	e.currentTarget.setStyle('backgroundAlpha', 1);
 	        }
 		]]>
 	</mx:Script>

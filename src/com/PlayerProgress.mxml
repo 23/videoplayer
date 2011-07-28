@@ -39,10 +39,12 @@
 			backgroundAlpha="1" 
 			/>
 	</mx:Canvas>					
+
 	<mx:Label id="videoTimeLabel" 
-		selectable="false" 
-		fontSize="9"
-		height="11" 
+		selectable="false"
+		fontFamily="Helvetica"
+		fontSize="10"
+		height="17" 
 		color="white"
 		right="0"
 		top="0"
@@ -51,7 +53,7 @@
 
 	<!-- videoTime -->
 	<mx:HBox id="videoDragHandle"
-			 y="{(this.height-videoTimeLabel.height)/2}" 
+			 y="{3+ ((this.height-videoTimeLabel.height)/2)}" 
 			 width="8"
 			 height="6"
 			 x="-8"
@@ -82,7 +84,7 @@
 					if(scrubberStartMouseX<0) return;
 					videoDragHandle.x = scrubberStartX + (e.stageX-scrubberStartMouseX);
 					var x = scrubberStartX + (e.stageX-scrubberStartMouseX);
-					videoTimeLabel.text = formatTime(timeFromPoint(x));
+					videoTimeLabel.text = formatTime(timeFromPoint(x), _targetVideo.totalTime + activeElement.getNumber('start'));
 				});
 				this.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent){
 					if(scrubberStartMouseX<0) return;
@@ -138,7 +140,7 @@
 				videoPlayProgress.width  = _targetVideo.playheadTime/_targetVideo.totalTime*(videoProgress.width-videoPlayProgress.x);
 				if(scrubberStartMouseX<0) {
 					videoDragHandle.x = videoPlayProgress.x + videoPlayProgress.width - 8;
-					videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'));
+					videoTimeLabel.text = formatTime(_targetVideo.playheadTime + activeElement.getNumber('start'), _targetVideo.totalTime + activeElement.getNumber('start'));
 				}
             }
 

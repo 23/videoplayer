@@ -157,13 +157,6 @@ private function prepareSupportedFormats(o:Object):void {
 	if (h264()&&typeof(o.video_1080p_download)!='undefined'&&o.video_1080p_download.length>0) {
 		supportedFormats.push({format:'video_1080p', pseudo:true, label: 'Full HD (1080p)', source:props.get('site_url') + o.video_1080p_download}); 
 	}
-	
-	// We'll want a menu for this
-	var _formats:Array = [];
-	for (var i:Object in supportedFormats) {
-		_formats.push({value:supportedFormats[i].format, label:supportedFormats[i].label});
-	}
-	formatsMenu.options = _formats;	
 }
 public function setVideoFormat(format:String):void {
 	var o:Object = null;

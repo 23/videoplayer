@@ -11,7 +11,7 @@
 	verticalScrollPolicy="off" 
 	horizontalScrollPolicy="off"
 	preloader="preload.CustomPreloader" 
-	backgroundColor="black" 
+	backgroundColor="#cc0000" 
 	width="100%" 
 	height="100%" 
 	creationComplete="init(); resizeTray();" 
@@ -20,14 +20,8 @@
 	>
 	<mx:Style>
      @font-face {
-        src:url("assets/fonts/HelveticaNeue.ttc");
+        src:url("assets/fonts/TazWt05-Regular.otf");
         fontFamily: Helvetica;
-        advancedAntiAliasing: true;
-     }		
-     @font-face {
-        src:url("assets/fonts/HelveticaNeue.ttc");
-        fontFamily: Helvetica;
-        fontWeight: bold;
         advancedAntiAliasing: true;
      }		
      Application {
@@ -57,7 +51,7 @@
 			import mx.events.VideoEvent;
 			
 			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = 'reinvent.23video.com';
+			private var defaultDomain:String = 'video.home.dk';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
@@ -204,18 +198,10 @@
 				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void{infoHide();});
             }             
             private function infoHide():void {
-            	if(props.getNumber('infoTimeout')<=0) return;
-				descriptions.visible = false;
             }
             private function infoShow(timeout:Boolean=true):void {
-            	if(!activeElement.get('hasInfo')) {descriptions.visible = false; return;}
-				infoTimer.stop();
-				descriptions.visible = true;
-				if(timeout) infoTimer.start();
             }
             private function infoToggle():void {				
-				if(descriptions.visible) infoHide();
-				else infoShow(false); // no timeout, since this a manual action
             }
             private function onPlayListDone():void {
             	if(props.get('loop')) { 
@@ -298,7 +284,7 @@
 	
 	<!-- Simple element to provide a backdrop when everything else fails -->
 	<mx:Box id="background" 
-		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}" 
+		backgroundColor="#cc0000" 
 		width="100%" 
 		height="100%" 
 		verticalCenter="0" 
@@ -317,10 +303,12 @@
 		horizontalScrollPolicy="off"
 		>
 	<!-- Image and Video -->
-	<mx:VideoDisplay id="video" 
+	<mx:VideoDisplay id="video"
+		backgroundColor="#c00"
 		autoRewind="false"  
 		maintainAspectRatio="false"  
 		autoPlay="false" 
+		visible="false"
 		volume="1" 
 		horizontalCenter="0" 
 		verticalCenter="0" 
@@ -495,35 +483,6 @@
 		</mx:VBox>
 		<!-- /Embed panel -->
 		
-		<!-- Words panel -->
-		<mx:VBox id="descriptions" 
-			width="100%" 
-			horizontalGap="1" 
-			horizontalScrollPolicy="off" 
-			verticalScrollPolicy="off" 
-			visible="false"
-			backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
-			backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-			includeInLayout="{descriptions.visible}"
-			fontFamily="{props.get('trayFont')}" 
-			color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-			>
-			<mx:Text id="trayContent" 
-				paddingLeft="10" 
-				paddingTop="5" 
-				fontSize="{(props.get('trayContentFontSize') as Number)}" 
-				fontWeight="{props.get('trayContentFontWeight')}" 
-				color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-				htmlText="{activeElement.get('content')}" 
-				truncateToFit="true" 
-				maxWidth="{FlexGlobals.topLevelApplication.width}" 
-				updateComplete="trayContent.visible = (trayContent.text.length>0);" 
-				height="{(props.get('trayContentFontSize') as Number)*4.8}" 
-				width="{descriptions.width - 15}"
-				/>
-		</mx:VBox>
-		<!-- /Words panel -->
-		
 	
 		<mx:VBox 
 			id="videoControls"
@@ -576,19 +535,19 @@
 					<mx:HBox 
 						paddingTop="3"
 						clipContent="false"
-						height="24"
 						width="100%"
+						height="24"
 						horizontalGap="0">
 						<!-- Title -->
 						<mx:Text 
-							text="{activeElement.getString('title').toUpperCase()}"
+							text="{activeElement.getString('title')}"
 							truncateToFit="true"
 							fontSize="{(props.get('trayTitleFontSize') as Number)}" 
 							fontWeight="{props.get('trayTitleFontWeight')}" 
 							color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-							paddingTop="2"
+							paddingTop="4"
 							visible="{video.width-featureButtons.width>100}"
-							height="17"
+							height="25"
 							includeInLayout="true"
 							width="{progressContainer.width-featureButtons.width-13}"
 							/>
@@ -599,36 +558,6 @@
 							paddingTop="2"
 							>
 
-							<!-- FeedPanel -->
-				    		<com:PlayerButton id="feedpanelBtn" 
-				    			imageSource="@Embed(source='assets/buttons/share.swf')"
-				    			visible="{(props.get('showShare') as Boolean)}" 
-				    			click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible;"
-				    			/>
-
-
-				    		<!-- InfoBtn -->
-				    		<com:PlayerButton id="infoImage" 
-				    			imageSource="@Embed(source='assets/buttons/info.swf')"
-				    			visible="{(activeElement.get('hasInfo') as Boolean)}" 
-				    			click="infoToggle();"
-				    			/>
-
-							<!-- HDbutton-->
-							<com:PlayerButton id="hdBtn" 
-							  	imageSource="@Embed(source='assets/buttons/hd.swf')"
-							  	>
-								<com:PlayerMenu 
-									id="formatsMenu"
-									value="{currentVideoFormat}"
-									change="{switchVideoFormat(new String(formatsMenu.value));}"
-									backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
-									backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-									fontFamily="{props.get('trayFont')}" 
-									color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-									/>
-							</com:PlayerButton>
-							
 							<!-- Subtitle button-->
 							<com:PlayerButton id="subtitlesBtn" 
 								imageSource="@Embed(source='assets/buttons/cc.swf')"
@@ -644,24 +573,21 @@
 									/>
 							</com:PlayerButton>
 
-							<!-- Link -->
-				    		<com:PlayerButton id="linkBtn" 
-				    			imageSource="@Embed(source='assets/buttons/link.swf')"
-				    			visible="{(props.get('showShare') as Boolean)}" 
-				    			click="{goToUrl(activeElement.get('link') + '?player_id=' + props.get('player_id'))}"
-				    			/>
-							<!-- Twitter -->
-				    		<com:PlayerButton id="twitterBtn" 
-				    			imageSource="@Embed(source='assets/buttons/twitter.swf')"
-				    			visible="{(props.get('showShare') as Boolean)}" 
-				    			click="{goToUrl(activeElement.get('link') + '/twitter?player_id=' + props.get('player_id'))}"
-				    			/>
-							<!-- Facebook -->
-				    		<com:PlayerButton id="facebookBtn" 
-				    			imageSource="@Embed(source='assets/buttons/facebook.swf')"
-				    			visible="{(props.get('showShare') as Boolean)}" 
-				    			click="{goToUrl(activeElement.get('link') + '/facebook?player_id=' + props.get('player_id'))}"
-				    			/>
+							<!-- Mute -->
+							<com:PlayerButton id="muteImage"
+								imageSource="@Embed(source='assets/buttons/mute-on.swf')"
+								click="{video.volume=0}"
+								visible="{video.volume>0}"
+								includeInLayout="{video.volume>0}"
+								/>
+							<!-- Unmute -->
+							<com:PlayerButton id="unmuteImage"
+								imageSource="@Embed(source='assets/buttons/mute-off.swf')"
+								click="{video.volume = 1}"
+								visible="{video.volume == 0}"
+								includeInLayout="{video.volume == 0}"
+								/>
+
 							<!-- Fullscreen -->
 				    		<com:PlayerButton id="fullscreenImage"
 				    			imageSource="@Embed(source='assets/buttons/fullscreen.swf')"
