@@ -47,12 +47,20 @@ public function reportPlay(event:String, time:Number):void {
 	}
 	var time_total:String = (video.totalTime>0 ? new String(video.totalTime + activeElement.getNumber('start')) : '');
 	var photo_id:int = context.photos[currentElementIndex].photo_id;
+
+	try {
+		ExternalInterface.call('callbackEvent', 'play', expandReportObject({photo_id:photo_id, time_start:time_start, time_end:time_end, time_total:time_total, uuid:uuid}));
+	}catch(e:Error){}
+
 	try {
 		doAPI('/api/analytics/report/play', expandReportObject({photo_id:photo_id, time_start:time_start, time_end:time_end, time_total:time_total, uuid:uuid}), function():void{});
 	} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
 }
 public function reportEvent(event:String):void {
 	var photo_id:int = context.photos[currentElementIndex].photo_id;
+	try {
+		ExternalInterface.call('callbackEvent', event, expandReportObject({photo_id:photo_id, event:event, uuid:uuid}));
+	}catch(e:Error){}
 	try {
 		doAPI('/api/analytics/report/event', expandReportObject({photo_id:photo_id, event:event, uuid:uuid}), function():void{});
 	} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
@@ -62,3 +70,4 @@ public function goToUrl(url:String):void {
 	if(!new RegExp('\:\/\/').test(url)) url = props.get('site_url') + url;
     navigateToURL(new URLRequest(url), "_top");
 }
+

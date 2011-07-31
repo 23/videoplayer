@@ -1,3 +1,9 @@
+import com.ActionButton;
+
+import flash.events.MouseEvent;
+
+import mx.controls.Button;
+
 [Bindable] public var numVideoElements:int = 0;
 [Bindable] public var currentElementIndex:int = 0;
 [Bindable] public var activeElement:HashCollection = new HashCollection();
@@ -33,6 +39,42 @@ private function resetActiveElement():void {
 	activeElement.put('skip', '0');
 }
 
+private var actionsAreDefaults:Boolean = true;
+private function getShareActions():Array {
+	var actions:Array = ['Se boligen hos Home']
+	try {
+		var a:Array = ExternalInterface.call('getActions', activeElement.get('tags'));
+		if(a.length) {
+			actions = a;
+			actionsAreDefaults = false;
+		}
+	}catch(e:Error){}
+	return(actions);
+}
+
+private function callShareAction(index:int):void {
+	if(actionsAreDefaults) {
+		goToActiveElement();
+	} else {
+		try {
+			ExternalInterface.call('callAction', index, activeElement.get('photo_id'), activeElement.get('one'), activeElement.get('tags'));
+		}catch(e:Error){}
+	}
+}
+
+private function buildShareActions():void {
+	sharePanel.removeAllChildren();
+	getShareActions().forEach(function(label:String, index:int, arr:Array):void {
+		var b:ActionButton = new com.ActionButton;
+		b.text = label;
+		var currentIndex:int = index;
+		b.addEventListener(MouseEvent.CLICK, function(e:MouseEvent){
+			callShareAction(currentIndex);
+		});
+		sharePanel.addChild(b);
+	});
+}
+
 private function setActiveElement(i:int, startPlaying:Boolean=false, start:Number=0, skip:int=0, format:String=null):Boolean {
 	if (!context || !context.photos || !context.photos[i]) return(false);
 	clearVideo();
@@ -50,6 +92,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
   	var content:String = o.content_text.replace(new RegExp('(<([^>]+)>)', 'ig'), '');
   	var hasInfo:Boolean =  (props.get('showDescriptions') && (title.length>0 || content.length>0));
   	activeElement.put('photo_id', o.photo_id);
+	activeElement.put('tags', o.tags);
   	activeElement.put('title', title);
   	activeElement.put('content', content);
   	activeElement.put('hasInfo', hasInfo);
@@ -130,6 +173,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	// We want the tray and possible the info box to show up when a new element starts playing
 	infoShow();
 	trayShow();
+	buildShareActions();
 
 	// Note that we've loaded the video 
 	reportEvent('load');

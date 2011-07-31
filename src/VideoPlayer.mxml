@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
-  Squares for 23
-  Benjamin Bernhard, benjamin@23company.com
-  Steffen Tiedemann Christensen, steffen@23company.com
+  Home
+
+  - Gemius
 -->
 <mx:Application 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
@@ -21,11 +21,11 @@
 	<mx:Style>
      @font-face {
         src:url("assets/fonts/TazWt05-Regular.otf");
-        fontFamily: Helvetica;
+        fontFamily: Taz;
         advancedAntiAliasing: true;
      }		
      Application {
-     	fontFamily: Helvetica;
+     	fontFamily: Taz;
      }
 	</mx:Style>
  	<mx:Script source="Utility.as"></mx:Script>
@@ -228,12 +228,15 @@
 				}
 				
 				if(evt.currentTarget.state==VideoEvent.PLAYING || evt.currentTarget.state==VideoEvent.SEEKING) {
+					sharePanel.visible = false;
 					cleanVideoState = 'playing';
 					playListHide();
 				} else if(evt.currentTarget.state==VideoEvent.LOADING || evt.currentTarget.state==VideoEvent.BUFFERING) {
+					sharePanel.visible = false;
 					cleanVideoState = 'buffering';
 					playListHide();
 				} else if(evt.currentTarget.state==VideoEvent.DISCONNECTED || evt.currentTarget.state==VideoEvent.COMPLETE || evt.currentTarget.state==VideoEvent.PAUSED || evt.currentTarget.state==VideoEvent.STOPPED) {
+					sharePanel.visible = true;
 					cleanVideoState = 'paused';
 					if (identityVideo.visible==false) playListShow();
 				}
@@ -252,6 +255,7 @@
             }
             private function onVideoComplete(ignoreIdentity:Boolean=false):void {
 				reportPlay('end', video.playheadTime);
+				sharePanel.visible = true;
      			if(!ignoreIdentity) return(handleIdentity('after', function():void {onVideoComplete(true);}));
             	if(props.get('loop')) {
             		var more:Boolean = nextElement();
@@ -271,8 +275,6 @@
 	            	
 	            	// Tray
 	            	tray.width = video.width-20;
-	            	// Sharing
-	            	embedPanel.width = tray.width;
 	            	// Progress etc
 	            	progressContainer.width = tray.width-61;
 
@@ -347,7 +349,7 @@
 		imageHeight="30"
 		verticalCenter="0" 
 		horizontalCenter="0" 
-		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
+		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing &amp;&amp; !sharePanel.visible)}" 
 		click="playVideoElement()"
 		/>
  	
@@ -373,7 +375,7 @@
 		buttonMode="true"
 		/>
 	<com:OverlayMessage id="identityMessage"
-		fontFamily="{props.get('trayFont')}" 
+		fontFamily="Taz" 
 		color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 		backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 		visible="{props.get('identityCountdown') &amp;&amp; identityVideo.visible}"
@@ -443,50 +445,9 @@
 		</mx:Canvas>					
 		<!-- /PlayList -->
 
-		<!-- Embed panel -->
-		<mx:VBox 
-			id="embedPanel" 
-			width="100%" 
-			horizontalGap="1" 
-			height="68" 
-			backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
-			backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-			paddingLeft="10" 
-			paddingRight="10" 
-			paddingTop="5" 
-			verticalGap="3" 
-			horizontalScrollPolicy="off" 
-			verticalScrollPolicy="off" 
-			visible="false"
-			includeInLayout="{embedPanel.visible}"
-			show="{reportEvent('shareEngaged');}"
-			>
-			<mx:Text 
-				text="EMBED"
-				color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-				fontSize="{(props.get('trayTitleFontSize') as Number)}" 
-				fontWeight="{props.get('trayTitleFontWeight')}" 
-				/>
-			<mx:TextArea 
-				id="embedText" 
-				height="21" 
-				width="100%" 
-				color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-				backgroundColor="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-				backgroundAlpha="0.15" 
-				text="{props.get('embedCode')}" 
-				click="{reportEvent('embedEngaged'); embedText.setFocus(); embedText.selectionBeginIndex = 0; embedText.selectionEndIndex = embedText.text.length;}" 
-				borderStyle="none" 
-				paddingTop="2" 
-				paddingLeft="2" 
-				fontSize="11" /> 
-		</mx:VBox>
-		<!-- /Embed panel -->
-		
-	
 		<mx:VBox 
 			id="videoControls"
-			verticalGap="0" hide="embedPanel.visible=false;"
+			verticalGap="0" hide="sharePanel.visible=false;"
 			 horizontalScrollPolicy="off" verticalScrollPolicy="off">
 			<mx:HBox
 				horizontalGap="1" 
@@ -542,16 +503,16 @@
 						<mx:Text 
 							text="{activeElement.getString('title')}"
 							truncateToFit="true"
-							fontSize="{(props.get('trayTitleFontSize') as Number)}" 
-							fontWeight="{props.get('trayTitleFontWeight')}" 
+							fontSize="17" 
+							fontWeight="normal"
+							fontFamily="Taz"
 							color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
-							paddingTop="4"
+							paddingTop="1"
 							visible="{video.width-featureButtons.width>100}"
 							height="25"
 							includeInLayout="true"
 							width="{progressContainer.width-featureButtons.width-13}"
 							/>
-
 						<mx:HBox
 							id="featureButtons"
 							horizontalGap="0"
@@ -568,7 +529,7 @@
 									change="{subtitles.locale=new String(subtitlesMenu.value);}"
 									backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
 									backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
-									fontFamily="{props.get('trayFont')}" 
+									fontFamily="Taz" 
 									color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 									/>
 							</com:PlayerButton>
@@ -624,22 +585,25 @@
 			paddingBottom="20"
 			click="{reportEvent('callToActionClick');}"
 			/>
-		<mx:HBox 
-			visible="{(props.get('showShare') as Boolean)}"
-			width="100%"
-			paddingTop="10" 
-			borderColor="#666666"
-			borderStyle="solid"
-			borderSides="top"
-			borderThickness="1"
-			>
-			<com:ActionButton
-				text="Share this video" 
-				iconSource="@Embed(source='assets/buttons/share.swf')"
-				click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible; identityPanel.close();"
-				/>
-		</mx:HBox>
 	</com:TextPanel> 
 	<!-- / Text panel for post-roll -->
+		
+	<!-- Share panel -->
+	<mx:Tile 
+		id="sharePanel"
+		horizontalScrollPolicy="off" 
+		verticalScrollPolicy="off" 
+		visible="false"
+		includeInLayout="{sharePanel.visible}"
+		show="{reportEvent('shareEngaged');}"
+		verticalCenter="0"
+		horizontalCenter="0"
+		horizontalGap="-17"
+		verticalGap="0"
+		maxWidth="350"
+		>
+	</mx:Tile>
+	<!-- /Share panel -->
+		
 </mx:Canvas>
 </mx:Application>
