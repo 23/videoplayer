@@ -40,7 +40,7 @@
 			import mx.events.VideoEvent;
 			
 			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = 'reinvent.23video.com';
+			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
@@ -211,15 +211,17 @@
 			private function onVideoStateChange(evt:VideoEvent):void {
 				// Flex VideoDisplay shows weird stuff during seek; to avoid this,
 				// we show a bitmap snapshot from the video during seek and wait for playing
-				if (evt.currentTarget.state==VideoEvent.PAUSED || evt.currentTarget.state==VideoEvent.STOPPED) {
-					var bmData:BitmapData = new BitmapData(video.width, video.height);  
-					bmData.draw(video as DisplayObject);  
-					var bm:Bitmap = new Bitmap(bmData);  
-					videoShadow.source = bm;
-				} else if (evt.currentTarget.state==VideoEvent.LOADING) {
-					videoShadow.visible = true;
-				} else if (evt.currentTarget.state==VideoEvent.PLAYING) {
-					videoShadow.visible = false;
+				if(!activeElement.getBoolean('live')) {
+					if (evt.currentTarget.state==VideoEvent.PAUSED || evt.currentTarget.state==VideoEvent.STOPPED) {
+						var bmData:BitmapData = new BitmapData(video.width, video.height);  
+						bmData.draw(video as DisplayObject);  
+						var bm:Bitmap = new Bitmap(bmData);  
+						videoShadow.source = bm;
+					} else if (evt.currentTarget.state==VideoEvent.LOADING) {
+						videoShadow.visible = true;
+					} else if (evt.currentTarget.state==VideoEvent.PLAYING) {
+						videoShadow.visible = false;
+					}
 				}
 				
 				if(evt.currentTarget.state==VideoEvent.PLAYING || evt.currentTarget.state==VideoEvent.SEEKING) {
@@ -290,8 +292,9 @@
 	<mx:VideoDisplay id="video" 
 		autoRewind="false"  
 		maintainAspectRatio="false"  
-		autoPlay="false" 
 		volume="1" 
+		live="{activeElement.getBoolean('live')}"
+		autoPlay="true"
 		horizontalCenter="0" 
 		verticalCenter="0" 
 		bufferTime="2"
@@ -487,7 +490,7 @@
 					<!-- Progress bar -->
 					<com:PlayerProgress id="progress"
 						targetVideo="{video}"
-						visible="{video.visible}" 
+						visible="{video.visible &amp;&amp; !activeElement.getBoolean('live')}" 
 						/>
 
 					<!-- Right Panel -->
@@ -579,6 +582,23 @@
 			    			visible="{(props.get('showShare') as Boolean)}" 
 			    			click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible;"
 			    			/>
+
+						
+						<!-- Live streams -->
+						<com:PlayerButton id="liveStreamsBtn" 
+							imageSource="@Embed(source='assets/buttons/cc.swf')"
+							visible="false"
+							>
+							<com:PlayerMenu 
+								id="liveStreamsMenu"
+								change="{setActiveElementToLiveStream(liveStreamsMenu.value, true)}"
+								showOneItemMenus="true"
+								backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+								backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+								fontFamily="{props.get('trayFont')}" 
+								color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+								/>
+						</com:PlayerButton>
 					</mx:HBox>
 				</mx:Canvas>
 			</mx:HBox>

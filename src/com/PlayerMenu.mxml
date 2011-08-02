@@ -25,6 +25,8 @@
 			[Embed("assets/buttons/notSelectedIcon.png")] public var notSelectedIcon:Class;
 			[Embed("assets/buttons/selectedIcon.png")] public var selectedIcon:Class;
 			
+			public var showOneItemMenus:Boolean = false;
+
 			// Options
 			private var _options:Array = [];
 			public var orderFromBottom:Boolean = true;
@@ -61,7 +63,7 @@
 			// Build content
 			private function draw():void {
 				// Only show button if there are more than one option
-				this.parent.visible = (_options.length>1);
+				this.parent.visible = ((showOneItemMenus&&_options.length>0) || (_options.length>1));
 				
 				container.removeAllChildren();
 				var _o:Array = (orderFromBottom ? _options.reverse() : _options);

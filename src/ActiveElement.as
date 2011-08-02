@@ -32,14 +32,65 @@ private function resetActiveElement():void {
 	activeElement.put('length', '0');
 	activeElement.put('start', '0');
 	activeElement.put('skip', '0');
-}
-
-private function setActiveElement(i:int, startPlaying:Boolean=false, start:Number=0, skip:int=0, format:String=null):Boolean {
-	if (!context || !context.photos || !context.photos[i]) return(false);
+	activeElement.put('live', false);
+	
+	// Reset other stuff related to the active video
 	clearVideo();
 	identityVideo.visible = false;
 	identityVideo.close();
 	showBeforeIdentity = true;
+	progress.setSections([]);
+	subtitles.suppportedLocales = {}; subtitlesMenu.options = [];
+	video.autoPlay = false;
+}
+
+private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolean=false):void {
+	resetActiveElement();
+
+	// Handle video title and description
+	//video.autoPlay = (props.get('autoPlay') || props.get('loop') || startPlaying);  // autoPlay=true is the best way to start an RTMP live stream in a fitting manner
+	//video.autoPlay = true;
+	var title:String = stream.name.replace(new RegExp('(<([^>]+)>)', 'ig'), '');
+	activeElement.put('video_p', true);
+	activeElement.put('photo_id', stream.liveevent_stream_id);
+	activeElement.put('title', title);
+	activeElement.put('content', "");
+	activeElement.put('hasInfo', false);
+	activeElement.put('link', stream.one);
+	activeElement.put('length', 0); 
+	activeElement.put('start', 0);
+	activeElement.put('skip', false);
+	activeElement.put('live', true);
+	supportedFormats = ['live'];
+	formatsMenu.options = [];
+	activeElement.put('videoSource', stream.rtmp_stream);
+	video.source = stream.rtmp_stream;
+	video.play();
+	
+	// Link back to the video
+	activeElement.put('one', props.get('site_url') + stream.one); 
+	// Photo source
+	activeElement.put('aspectRatio', 4/3);
+	
+	image.source = null;
+	showVideoElement();
+	
+	// Make embed code current
+	updateCurrentVideoEmbedCode();
+	
+	// We want the tray and possible the info box to show up when a new element starts playing
+	infoShow();
+	trayShow();
+	
+	// Note that we've loaded the video 
+	reportEvent('load');
+
+}
+
+private function setActiveElement(i:int, startPlaying:Boolean=false, start:Number=0, skip:int=0, format:String=null):Boolean {
+	if (!context || !context.photos || !context.photos[i]) return(false);
+	resetActiveElement();
+
 	numVideoElements = context.photos.length;
 	currentElementIndex = i;
 	var o:Object = context.photos[i];

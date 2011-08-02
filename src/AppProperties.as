@@ -41,6 +41,7 @@ public var propDefaults:Object = {
 	subtitlesOnByDefault: false,
 	subtitlesDesign: 'bars',
 	playlistClickMode:'link',
+	enableLiveStreams: true,
 	
 	start: parseFloat('0'),
 	player_id: parseFloat('0'),
@@ -159,6 +160,34 @@ private function initProperties(settings:Object):void {
 	
 	// Should we start by playing HD? 
 	if(props.get('playHD')) currentVideoFormat = 'video_hd';
+
+	// Load up featured live streams
+	if(props.get('enableLiveStreams')) {
+		var streamOptions:Object = {};
+		if (FlexGlobals.topLevelApplication.parameters['liveevent_id']) {
+			streamOptions = {
+				liveevent_id: FlexGlobals.topLevelApplication.parameters['liveevent_id'],
+				token: (FlexGlobals.topLevelApplication.parameters['token'] ? FlexGlobals.topLevelApplication.parameters['token'] : '')
+			}
+		} else {
+			streamOptions = {featured_p:1};
+		}
+		liveStreamsMenu.options = [];
+		liveStreamsMenu.value = null;
+		try {
+			doAPI('/api/liveevent/stream/list', streamOptions, function(s:Object):void{
+				var streams:Array = s.streams;
+				if(streams.length) {
+					var streamMenu:Array = [];
+					streams.forEach(function(stream:Object, i:int, ignore:Object):void{
+						streamMenu.push({value:stream, label:stream.name});
+					});
+					liveStreamsMenu.options = streamMenu;
+					//liveStreamsMenu.value = currentLiveStreamId;
+				}
+			});
+		} catch(e:Error) {}
+	}
 }
 
 private function getRecommendationSource():String {
