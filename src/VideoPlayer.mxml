@@ -60,6 +60,9 @@
 			private var context:Object = {};
 			private var recommendations:Object = {};
 			
+			import com.Gemius;
+			private var gemiusStream:Gemius;
+			
 			private var playList: PlayList;
 			[Bindable] private var enablePlayList: Boolean = false;		
 			[Bindable] private var showPlayList: Boolean = false;
@@ -91,6 +94,9 @@
 				try {if(video.playing) reportPlay('end', video.playheadTime)} catch(e:Error){}
 			}
 			public function load():void {
+				// Power up Gemius tracking
+				gemiusStream = new Gemius(video, 'ctfln4rzLbPa3E3Qgz.Iw3YYj1g1L1sfgi9rijsPotX.g7');
+				
 				// Are we using a specific player, or just the default? (if so, we want to specify the player id to get the correct video settings)
 				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(FlexGlobals.topLevelApplication.url);
 				if (testCustomPlayer && testCustomPlayer.length>1) playerId = testCustomPlayer[1]; 
