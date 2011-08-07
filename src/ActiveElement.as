@@ -117,7 +117,10 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	activeElement.put('afterDownloadUrl', props.get('site_url') + o.after_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
 	activeElement.put('afterLink', o.after_link);
 	activeElement.put('afterText', o.after_text); 
-	
+
+	// Notify Gemius about the new content
+	gemiusStream.newStream(o.photo_id, title, o.album_title||'Default', o.video_length, props.get('autoPlay') || props.get('loop'));  
+
 	// Get sections and show, otherwise reset
 	if(!skip) {
 		if(o.subtitles_p && props.get('enableSubtitles')) {
