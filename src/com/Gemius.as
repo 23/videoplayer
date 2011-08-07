@@ -23,9 +23,8 @@
 
 package com {
 	import flash.events.ErrorEvent;
-	
+	import flash.events.Event;
 	import gemius.gSmConnectorMediator;
-	
 	import mx.events.VideoEvent;
 
 	public class Gemius {
@@ -43,36 +42,30 @@ package com {
 		private var contentChannel:String;
 		private var contentTotalTime:Number;
 		private var contentAutoStart:Boolean;
-		private var video:VideoDisplay;
+		public var videoComponent:VideoDisplay;
 		
 		import mx.controls.VideoDisplay;
 		
 		// Constructor for the Flex component
-		public function Gemius(videoDisplay:VideoDisplay, identifier:String, hitcollector:String = 'gadk.hit.gemius.pl', publisherID:String = '000') {
+		public function Gemius(video:VideoDisplay, identifier:String, hitcollector:String = 'gadk.hit.gemius.pl', publisherID:String = '000') {
 			super();
-			
+
 			// Store public properties
 			gemiusIdentifier = identifier;
 			gemiusHitcollector = hitcollector;
 			publisherID = gemiusPublisherID;
-			video = videoDisplay;
+			videoComponent = video;
 			// Power the stream mediator
 			gSmConnectorMediator.setEncoding("utf-8");
 			gSmConnectorMediator.setGSMIdentifier(gemiusIdentifier);
 			gSmConnectorMediator.setGSMHitcollector(gemiusHitcollector);
 			
-			trace(video.source);
-			trace(video.addEventListener);
-			try {
-				video.addEventListener(VideoEvent.CLOSE, function():void{closeStream();});
-				video.addEventListener(VideoEvent.BUFFERING, function():void{event('buffering');});
-				video.addEventListener(VideoEvent.COMPLETE, function():void{event('complete');});
-				video.addEventListener(VideoEvent.LOADING, function():void{event('seekingStarted');});
-				video.addEventListener(VideoEvent.PAUSED, function():void{event('paused');});
-				video.addEventListener(VideoEvent.PLAYING, function():void{event('playing');});
-				video.addEventListener(VideoEvent.SEEKING, function():void{event('seekingStarted');});
-				video.addEventListener(VideoEvent.STOPPED, function():void{event('stopped');});
-			}catch(e:ErrorEvent){trace(e);}
+			videoComponent.addEventListener(VideoEvent.COMPLETE, function(e:VideoEvent):void{
+					closeStream();
+				});
+			videoComponent.addEventListener(VideoEvent.STATE_CHANGE, function(e:VideoEvent):void{
+					event(e.state!='seeking' ? e.state : 'seekingStarted');
+				});
 		}
 
 		public function newStream(id:int, title:String = '', channel:String = 'Default', totalTime:Number = 0, autoStart:Boolean = false):void {
@@ -80,7 +73,7 @@ package com {
 			contentID = id;
 			contentTitle = title;
 			contentChannel = channel;
-			contentTotalTime = totalTime||video.totalTime;
+			contentTotalTime = totalTime||videoComponent.totalTime;
 			contentAutoStart = autoStart;
 
 			// Properties about the player and it's material
@@ -93,20 +86,18 @@ package com {
 			customPackage.push({name:"PROGRAMME", value:contentChannel.toLocaleUpperCase()});
 
 			// Report that there's a new stream
-			trace('Gemius new');
+			trace('Gemius: newStream()');
 			gSmConnectorMediator.newStream(playerId, materialIdentifier, contentTotalTime, customPackage, [], []);
-			event('playing');
 		}  
 
 		public function closeStream():void {
-			trace('Gemius close');
-			gSmConnectorMediator.closeStream(playerId, materialIdentifier, video.playheadTime+videoStartOffset);
+			trace('Gemius: closeStream()/complete event');
+			gSmConnectorMediator.closeStream(playerId, materialIdentifier, videoComponent.playheadTime+videoStartOffset);
 		}
 		public function event(event:String):void {
-			try {
-				trace('Gemius: ' + event);
-				gSmConnectorMediator.event(playerId, materialIdentifier, video.playheadTime+videoStartOffset, event);
-			}catch(e:ErrorEvent){trace(e);}
+			var time:Number = videoComponent.playheadTime+videoStartOffset;
+			trace('Gemius: ' + event + ' event at ' + time);
+			gSmConnectorMediator.event(playerId, materialIdentifier, time, event);
 		}
 	}
 }
