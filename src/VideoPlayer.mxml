@@ -93,7 +93,7 @@
 			}
 			public function load():void {
 				// Power up Gemius tracking
-				gemiusStream = new Gemius(video, 'ctfln4rzLbPa3E3Qgz.Iw3YYj1g1L1sfgi9rijsPotX.g7');
+				gemiusStream = new Gemius(video, 'bOE1NNQBlQSFJlESPDNFJ.Vm3_MFCi_21fwGO3bm2vj.m7', 'sdk.hit.gemius.pl', '028');
 				
 				// Are we using a specific player, or just the default? (if so, we want to specify the player id to get the correct video settings)
 				var testCustomPlayer:Array = new RegExp('/([0-9]+)\.swf').exec(FlexGlobals.topLevelApplication.url);
