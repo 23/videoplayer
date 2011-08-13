@@ -1,7 +1,3 @@
-// TODO:
-// - Live stream menu, not selected
-// - Image previews
-
 package com.visual {
 	import flash.events.AsyncErrorEvent;
 	import flash.events.ErrorEvent;
@@ -28,22 +24,13 @@ package com.visual {
 	[Event(name="volumeChanged", type="mx.events.VideoEvent")]
 	
 	public class VisualVideo extends UIComponent {
-		// CONSTANTS
-		public static const DISCONNECTED:String = "disconnected";
-		public static const STOPPED:String = "stopped";
-		public static const PLAYING:String = "playing";
-		public static const PAUSED:String = "paused";
-		public static const BUFFERING:String = "buffering";
-		public static const LOADING:String = "loading";
-		public static const CONNECTION_ERROR:String = "connectionError";
-		public static const SEEKING:String = "seeking";
-
 		// Public properties to play around with
 		public var video:Video = new Video();
 		public var connection:NetConnection = new NetConnection();
 		public var stream:NetStream;
 		public var fcSubscribeCount:int = 0;
 		public var fcSubscribeMaxRetries:int = 3;
+		private var isPlaying:Boolean = false;
 		
 		// Constructor method
 		public function VisualVideo() {
@@ -57,7 +44,7 @@ package com.visual {
 		}
 
 		// READ-ONLY PROPERTIES
-		public function get playing():Boolean {return(state==PLAYING);}
+		public function get playing():Boolean {return(this.state==VideoEvent.PLAYING);}
 		private var _totalTime:Number = 0; 
 		public function get totalTime():Number {return(_totalTime);}
 		public function get bytesLoaded():Number {return(this.stream ? this.stream.bytesLoaded : 0);}
@@ -124,10 +111,10 @@ package com.visual {
 		public function get source():String {return(_source);}
 		public function set source(s:String):void {
 			if(_source==s) return;
-			//trace((new Date), "Swich source from", _source, 'to', s);
+			trace((new Date), "Swich source from", _source, 'to', s);
 			_source=s;
 			reset();
-			//trace((new Date), 'Done switching source');
+			trace((new Date), 'Done switching source');
 		}
 		
 		public function get playheadTime():Number {return(this.stream ? this.stream.time : 0);}
@@ -138,7 +125,7 @@ package com.visual {
 			this.stream.seek(pht);
 		} 
 		
-		private var _state:String = DISCONNECTED;
+		private var _state:String = VideoEvent.DISCONNECTED;
 		public function get state():String {return(_state);}
 		public function set state(s:String):void {
 			_state = s;
@@ -148,33 +135,34 @@ package com.visual {
 		// PUBLIC METHODS
 		public function close():void {this.stop();}
 		public function stop():void {
-			//trace((new Date), 'stop()');
+			trace((new Date), 'stop()');
 			if(this.stream) {
 				this.stream.pause();
 				this.stream.close();
-				this.state = STOPPED;
+				this.state = VideoEvent.STOPPED;
 			}
 		}
 		public function play():void {
-			//trace((new Date), 'play()');
+			trace((new Date), 'play()');
 			if(!this.connection.connected) {
-				//trace((new Date), 'play() -> not connected');
+				trace((new Date), 'play() -> not connected');
 				connect();
 			} if(this.stream) {
 				this.stream.resume();
+				this.state = VideoEvent.PLAYING;
 			}
 		}
 		public function pause():void {
-			//trace((new Date), 'pause()');
+			trace((new Date), 'pause()');
 			if(this.stream) {
 				this.stream.pause();
-				this.state = PAUSED;
+				this.state = VideoEvent.PAUSED;
 			}
 		}
 
 		// STREAM EVENTS AND LOGIC
 		private function reset():void {
-			//trace((new Date), 'reset()');
+			trace((new Date), 'reset()');
 			stop();
 			// Reset progress
 			_totalTime = 0;
@@ -193,14 +181,14 @@ package com.visual {
 			this.connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, netSecurityErrorHandler);
 		}
 		private function connect():void {
-			//trace((new Date), 'connect()');
+			trace((new Date), 'connect()');
 			reset();
-			this.state = LOADING;
+			this.state = VideoEvent.LOADING;
 			this.fcSubscribeCount = 0;
 			this.connection.connect(this.streamURL);
 		}
 		private function attachStreamToVideo():void {
-			//trace((new Date), 'attachStreamToVideo()');
+			trace((new Date), 'attachStreamToVideo()');
 			this.addChild(this.video);
 			this.stream = new NetStream(this.connection);
 			this.stream.soundTransform = new SoundTransform(_volume);
@@ -211,19 +199,19 @@ package com.visual {
 			this.stream.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
 			this.video.attachNetStream(this.stream);
 			this.video.visible = true;
-			this.state = BUFFERING;
+			this.state = VideoEvent.BUFFERING;
 			this.stream.play(this.streamName);
 			matchVideoSize();
 		}
 		private function subscribe():void {
-			//trace((new Date), 'FCSubscribe()');
+			trace((new Date), 'FCSubscribe()');
 			this.connection.call("FCSubscribe", null, this.streamName);
 		}
 
 		private var defaultClient:Object = (function(context:Object):Object {
 			return {
 				onFCSubscribe:function(info:Object):void{
-					//trace((new Date), 'onFCSubscribe', info.code);
+					trace((new Date), 'onFCSubscribe', info.code);
 					switch(info.code){
 						case "NetStream.Play.StreamNotFound":
 							if(fcSubscribeCount >= fcSubscribeMaxRetries){
@@ -255,11 +243,11 @@ package com.visual {
 		})(this);
 		
 		private function genericErrorEvent(event:Event):void {
-			//trace('Error', event.type);
-			this.state = CONNECTION_ERROR;
+			trace('Error', event.type);
+			this.state = VideoEvent.CONNECTION_ERROR;
 		}
 		private function netStatusHandler(event:NetStatusEvent):void {
-			//trace((new Date), 'netStatusHandler + ' + event.info.code);
+			trace((new Date), 'netStatusHandler + ' + event.info.code);
 			switch (event.info.code) {
 				case "NetConnection.Connect.Rejected":
 				case "NetConnection.Connect.IdleTimeout":
@@ -269,13 +257,13 @@ package com.visual {
 				case "NetStream.Failed":
 				case "NetStream.Play.Failed":
 				case "NetStream.Play.StreamNotFound":
-					this.state = CONNECTION_ERROR;
+					this.state = VideoEvent.CONNECTION_ERROR;
 					break;
 				case "NetConnection.Connect.Closed":
-					this.state = DISCONNECTED;
+					this.state = VideoEvent.DISCONNECTED;
 					break;
 				case "NetConnection.Connect.Success":
-					this.state = LOADING;
+					this.state = VideoEvent.LOADING;
 					if(this.isRTMP) {
 						subscribe();
 					} else {
@@ -283,20 +271,26 @@ package com.visual {
 					}
 					break;
 				case "NetStream.Buffer.Empty":
-					this.state = BUFFERING;
+					if(isPlaying) this.state = VideoEvent.BUFFERING;
 					break;
 				case "NetStream.Seek.Notify":
 				case "NetStream.Unpause.Notify":
 				case "NetStream.Buffer.Full":
 					break;
 				case "NetStream.Play.Start":
-					this.state = PLAYING;
+					isPlaying = true;
+					this.state = VideoEvent.PLAYING;
 					break;
 				case "NetStream.Pause.Notify":
-					this.state = PAUSED;
+					isPlaying = false;
+					this.state = VideoEvent.PAUSED;
 					break;
 				case "NetStream.Play.Stop":
-					this.state = STOPPED;
+					isPlaying = false;
+					this.state = VideoEvent.STOPPED;
+					if(this.stream && totalTime>0 && this.stream.time>=(totalTime-0.5)) {
+						dispatchVideoEvent(VideoEvent.COMPLETE);
+					}
 					break;
 			}
 		}			
@@ -310,7 +304,7 @@ package com.visual {
 		
 		// Match size of video to the container
 		private function matchVideoSize(e:ResizeEvent=null):void {
-			//trace((new Date), 'matchVideoSize()')
+			trace((new Date), 'matchVideoSize()')
 			if(this&&this.width) {
 				_aspectRatio = (_userAspectRatio && _userAspectRatio>0 ? _userAspectRatio : _videoAspectRatio);
 				var stageAspectRatio:Number = this.width/this.height;
@@ -325,7 +319,7 @@ package com.visual {
 					video.x = 0;
 					video.y = (this.height-video.height)/2;
 				}
-				//trace((new Date), 'matchVideoSize() -> resizing', video.width, video.height)
+				trace((new Date), 'matchVideoSize() -> resizing', video.width, video.height)
 			}
 		}
 		// Handle progress bar
@@ -340,7 +334,7 @@ package com.visual {
 			// don't like my scrubber jumping back when switching streams. Fugly.
 			if(this.stream.time > 0 && this.stream.time != _lastProgressTime) {
 				dispatchVideoEvent(VideoEvent.PLAYHEAD_UPDATE);
-			}
+			}			
 			_lastProgressBytes = this.stream.bytesLoaded;
 			_lastProgressTime = this.stream.time;
 		}
