@@ -69,6 +69,7 @@ private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolea
 	image.source = null;
 	showVideoElement();
 	if(startPlaying) playVideoElement();
+	progress.visible = false;
 
 	// Aspect ratios
 	activeElement.put('aspectRatio', 1);
