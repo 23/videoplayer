@@ -63,10 +63,10 @@ private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolea
 	activeElement.put('one', props.get('site_url') + stream.one); 
 	supportedFormats = ['live'];
 	formatsMenu.options = [];
+	activeElement.put('photoSource', null);
 	activeElement.put('videoSource', stream.rtmp_stream);
 	video.source = getFullVideoSource();
 	
-	image.source = null;
 	showVideoElement();
 	if(startPlaying) playVideoElement();
 
