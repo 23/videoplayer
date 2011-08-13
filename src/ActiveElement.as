@@ -69,7 +69,6 @@ private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolea
 	image.source = null;
 	showVideoElement();
 	if(startPlaying) playVideoElement();
-	progress.visible = false;
 
 	// Aspect ratios
 	activeElement.put('aspectRatio', 1);
@@ -290,7 +289,8 @@ private function showImageElement():void {
 }
 private function showVideoElement():void {
 	video.visible=false;
-	videoControls.visible=progress.visible=true;
+	videoControls.visible=true;
+	progress.visible=(!video.isLive);
 	
 	image.source = activeElement.get('photoSource');
 	image.visible=true;
@@ -300,7 +300,8 @@ public function playVideoElement():void {
 	if(!activeElement.get('video_p')) return;
 	image.visible=false;
 	video.visible=true;
-	videoControls.visible=progress.visible=true;
+	videoControls.visible=true;
+	progress.visible=(!video.isLive);
 	video.source = getFullVideoSource();
 	if(showBeforeIdentity) {
 		// For some reason, this seems to trigger pre-buffering of the video; which is good.
