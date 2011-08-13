@@ -183,7 +183,6 @@ private function initProperties(settings:Object):void {
 						streamMenu.push({value:stream, label:stream.name});
 					});
 					liveStreamsMenu.options = streamMenu;
-					//liveStreamsMenu.value = currentLiveStreamId;
 				}
 			});
 		} catch(e:Error) {}

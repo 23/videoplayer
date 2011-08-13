@@ -1,3 +1,4 @@
+import flash.events.ErrorEvent;
 import mx.events.VideoEvent;
 [Bindable] public var numVideoElements:int = 0;
 [Bindable] public var currentElementIndex:int = 0;
@@ -41,15 +42,13 @@ private function resetActiveElement():void {
 	showBeforeIdentity = true;
 	progress.setSections([]);
 	subtitles.suppportedLocales = {}; subtitlesMenu.options = [];
-	video.autoPlay = false;
+	liveStreamsMenu.value = null;
 }
 
-private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolean=false):void {
+private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolean=true):void {
 	resetActiveElement();
 
 	// Handle video title and description
-	//video.autoPlay = (props.get('autoPlay') || props.get('loop') || startPlaying);  // autoPlay=true is the best way to start an RTMP live stream in a fitting manner
-	//video.autoPlay = true;
 	var title:String = stream.name.replace(new RegExp('(<([^>]+)>)', 'ig'), '');
 	activeElement.put('video_p', true);
 	activeElement.put('photo_id', stream.liveevent_stream_id);
@@ -61,19 +60,19 @@ private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolea
 	activeElement.put('start', 0);
 	activeElement.put('skip', false);
 	activeElement.put('live', true);
+	activeElement.put('one', props.get('site_url') + stream.one); 
 	supportedFormats = ['live'];
 	formatsMenu.options = [];
 	activeElement.put('videoSource', stream.rtmp_stream);
-	video.source = stream.rtmp_stream;
-	video.play();
-	
-	// Link back to the video
-	activeElement.put('one', props.get('site_url') + stream.one); 
-	// Photo source
-	activeElement.put('aspectRatio', 4/3);
+	video.source = getFullVideoSource();
 	
 	image.source = null;
 	showVideoElement();
+	if(startPlaying) playVideoElement();
+
+	// Aspect ratios
+	activeElement.put('aspectRatio', 1);
+	video.aspectRatio = identityVideo.aspectRatio = 0;
 	
 	// Make embed code current
 	updateCurrentVideoEmbedCode();
@@ -166,7 +165,13 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
   	activeElement.put('photoSource', props.get('site_url') + o.large_download);
   	activeElement.put('photoWidth', new Number(o.large_width));
   	activeElement.put('photoHeight', new Number(o.large_height));
-  	activeElement.put('aspectRatio', parseInt(o.large_width) / parseInt(o.large_height));
+	
+	// Aspect ratios
+	var ar:Number = parseInt(o.large_width) / parseInt(o.large_height);
+  	activeElement.put('aspectRatio', ar);
+	video.aspectRatio = ar;
+	identityVideo.aspectRatio = (props.getBoolean('maintainIdentityAspectRatio') ? 0 : ar)
+	
  
  	if(video_p) {
  		image.source = null;
@@ -308,8 +313,9 @@ public function playVideoElement():void {
 	video.play();
 }
 private function pauseVideoElement():void {
-	playVideoElement();
-	video.pause();
+	try {
+		video.pause();
+	}catch(e:ErrorEvent){}
 }
 
 private function getFullVideoSource():String {

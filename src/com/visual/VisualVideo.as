@@ -105,8 +105,8 @@ package com.visual {
 		public function set bufferTime(bt:int):void {if(_bufferTime>0) {_bufferTime=bt;}}
 
 		private var _aspectRatio:Number = 1; 
-		private var _userAspectRatio:Number; 
-		private var _videoAspectRatio:Number; 
+		private var _userAspectRatio:Number = 0; 
+		private var _videoAspectRatio:Number = 16/9; 
 		public function get aspectRatio():Number {return(_aspectRatio);}
 		public function set aspectRatio(ar:Number):void {_userAspectRatio=ar; matchVideoSize();}
 
@@ -312,7 +312,7 @@ package com.visual {
 		private function matchVideoSize(e:ResizeEvent=null):void {
 			//trace((new Date), 'matchVideoSize()')
 			if(this&&this.width) {
-				_aspectRatio = (_userAspectRatio ? _userAspectRatio : _videoAspectRatio);
+				_aspectRatio = (_userAspectRatio && _userAspectRatio>0 ? _userAspectRatio : _videoAspectRatio);
 				var stageAspectRatio:Number = this.width/this.height;
 				if(stageAspectRatio>_aspectRatio) {
 					video.height = this.height;
