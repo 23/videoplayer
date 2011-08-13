@@ -38,7 +38,11 @@
 			
 			// Value
 			public function set value(v:Object):void {
-				group.selectedValue = v;				
+				if(v==null) {
+					group.selection = null
+				} else {
+					group.selectedValue = v;
+				}
 			}
 			public function get value():Object {return(group.selectedValue);}
 			
