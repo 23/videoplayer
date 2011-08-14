@@ -31,14 +31,63 @@ private function resetActiveElement():void {
 	activeElement.put('length', '0');
 	activeElement.put('start', '0');
 	activeElement.put('skip', '0');
-}
-
-private function setActiveElement(i:int, startPlaying:Boolean=false, start:Number=0, skip:int=0, format:String=null):Boolean {
-	if (!context || !context.photos || !context.photos[i]) return(false);
+	activeElement.put('live', false);
+	
+	// Reset other stuff related to the active video
 	clearVideo();
 	identityVideo.visible = false;
 	identityVideo.close();
 	showBeforeIdentity = true;
+	progress.setSections([]);
+	subtitles.suppportedLocales = {}; subtitlesMenu.options = [];
+	liveStreamsMenu.value = null;
+}
+
+private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolean=true):void {
+	resetActiveElement();
+
+	// Handle video title and description
+	var title:String = stream.name.replace(new RegExp('(<([^>]+)>)', 'ig'), '');
+	activeElement.put('video_p', true);
+	activeElement.put('photo_id', stream.liveevent_stream_id);
+	activeElement.put('title', title);
+	activeElement.put('content', "");
+	activeElement.put('hasInfo', false);
+	activeElement.put('link', stream.one);
+	activeElement.put('length', 0); 
+	activeElement.put('start', 0);
+	activeElement.put('skip', false);
+	activeElement.put('live', true);
+	activeElement.put('one', props.get('site_url') + stream.one); 
+	supportedFormats = ['live'];
+	formatsMenu.options = [];
+	activeElement.put('photoSource', null);
+	activeElement.put('videoSource', stream.rtmp_stream);
+	video.source = getFullVideoSource();
+	
+	showVideoElement();
+	if(startPlaying) playVideoElement();
+
+	// Aspect ratios
+	activeElement.put('aspectRatio', 1);
+	video.aspectRatio = identityVideo.aspectRatio = 0;
+	
+	// Make embed code current
+	updateCurrentVideoEmbedCode();
+	
+	// We want the tray and possible the info box to show up when a new element starts playing
+	infoShow();
+	trayShow();
+	
+	// Note that we've loaded the video 
+	reportEvent('load');
+
+}
+
+private function setActiveElement(i:int, startPlaying:Boolean=false, start:Number=0, skip:int=0, format:String=null):Boolean {
+	if (!context || !context.photos || !context.photos[i]) return(false);
+	resetActiveElement();
+
 	numVideoElements = context.photos.length;
 	currentElementIndex = i;
 	var o:Object = context.photos[i];
@@ -114,7 +163,13 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
   	activeElement.put('photoSource', props.get('site_url') + o.large_download);
   	activeElement.put('photoWidth', new Number(o.large_width));
   	activeElement.put('photoHeight', new Number(o.large_height));
-  	activeElement.put('aspectRatio', parseInt(o.large_width) / parseInt(o.large_height));
+	
+	// Aspect ratios
+	var ar:Number = parseInt(o.large_width) / parseInt(o.large_height);
+  	activeElement.put('aspectRatio', ar);
+	video.aspectRatio = ar;
+	identityVideo.aspectRatio = (props.getBoolean('maintainIdentityAspectRatio') ? 0 : ar)
+	
  
  	if(video_p) {
  		image.source = null;
@@ -232,7 +287,8 @@ private function showImageElement():void {
 }
 private function showVideoElement():void {
 	video.visible=false;
-	videoControls.visible=progress.visible=true;
+	videoControls.visible=true;
+	progress.visible=(!video.isLive);
 	
 	image.source = activeElement.get('photoSource');
 	image.visible=true;
@@ -242,7 +298,8 @@ public function playVideoElement():void {
 	if(!activeElement.get('video_p')) return;
 	image.visible=false;
 	video.visible=true;
-	videoControls.visible=progress.visible=true;
+	videoControls.visible=true;
+	progress.visible=(!video.isLive);
 	video.source = getFullVideoSource();
 	if(showBeforeIdentity) {
 		// For some reason, this seems to trigger pre-buffering of the video; which is good.
@@ -256,8 +313,9 @@ public function playVideoElement():void {
 	video.play();
 }
 private function pauseVideoElement():void {
-	playVideoElement();
-	video.pause();
+	try {
+		video.pause();
+	}catch(e:ErrorEvent){}
 }
 
 private function getFullVideoSource():String {
