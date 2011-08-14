@@ -219,9 +219,9 @@ private function getRecommendationSource():String {
 private function updateCurrentVideoEmbedCode():void {
 	try {
 		var e:String = props.getString('embedCode');
-		if (!e.match(/photo\%5fid/)) {
+		if (!e.match(/photo\%5fid/) && !e.match(/liveevent(\%5f|\%5fstream\%5f)\%5fid/)) {
 			// remove album_id and token
-			e = e.replace(new RegExp('(album\%5fid|token)=[a-zA-Z0-9]*', 'img'), '');
+			e = e.replace(new RegExp('(album\%5fid|token)=[a-zA-Z0-9]*\&?', 'img'), '');
 			// set photo_id
 			e = e.replace(new RegExp('FlashVars="'), 'FlashVars="photo\%5fid=' + activeElement.getString('photo_id') + '&');
 			e = e.replace(new RegExp('FlashVars" value="', 'img'), 'FlashVars="photo\%5fid=' + activeElement.getString('photo_id') + '&');
