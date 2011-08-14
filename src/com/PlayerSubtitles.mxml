@@ -12,13 +12,13 @@
 		<![CDATA[
 			import mx.containers.HBox;
 			import mx.controls.Label;
-			import mx.controls.VideoDisplay;
+			import com.visual.VisualVideo;
 			
-			private var _targetVideo:VideoDisplay;
-			public function set targetVideo(v:VideoDisplay):void {
+			private var _targetVideo:VisualVideo;
+			public function set targetVideo(v:VisualVideo):void {
 				_targetVideo = v;
 			}
-			public function get targetVideo():VideoDisplay {return(_targetVideo);}
+			public function get targetVideo():VisualVideo {return(_targetVideo);}
 			
 			// Supported locales
 			[Bindable] private var _supportedLocales:Object = {};

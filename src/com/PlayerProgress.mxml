@@ -69,7 +69,7 @@
 		<![CDATA[
 			import com.philemonworks.flex.util.HashCollection;
 			
-			import mx.controls.VideoDisplay;
+			import com.visual.VisualVideo;
 			import mx.core.Application;
 			import mx.events.VideoEvent;
 			[bindable] private var props:HashCollection = mx.core.FlexGlobals.topLevelApplication.props;
@@ -148,13 +148,13 @@
             		
 
 			// Which video display are we binding to? (and attach to events)
-			private var _targetVideo:VideoDisplay;
-			public function set targetVideo(v:VideoDisplay):void {
+			private var _targetVideo:VisualVideo;
+			public function set targetVideo(v:VisualVideo):void {
 				_targetVideo = v;
 				v.addEventListener(VideoEvent.PLAYHEAD_UPDATE, updatePlay);
 				v.addEventListener(ProgressEvent.PROGRESS, updateBuffer);
 			}
-			public function get targetVideo():VideoDisplay {return(_targetVideo);}
+			public function get targetVideo():VisualVideo {return(_targetVideo);}
 			
 			private var _sections:Array = [];
 			public function setSections(s:Array):void{
