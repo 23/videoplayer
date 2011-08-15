@@ -192,11 +192,13 @@
 				
 				if(evt.currentTarget.state==VideoEvent.PLAYING || evt.currentTarget.state==VideoEvent.SEEKING) {
 					cleanVideoState = 'playing';
+					playListHide();
 				} else if(evt.currentTarget.state==VideoEvent.LOADING || evt.currentTarget.state==VideoEvent.BUFFERING) {
 					cleanVideoState = 'buffering';
 				} else if(evt.currentTarget.state==VideoEvent.DISCONNECTED || evt.currentTarget.state==VideoEvent.COMPLETE || evt.currentTarget.state==VideoEvent.PAUSED || evt.currentTarget.state==VideoEvent.STOPPED) {
 					cleanVideoState = 'paused';
 				}
+				if(evt.currentTarget.state==VideoEvent.PAUSED && identityVideo.visible==false && video.playheadTime>2) playListShow();
                 switch (evt.currentTarget.state) {
                 	case VideoEvent.PAUSED:
 						reportPlay('end', video.playheadTime);
@@ -325,13 +327,21 @@
 		horizontalCenter="0" 
 		hideEffect="{fadeOut}"
 		showEffect="{fadeIn}"
-		visible="{playListContainer.visible}">
+		visible="{(playListContainer.visible)}">
+		<!-- Big Play -->
+		<com:PlayerButton id="bigRestartPlayImage" 
+						  imageSource="@Embed(source='assets/buttons/bigplay.png')"
+						  imageHoverSource="@Embed(source='assets/buttons/bigplay-hover.png')"
+						  click="{playVideoElement();}"
+						  visible="{video.totalTime>0 &amp;&amp; video.playheadTime&lt;(video.totalTime-1)}"
+						  />
 		<!-- Big Replay -->
 		<com:PlayerButton id="bigReplayImage" 
-			  imageSource="@Embed(source='assets/buttons/replay.png')"
-			  imageHoverSource="@Embed(source='assets/buttons/replay-hover.png')"
-			  click="{activeElement.put('start', 0); playVideoElement();}"
-			  />
+						  imageSource="@Embed(source='assets/buttons/replay.png')"
+						  imageHoverSource="@Embed(source='assets/buttons/replay-hover.png')"
+						  click="{activeElement.put('start', 0); playVideoElement();}"
+						  visible="{(!bigRestartPlayImage.visible)}"
+						  />
 	</mx:HBox>
 
 	<!-- Extra displays for identity video and photo -->
