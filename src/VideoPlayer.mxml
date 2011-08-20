@@ -12,7 +12,7 @@
 	verticalScrollPolicy="off" 
 	horizontalScrollPolicy="off"
 	preloader="preload.CustomPreloader" 
-	backgroundColor="black" 
+	backgroundAlpha="0"
 	width="100%" 
 	height="100%" 
 	creationComplete="init();" 
@@ -249,13 +249,6 @@
 	</mx:Script>	
 	
 	<!-- Simple element to provide a backdrop when everything else fails -->
-	<mx:Box id="background" 
-		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}" 
-		width="100%" 
-		height="100%" 
-		verticalCenter="0" 
-		horizontalCenter="0"
-		/>
 	<mx:Label id="errorContainer" 
 		color="white"
 		/>
