@@ -2,7 +2,8 @@
 import mx.core.FlexGlobals;
 import mx.utils.URLUtil;
 
-[Bindable] public var props:HashCollection = new HashCollection()
+[Bindable] public var props:HashCollection = new HashCollection();
+private var prioritizeLiveStreams:Boolean = false;
 public var propDefaults:Object = {
 	backgroundColor: 'black',
 	trayBackgroundColor: 'black',
@@ -165,8 +166,15 @@ private function initProperties(settings:Object):void {
 	if(props.get('enableLiveStreams')) {
 		var streamOptions:Object = {};
 		if (FlexGlobals.topLevelApplication.parameters['liveevent_id']) {
+			prioritizeLiveStreams = true;
 			streamOptions = {
 				liveevent_id: FlexGlobals.topLevelApplication.parameters['liveevent_id'],
+				token: (FlexGlobals.topLevelApplication.parameters['token'] ? FlexGlobals.topLevelApplication.parameters['token'] : '')
+			}
+		} else if (FlexGlobals.topLevelApplication.parameters['liveevent_stream_id']) {
+			prioritizeLiveStreams = true;
+			streamOptions = {
+				liveevent_stream_id: FlexGlobals.topLevelApplication.parameters['liveevent_stream_id'],
 				token: (FlexGlobals.topLevelApplication.parameters['token'] ? FlexGlobals.topLevelApplication.parameters['token'] : '')
 			}
 		} else {
@@ -183,6 +191,12 @@ private function initProperties(settings:Object):void {
 						streamMenu.push({value:stream, label:stream.name});
 					});
 					liveStreamsMenu.options = streamMenu;
+					
+					if(prioritizeLiveStreams) {
+						setActiveElementToLiveStream(streams[0], false);
+					}
+				} else {
+					prioritizeLiveStreams = false;
 				}
 			});
 		} catch(e:Error) {}

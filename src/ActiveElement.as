@@ -45,7 +45,7 @@ private function resetActiveElement():void {
 	liveStreamsMenu.value = null;
 }
 
-private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolean=true):void {
+private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolean=false):void {
 	resetActiveElement();
 
 	// Handle video title and description
