@@ -95,7 +95,7 @@
 				});
 			}
 			public function build():void {
-				if(!context || !context.photos || context.photos.length==0) {displayError('Empty video stream...'); return;}
+				if(!prioritizeLiveStreams && (!context || !context.photos || context.photos.length==0)) {displayError('Empty video stream...'); return;}
 				if(!prioritizeLiveStreams) setActiveElement(0, false, props.getNumber('start'));
 				
 				if (props.get('showTray') && props.get('showBrowse')) {
