@@ -43,7 +43,7 @@ private function resetActiveElement():void {
 	liveStreamsMenu.value = null;
 }
 
-private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolean=true):void {
+private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolean=false):void {
 	resetActiveElement();
 
 	// Handle video title and description
@@ -61,7 +61,7 @@ private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolea
 	activeElement.put('one', props.get('site_url') + stream.one); 
 	supportedFormats = ['live'];
 	formatsMenu.options = [];
-	activeElement.put('photoSource', null);
+	activeElement.put('photoSource', props.get('site_url') + stream.large_download);
 	activeElement.put('videoSource', stream.rtmp_stream);
 	video.source = getFullVideoSource();
 	
@@ -69,7 +69,7 @@ private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolea
 	if(startPlaying) playVideoElement();
 
 	// Aspect ratios
-	activeElement.put('aspectRatio', 1);
+	activeElement.put('aspectRatio', stream.thumbnail_large_aspect_ratio*1.0);
 	video.aspectRatio = identityVideo.aspectRatio = 0;
 	
 	// Make embed code current

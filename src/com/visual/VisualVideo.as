@@ -6,6 +6,7 @@ package com.visual {
 	import flash.events.NetStatusEvent;
 	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
+	import flash.geom.Rectangle;
 	import flash.media.SoundTransform;
 	import flash.media.Video;
 	import flash.net.NetConnection;
@@ -25,22 +26,29 @@ package com.visual {
 	
 	public class VisualVideo extends UIComponent {
 		// Public properties to play around with
-		public var video:Video = new Video();
+		public var video:Object = null;
 		public var connection:NetConnection = new NetConnection();
 		public var stream:NetStream;
 		public var fcSubscribeCount:int = 0;
 		public var fcSubscribeMaxRetries:int = 3;
 		private var isPlaying:Boolean = false;
-		
+				
 		// Constructor method
 		public function VisualVideo() {
 			super();
 			// Handle resize and progress
 			this.addEventListener(ResizeEvent.RESIZE, matchVideoSize);
 			setInterval(updateProgress, 200);
-			// Defaults for the video display
-			video.smoothing = true;
-			video.deblocking = 1;
+			// Listen for Stage Video events
+			var $:Object = this;
+			this.addEventListener(Event.ADDED_TO_STAGE, function(e:Event):void {
+				$.stage.addEventListener('stageVideoAvailability', function(e:Object):void{
+					if(!$.video && e.availability=='available') {
+						_displayMode = 'stage';
+						$.video = $.stage.stageVideos[0];	
+					}
+				});
+			});
 		}
 
 		// READ-ONLY PROPERTIES
@@ -53,6 +61,8 @@ package com.visual {
 		public function get videoWidth():int {return(_videoWidth);}
 		private var _videoHeight:int = 0; 
 		public function get videoHeight():int {return(_videoHeight);}
+		private var _displayMode:String = "standard";
+		public function get displayMode():String {return(_displayMode);}
 		
 		// Is this an RTMP stream?
 		public function get isLive():Boolean {return(isRTMP);}
@@ -189,7 +199,6 @@ package com.visual {
 		}
 		private function attachStreamToVideo():void {
 			trace((new Date), 'attachStreamToVideo()');
-			this.addChild(this.video);
 			this.stream = new NetStream(this.connection);
 			this.stream.soundTransform = new SoundTransform(_volume);
 			this.stream.client = defaultClient;
@@ -197,10 +206,19 @@ package com.visual {
 			this.stream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, genericErrorEvent);
 			this.stream.addEventListener(IOErrorEvent.IO_ERROR, genericErrorEvent);
 			this.stream.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler);
+			// Defaults for the video display
+			if(!this.video) {
+				var v:Video = new Video();
+				v.smoothing = true;
+				v.deblocking = 1;
+				this.addChild(v);
+				v.visible = true;
+				this.video = v;	
+			}
 			this.video.attachNetStream(this.stream);
-			this.video.visible = true;
 			this.state = VideoEvent.BUFFERING;
 			this.stream.play(this.streamName);
+			trace('displayMode = ', displayMode);
 			matchVideoSize();
 		}
 		private function subscribe():void {
@@ -305,21 +323,29 @@ package com.visual {
 		// Match size of video to the container
 		private function matchVideoSize(e:ResizeEvent=null):void {
 			trace((new Date), 'matchVideoSize()')
-			if(this&&this.width) {
+			if(this&&this.width&&this.video) {
 				_aspectRatio = (_userAspectRatio && _userAspectRatio>0 ? _userAspectRatio : _videoAspectRatio);
 				var stageAspectRatio:Number = this.width/this.height;
+				var x:int, y:int, w:int, h:int = 0;
 				if(stageAspectRatio>_aspectRatio) {
-					video.height = this.height;
-					video.width = this.height*_aspectRatio;
-					video.x = (this.width-video.width)/2;
-					video.y = 0;
+					h = this.height;
+					w = this.height*_aspectRatio;
+					x = (this.width-w)/2;
+					y = 0;
 				} else {
-					video.width = this.width;
-					video.height = this.width/_aspectRatio;
-					video.x = 0;
-					video.y = (this.height-video.height)/2;
+					w = this.width;
+					h = this.width/_aspectRatio;
+					x = 0;
+					y = (this.height-h)/2;
 				}
-				trace((new Date), 'matchVideoSize() -> resizing', video.width, video.height)
+				if(displayMode=='stage') {
+					this.video.viewPort = new Rectangle(x,y,w,h);
+				} else {
+					this.video.x = x;
+					this.video.y = y;
+					this.video.width = w;
+					this.video.height = h;
+				}
 			}
 		}
 		// Handle progress bar
