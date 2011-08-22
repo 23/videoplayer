@@ -71,5 +71,14 @@ package com.philemonworks.flex.util
 			var value:Object = this.get(key)
 			return ((value==null || !(new RegExp('^[0-9]+\.?[0-9]*$', 'img').test(new String(value)))) ? 0 : new Number(value));
 		}
-	}
+
+		/**
+		 * Convenience method to access a Boolead value
+		 */
+		[Bindable("collectionChange")]
+		public function getBoolean(key:String):Boolean {
+			var value:String = new String(this.get(key));
+			return(value==='true' || value==='t' || value==='1'); 
+		}
+}
 }

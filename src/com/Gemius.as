@@ -26,6 +26,7 @@ package com {
 	import flash.events.Event;
 	import gemius.gSmConnectorMediator;
 	import mx.events.VideoEvent;
+	import com.visual.VisualVideo;
 
 	public class Gemius {
 		// Set up component properties
@@ -42,12 +43,10 @@ package com {
 		private var contentChannel:String;
 		private var contentTotalTime:Number;
 		private var contentAutoStart:Boolean;
-		public var videoComponent:VideoDisplay;
-		
-		import mx.controls.VideoDisplay;
+		public var videoComponent:VisualVideo;
 		
 		// Constructor for the Flex component
-		public function Gemius(video:VideoDisplay, identifier:String, hitcollector:String = 'gadk.hit.gemius.pl', publisherID:String = '000') {
+		public function Gemius(video:VisualVideo, identifier:String, hitcollector:String = 'gadk.hit.gemius.pl', publisherID:String = '000') {
 			super();
 
 			// Store public properties

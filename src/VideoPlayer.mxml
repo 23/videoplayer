@@ -5,11 +5,12 @@
 <mx:Application 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
 	xmlns:com="com.*" 
+	xmlns:visual="com.visual.*"
 	layout="absolute" 
 	verticalScrollPolicy="off" 
 	horizontalScrollPolicy="off"
 	preloader="preload.CustomPreloader" 
-	backgroundColor="#cc0000" 
+	backgroundAlpha="0"
 	width="100%" 
 	height="100%" 
 	creationComplete="init(); resizeTray();" 
@@ -43,10 +44,6 @@
 			
 			import flash.display.StageDisplayState;
 			import flash.external.ExternalInterface;
-			
-			import mx.controls.Alert;
-			import mx.core.mx_internal;
-			import mx.events.VideoEvent;
 			
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'video.home.dk';
@@ -113,10 +110,8 @@
 				});
 			}
 			public function build():void {
-				if(!context || !context.photos || context.photos.length==0) {displayError('Empty video stream...'); return;}
-				video.mx_internal::videoPlayer.smoothing = true;
-				identityVideo.mx_internal::videoPlayer.smoothing = true;
-				setActiveElement(0, false, props.getNumber('start'));
+				if(!prioritizeLiveStreams && (!context || !context.photos || context.photos.length==0)) {displayError('Empty video stream...'); return;}
+				if(!prioritizeLiveStreams) setActiveElement(0, false, props.getNumber('start'));
 				
 				if (props.get('showTray')) tray.visible=true;
 				bigPlayImage.imageContainer.horizontalCenter = 5;
@@ -217,20 +212,7 @@
             		}
             	}
             }
-			private function onVideoStateChange(evt:VideoEvent):void {
-				// Flex VideoDisplay shows weird stuff during seek; to avoid this,
-				// we show a bitmap snapshot from the video during seek and wait for playing
-				if (evt.currentTarget.state==VideoEvent.PAUSED || evt.currentTarget.state==VideoEvent.STOPPED) {
-					var bmData:BitmapData = new BitmapData(video.width, video.height);  
-					bmData.draw(video as DisplayObject);  
-					var bm:Bitmap = new Bitmap(bmData);  
-					videoShadow.source = bm;
-				} else if (evt.currentTarget.state==VideoEvent.LOADING) {
-					videoShadow.visible = true;
-				} else if (evt.currentTarget.state==VideoEvent.PLAYING) {
-					videoShadow.visible = false;
-				}
-				
+			private function onVideoStateChange(evt:Event):void {
 				if(evt.currentTarget.state==VideoEvent.PLAYING || evt.currentTarget.state==VideoEvent.SEEKING) {
 					sharePanel.visible = false;
 					cleanVideoState = 'playing';
@@ -289,13 +271,6 @@
 	</mx:Script>	
 	
 	<!-- Simple element to provide a backdrop when everything else fails -->
-	<mx:Box id="background" 
-		backgroundColor="#cc0000" 
-		width="100%" 
-		height="100%" 
-		verticalCenter="0" 
-		horizontalCenter="0"
-		/>
 	<mx:Label id="errorContainer" 
 		color="white"
 		/>
@@ -309,39 +284,27 @@
 		horizontalScrollPolicy="off"
 		>
 	<!-- Image and Video -->
-	<mx:VideoDisplay id="video"
-		backgroundColor="#c00"
-		autoRewind="false"  
-		maintainAspectRatio="false"  
-		autoPlay="false" 
-		visible="false"
+	<visual:VisualVideo id="video"
 		volume="1" 
 		horizontalCenter="0" 
 		verticalCenter="0" 
 		bufferTime="2"
-		width="{(contentContainer.width/contentContainer.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : contentContainer.width)}"
-		height="{(contentContainer.width/contentContainer.height>activeElement.get('aspectRatio') ? contentContainer.height : contentContainer.width/(activeElement.get('aspectRatio') as Number))}"
+		width="100%"
+		height="100%"
 		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" 
 		stateChange="onVideoStateChange(event);"
 		complete="onVideoComplete();"
 		resize="resizeTray();"
 		/>
-	<com:SmoothImage id="videoShadow" 
-		horizontalCenter="0" 
-		verticalCenter="0"
-		width="{video.width}"
-		height="{video.height}"
-		includeInLayout="{videoShadow.visible}"
-		/> 
 	<com:SmoothImage id="image" 
 		source="{activeElement.get('photoSource')}" 
-		width="{video.width}" 
-		height="{video.height}" 
+		width="{(contentContainer.width/contentContainer.height>activeElement.get('aspectRatio') ? video.height*(activeElement.get('aspectRatio') as Number) : contentContainer.width)}"
+		height="{(contentContainer.width/contentContainer.height>activeElement.get('aspectRatio') ? contentContainer.height : contentContainer.width/(activeElement.get('aspectRatio') as Number))}"
 		horizontalCenter="0" 
 		verticalCenter="0"
 		click="{playListHide(); playVideoElement()}" 
 		/>
- 
+
  	 <!-- Big Play -->
 	<com:PlayerButton id="bigPlayImage" 
 		width="64" 
@@ -358,7 +321,7 @@
 		/>
  	
 	<!-- Extra displays for identity video and photo -->
-	<mx:VideoDisplay id="identityVideo" 
+	<visual:VisualVideo id="identityVideo" 
 		visible="false" 
 		volume="1" 
 		horizontalCenter="0" 
@@ -366,7 +329,6 @@
 		bufferTime="2" 
 		width="{video.width}" 
 		height="{video.height}"
-		maintainAspectRatio="{props.get('maintainIdentityAspectRatio')}"
 		buttonMode="true"
 		playheadUpdate="{var secs:int=Math.round(identityVideo.totalTime-identityVideo.playheadTime); var mess:String = (secs!=1 ? props.getString('identityCountdownTextPlural') : props.getString('identityCountdownTextSingular')); identityMessage.message = mess.replace(/%/, secs);}"
 		/>
@@ -482,7 +444,6 @@
 					backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
 	    			/>  
 
-
 				<mx:VBox 
 					id="progressContainer"
 					backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}"
@@ -523,6 +484,37 @@
 							paddingTop="2"
 							>
 
+							<!-- Live streams -->
+							<com:PlayerButton id="liveStreamsBtn" 
+								imageSource="@Embed(source='assets/buttons/live.swf')"
+								visible="false"
+								>
+								<com:PlayerMenu 
+									id="liveStreamsMenu"
+									change="{setActiveElementToLiveStream(liveStreamsMenu.value, true)}"
+									showOneItemMenus="true"
+									backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+									backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+									fontFamily="{props.get('trayFont')}" 
+									color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+									/>
+							</com:PlayerButton>
+
+							<!-- HDbutton-->
+							<com:PlayerButton id="hdBtn" 
+							  	imageSource="@Embed(source='assets/buttons/hd.swf')"
+							  	>
+								<com:PlayerMenu 
+									id="formatsMenu"
+									value="{currentVideoFormat}"
+									change="{switchVideoFormat(new String(formatsMenu.value));}"
+									backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+									backgroundAlpha="{(props.get('trayAlpha') as Number)}" 
+									fontFamily="{props.get('trayFont')}" 
+									color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+									/>
+							</com:PlayerButton>
+							
 							<!-- Subtitle button-->
 							<com:PlayerButton id="subtitlesBtn" 
 								imageSource="@Embed(source='assets/buttons/cc.swf')"

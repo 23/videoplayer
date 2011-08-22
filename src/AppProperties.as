@@ -2,7 +2,8 @@
 import mx.core.FlexGlobals;
 import mx.utils.URLUtil;
 
-[Bindable] public var props:HashCollection = new HashCollection()
+[Bindable] public var props:HashCollection = new HashCollection();
+private var prioritizeLiveStreams:Boolean = false;
 public var propDefaults:Object = {
 	backgroundColor: '#cc0000',
 	trayBackgroundColor: '#cc0000',
@@ -41,6 +42,7 @@ public var propDefaults:Object = {
 	subtitlesOnByDefault: false,
 	subtitlesDesign: 'bars',
 	playlistClickMode:'link',
+	enableLiveStreams: true,
 	
 	start: parseFloat('0'),
 	player_id: parseFloat('0'),
@@ -104,7 +106,7 @@ private function initProperties(settings:Object):void {
 	}
 
 	// Determine a load parameters
-    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size', 'rand'];
+    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size', 'rand', 'liveevent_id', 'liveevent_stream_id'];
     for (var i:int=0; i<options.length; i++) {
 		var opt:String = options[i];
 		if (FlexGlobals.topLevelApplication.parameters[opt]) {
@@ -159,6 +161,46 @@ private function initProperties(settings:Object):void {
 	
 	// Should we start by playing HD? 
 	if(props.get('playHD')) currentVideoFormat = 'video_hd';
+
+	// Load up featured live streams
+	if(props.get('enableLiveStreams')) {
+		var streamOptions:Object = {};
+		if (FlexGlobals.topLevelApplication.parameters['liveevent_id']) {
+			prioritizeLiveStreams = true;
+			streamOptions = {
+				liveevent_id: FlexGlobals.topLevelApplication.parameters['liveevent_id'],
+				token: (FlexGlobals.topLevelApplication.parameters['token'] ? FlexGlobals.topLevelApplication.parameters['token'] : '')
+			}
+		} else if (FlexGlobals.topLevelApplication.parameters['liveevent_stream_id']) {
+			prioritizeLiveStreams = true;
+			streamOptions = {
+				liveevent_stream_id: FlexGlobals.topLevelApplication.parameters['liveevent_stream_id'],
+				token: (FlexGlobals.topLevelApplication.parameters['token'] ? FlexGlobals.topLevelApplication.parameters['token'] : '')
+			}
+		} else {
+			streamOptions = {featured_p:1};
+		}
+		liveStreamsMenu.options = [];
+		liveStreamsMenu.value = null;
+		try {
+			doAPI('/api/liveevent/stream/list', streamOptions, function(s:Object):void{
+				var streams:Array = s.streams;
+				if(streams.length) {
+					var streamMenu:Array = [];
+					streams.forEach(function(stream:Object, i:int, ignore:Object):void{
+						streamMenu.push({value:stream, label:stream.name});
+					});
+					liveStreamsMenu.options = streamMenu;
+					
+					if(prioritizeLiveStreams) {
+						setActiveElementToLiveStream(streams[0], false);
+					}
+				} else {
+					prioritizeLiveStreams = false;
+				}
+			});
+		} catch(e:Error) {}
+	}
 }
 
 private function getRecommendationSource():String {
@@ -191,9 +233,9 @@ private function getRecommendationSource():String {
 private function updateCurrentVideoEmbedCode():void {
 	try {
 		var e:String = props.getString('embedCode');
-		if (!e.match(/photo\%5fid/)) {
+		if (!e.match(/photo\%5fid/) && !e.match(/liveevent(\%5f|\%5fstream\%5f)\%5fid/)) {
 			// remove album_id and token
-			e = e.replace(new RegExp('(album\%5fid|token)=[a-zA-Z0-9]*', 'img'), '');
+			e = e.replace(new RegExp('(album\%5fid|token)=[a-zA-Z0-9]*\&?', 'img'), '');
 			// set photo_id
 			e = e.replace(new RegExp('FlashVars="'), 'FlashVars="photo\%5fid=' + activeElement.getString('photo_id') + '&');
 			e = e.replace(new RegExp('FlashVars" value="', 'img'), 'FlashVars="photo\%5fid=' + activeElement.getString('photo_id') + '&');
