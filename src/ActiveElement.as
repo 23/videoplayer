@@ -211,7 +211,7 @@ private function prepareSupportedFormats(o:Object):void {
 	if (h264()&&typeof(o.video_hd_download)!='undefined'&&o.video_hd_download.length>0) {
 		supportedFormats.push({format:'video_hd', pseudo:true, label: 'HD (720p)', source:props.get('site_url') + o.video_hd_download}); 
 	}
-	if (h264()&&typeof(o.video_1080p_download)!='undefined'&&o.video_1080p_download.length>0) {
+	if (h264()&&typeof(o.video_1080p_download)!='undefined'&&o.video_1080p_download.length>0&&o.video_1080p_size>0) {
 		supportedFormats.push({format:'video_1080p', pseudo:true, label: 'Full HD (1080p)', source:props.get('site_url') + o.video_1080p_download}); 
 	}
 	
