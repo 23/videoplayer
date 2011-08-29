@@ -103,10 +103,15 @@
 				a.push('height=' + encodeURIComponent(FlexGlobals.topLevelApplication.height));
 				
 				// Get settings for this player from 23 Video
+				initLoadURL();
 				doAPI('/api/player/settings', {player_id:(playerId?playerId:''), parameters:a.join('&')}, function(o:Object):void{
 					initProperties(o.settings);
-					initActiveElement();
-					doJSON((props.get('jsonSource') as String), function(o:Object):void{context=o; build();});
+				});
+				// Load content
+				initActiveElement();
+				doJSON((props.get('jsonSource') as String), function(o:Object):void{
+					context=o; 
+					build();
 				});
 			}
 			public function build():void {
@@ -288,7 +293,7 @@
 		volume="1" 
 		horizontalCenter="0" 
 		verticalCenter="0" 
-		bufferTime="2"
+		bufferTime="10"
 		width="100%"
 		height="100%"
 		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();" 
