@@ -15,8 +15,13 @@ private function doAPI(method:String, parameters:Object, f:Function):URLLoader {
 }
 private function toQueryString(o:Object):String {
 	var a:Array = [];
-	for (var s:String in o) {
-		a.push(encodeURIComponent(s) + '=' + encodeURIComponent(o[s]));
+	var names:Array = [];
+	for (var s:String in o) names.push(s);
+	names.sort();
+	var x:String;
+	for (var i:int=0; i<names.length; i++) {
+		x = names[i];
+		a.push(encodeURIComponent(x) + '=' + encodeURIComponent(o[x]));
 	}
 	return(a.join('&'));
 }
