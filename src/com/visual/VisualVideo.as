@@ -97,9 +97,9 @@ package com.visual {
 		}
 
 		// READ-WRITE PROPERTIES
-		private var _bufferTime:int = 2;
-		public function get bufferTime():int {return(_bufferTime);}
-		public function set bufferTime(bt:int):void {if(_bufferTime>0) {_bufferTime=bt;}}
+		private var _bufferTime:Number = 2;
+		public function get bufferTime():Number {return(_bufferTime);}
+		public function set bufferTime(bt:Number):void {if(_bufferTime>0) {_bufferTime=bt;}}
 
 		private var _aspectRatio:Number = 1; 
 		private var _userAspectRatio:Number = 0; 

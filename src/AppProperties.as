@@ -64,12 +64,28 @@ private function initLoadURL():void{
 	if(protocol!='https') protocol='http';
 	props.put('domain', domain);
 	props.put('site_url', protocol + '://' + domain);
+	
+	// Determine a load parameters
+	var loadParameters:Array = new Array();
+	var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size', 'rand', 'liveevent_id', 'liveevent_stream_id'];
+	for (var i:int=0; i<options.length; i++) {
+		var opt:String = options[i];
+		if (FlexGlobals.topLevelApplication.parameters[opt]) {
+			loadParameters.push(opt + '=' + encodeURI(FlexGlobals.topLevelApplication.parameters[opt]));
+		}
+	}
+	if (defaultPhotoId.length) loadParameters.push('photo_id=' + encodeURI(defaultPhotoId)); 
+	if (defaultAlbumId.length) loadParameters.push('album_id=' + encodeURI(defaultAlbumId));
+	loadParameters.push('player_id=' + encodeURI(playerId));
+	
+	// Use load parameters to build JSON source
+	var jsonSource:String = props.get('site_url') + '/api/photo/list?raw&format=json&' + loadParameters.join('&');
+	props.put('jsonSource', jsonSource);
+	
+	// Mail link from parameters 
+	props.put('mailLink', (props.get('socialSharing') ? "/send?popup_p=1&" + loadParameters.join('&') : ''));	
 }
 private function initProperties(settings:Object):void {
-	initLoadURL();
-	var loadParameters:Array = new Array();
-	var loadSettings:Array = new Array();
-
 	// Load defaults
 	for (name in propDefaults) {
 		props.put(name, propDefaults[name]);
@@ -92,7 +108,6 @@ private function initProperties(settings:Object):void {
 	// Read from FlashVars
 	for (name in propDefaults) {
 	  	if(typeof(FlexGlobals.topLevelApplication.parameters[name])!='undefined') {
-	  		if(name!='showDescriptions' && name!='autoPlay') loadSettings.push(name + '=' + encodeURI(FlexGlobals.topLevelApplication.parameters[name]));
 	  		if (typeof propDefaults[name]=='boolean') {
 			 	props.put(name, new Boolean(parseFloat(FlexGlobals.topLevelApplication.parameters[name])));
 		 	} else {	
@@ -104,26 +119,6 @@ private function initProperties(settings:Object):void {
 	  	    }
 	  	}
 	}
-
-	// Determine a load parameters
-    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size', 'rand', 'liveevent_id', 'liveevent_stream_id'];
-    for (var i:int=0; i<options.length; i++) {
-		var opt:String = options[i];
-		if (FlexGlobals.topLevelApplication.parameters[opt]) {
-			loadParameters.push(opt + '=' + encodeURI(FlexGlobals.topLevelApplication.parameters[opt]));
-			loadSettings.push(opt + '=' + encodeURI(FlexGlobals.topLevelApplication.parameters[opt]));
-		}
-    }
-	if (defaultPhotoId.length) loadParameters.push('photo_id=' + encodeURI(defaultPhotoId)); 
-	if (defaultAlbumId.length) loadParameters.push('album_id=' + encodeURI(defaultAlbumId));
-	loadParameters.push('player_id=' + encodeURI(playerId));
-
-	// Use load parameters to build JSON source
-	var jsonSource:String = props.get('site_url') + '/api/photo/list?raw&format=json&' + loadParameters.join('&');
-	props.put('jsonSource', jsonSource);
-	
-	// Mail link from parameters 
-	props.put('mailLink', (props.get('socialSharing') ? "/send?popup_p=1&" + loadParameters.join('&') : ''));
 
 	// Test logoSource
 	if (props.get('logoSource')=='no logo' || props.get('logoSource')=='') {
