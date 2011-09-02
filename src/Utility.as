@@ -60,7 +60,7 @@ public function reportEvent(event:String):void {
 	} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
 }
 
-public function goToUrl(url:String):void {
+public function goToUrl(url:String, target:String = '_top'):void {
 	if(!new RegExp('\:\/\/').test(url)) url = props.get('site_url') + url;
-    navigateToURL(new URLRequest(url), "_top");
+    navigateToURL(new URLRequest(url), target);
 }
