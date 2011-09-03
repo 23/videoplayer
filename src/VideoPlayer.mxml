@@ -36,11 +36,12 @@
 			import flash.display.StageDisplayState;
 			import flash.external.ExternalInterface;
 			import flash.utils.setInterval;
+			import flash.utils.setTimeout;
 			
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
-			private var defaultPhotoId:String = '';
+			private var defaultPhotoId:String = '1074305';
 			private var defaultAlbumId:String = '';
 			private var playerId:String = '0';
 
@@ -112,10 +113,13 @@
 						// The list displays all the items in the feed
 						recommendations=context; createPlayList();
 					} else {
-						// The list consists of recommendations, we'll need to load them 
-						try {
-							doJSON(recommendationSource, function(o:Object):void{recommendations=o; createPlayList();});
-				        } catch(e:JSONParseError) {enablePlayList = false; props.put('showShare', false);}
+						// The list consists of recommendations, we'll need to load them
+						// Loading is deferred for a few seconds if browseMode isn't on 
+						setTimeout(function():void {
+							try {
+								doJSON(recommendationSource, function(o:Object):void{recommendations=o; createPlayList();});
+					        } catch(e:JSONParseError) {enablePlayList = false; props.put('showShare', false);}
+						}, (props.getBoolean('browseMode') ? 0 : 5000));
 					}
 				}
 				trayShow();
