@@ -41,7 +41,7 @@
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
-			private var defaultPhotoId:String = '1074305';
+			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
 			private var playerId:String = '0';
 
