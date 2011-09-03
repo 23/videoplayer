@@ -35,11 +35,13 @@
 			
 			import flash.display.StageDisplayState;
 			import flash.external.ExternalInterface;
+			import flash.utils.setInterval;
+			import flash.utils.setTimeout;
 			
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
-			private var defaultPhotoId:String = '';
+			private var defaultPhotoId:String = '1074305';
 			private var defaultAlbumId:String = '';
 			private var playerId:String = '0';
 
@@ -50,6 +52,7 @@
 			[Bindable] private var enablePlayList: Boolean = false;		
 			[Bindable] private var showPlayList: Boolean = false;
 			[Bindable] private var cleanVideoState:String = 'paused';
+			[Bindable] private var applicationLoaded:Boolean = false;
 			
 			public function init():void {
 				prepareTimers();
@@ -110,12 +113,17 @@
 						// The list displays all the items in the feed
 						recommendations=context; createPlayList();
 					} else {
-						// The list consists of recommendations, we'll need to load them 
-						try {
-							doJSON(recommendationSource, function(o:Object):void{recommendations=o; createPlayList();});
-				        } catch(e:JSONParseError) {enablePlayList = false; props.put('showShare', false);}
+						// The list consists of recommendations, we'll need to load them
+						// Loading is deferred for a few seconds if browseMode isn't on 
+						setTimeout(function():void {
+							try {
+								doJSON(recommendationSource, function(o:Object):void{recommendations=o; createPlayList();});
+					        } catch(e:JSONParseError) {enablePlayList = false; props.put('showShare', false);}
+						}, (props.getBoolean('browseMode') ? 0 : 5000));
 					}
 				}
+				trayShow();
+				applicationLoaded = true;
 			}
 			
             private function createPlayList():void  {
@@ -183,6 +191,14 @@
             	// INFORMATION BOX WITH TITLE AND DESCRIPTION
             	// Hide when the timer completes
 				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void{infoHide();});
+				
+				// PLAY EVENTS
+				// Report plays back to analytics continously
+				setInterval(function():void{
+						try {
+							if(video.playing) reportPlay('start', video.playheadTime);
+						}catch(e:ErrorEvent){}
+					}, 15000);
             }             
             private function infoHide():void {
             	if(props.getNumber('infoTimeout')<=0) return;
@@ -258,6 +274,14 @@
 		color="white"
 		/>
 	
+	<!-- Keep the preloader around until everything is ready to display -->
+	<mx:Image
+		 source="@Embed(source='preload/preloader.swf')"
+		 verticalCenter="0"
+		 horizontalCenter="0"
+		 visible="{!applicationLoaded}"
+		 />
+	
 	<mx:Canvas id="contentContainer"
 		x="{props.getNumber('horizontalPadding')/2}"
 		y="0"
@@ -292,7 +316,7 @@
 		source="@Embed(source='assets/buttons/bigplay.swf')"
 		verticalCenter="0" 
 		horizontalCenter="0" 
-		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
+		visible="{(applicationLoaded &amp;&amp; (props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
 		click="playVideoElement()"
 		/>
  	
@@ -366,10 +390,9 @@
 		x="0" 
 		width="{FlexGlobals.topLevelApplication.width}" 
 		horizontalScrollPolicy="off" 
-		verticalScrollPolicy="off"
-		visible="{(props.get('showTray') as Boolean)}" 
 		resize="onTrayResize();" 
 		horizontalCenter="0"
+		visible="false"
 		>
 		<mx:VBox 
 			clipContent="false"
@@ -461,7 +484,7 @@
 					<!-- Progress bar -->
 					<com:PlayerProgress id="progress"
 						targetVideo="{video}"
-						visible="{video.visible &amp;&amp; !activeElement.getBoolean('live')}" 
+						visible="{!activeElement.getBoolean('live') &amp;&amp; !identityVideo.visible}" 
 						/>
 
 					<!-- Right Panel -->
