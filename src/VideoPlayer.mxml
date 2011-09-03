@@ -35,6 +35,7 @@
 			
 			import flash.display.StageDisplayState;
 			import flash.external.ExternalInterface;
+			import flash.utils.setInterval;
 			
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
@@ -50,6 +51,7 @@
 			[Bindable] private var enablePlayList: Boolean = false;		
 			[Bindable] private var showPlayList: Boolean = false;
 			[Bindable] private var cleanVideoState:String = 'paused';
+			[Bindable] private var applicationLoaded:Boolean = false;
 			
 			public function init():void {
 				prepareTimers();
@@ -116,6 +118,8 @@
 				        } catch(e:JSONParseError) {enablePlayList = false; props.put('showShare', false);}
 					}
 				}
+				trayShow();
+				applicationLoaded = true;
 			}
 			
             private function createPlayList():void  {
@@ -183,6 +187,14 @@
             	// INFORMATION BOX WITH TITLE AND DESCRIPTION
             	// Hide when the timer completes
 				infoTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function():void{infoHide();});
+				
+				// PLAY EVENTS
+				// Report plays back to analytics continously
+				setInterval(function():void{
+						try {
+							if(video.playing) reportPlay('start', video.playheadTime);
+						}catch(e:ErrorEvent){}
+					}, 15000);
             }             
             private function infoHide():void {
             	if(props.getNumber('infoTimeout')<=0) return;
@@ -258,6 +270,14 @@
 		color="white"
 		/>
 	
+	<!-- Keep the preloader around until everything is ready to display -->
+	<mx:Image
+		 source="@Embed(source='preload/preloader.swf')"
+		 verticalCenter="0"
+		 horizontalCenter="0"
+		 visible="{!applicationLoaded}"
+		 />
+	
 	<mx:Canvas id="contentContainer"
 		x="{props.getNumber('horizontalPadding')/2}"
 		y="0"
@@ -296,7 +316,7 @@
 		imageHeight="50"
 		verticalCenter="0" 
 		horizontalCenter="0" 
-		visible="{((props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
+		visible="{(applicationLoaded &amp;&amp; (props.get('showBigPlay') as Boolean) &amp;&amp; cleanVideoState=='paused' &amp;&amp; !identityVideo.playing)}" 
 		click="playVideoElement()"
 		/>
  	
@@ -371,9 +391,9 @@
 		width="{FlexGlobals.topLevelApplication.width}" 
 		horizontalScrollPolicy="off" 
 		verticalScrollPolicy="off" 
-		visible="{(props.get('showTray') as Boolean)}" 
 		resize="onTrayResize();" 
 		horizontalCenter="0"
+		visible="false"
 		>
 		<mx:VBox 
 			verticalGap="0"
@@ -456,7 +476,7 @@
 					<!-- Progress bar -->
 					<com:PlayerProgress id="progress"
 						targetVideo="{video}"
-						visible="{video.visible &amp;&amp; !activeElement.getBoolean('live')}" 
+						visible="{!activeElement.getBoolean('live') &amp;&amp; !identityVideo.visible}" 
 						/>
 
 					<!-- Right Panel -->
