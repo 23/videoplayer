@@ -37,7 +37,6 @@ public function expandReportObject(o:Object):Object {
 
 private var lastPlayTimeStart:String = '0';
 public function reportPlay(event:String, time:Number):void {
-	if(!currentElementIndex) return;
 	if(event=='start' || time<=0) {
 		var time_start:String = new String(time+activeElement.getNumber('start'));
 		lastPlayTimeStart = time_start;
@@ -53,14 +52,13 @@ public function reportPlay(event:String, time:Number):void {
 	} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
 }
 public function reportEvent(event:String):void {
-	if(!currentElementIndex) return;
 	var photo_id:int = context.photos[currentElementIndex].photo_id;
 	try {
 		doAPI('/api/analytics/report/event', expandReportObject({photo_id:photo_id, event:event, uuid:uuid}), function():void{});
 	} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
 }
 
-public function goToUrl(url:String):void {
+public function goToUrl(url:String, target:String = '_top'):void {
 	if(!new RegExp('\:\/\/').test(url)) url = props.get('site_url') + url;
-    navigateToURL(new URLRequest(url), "_top");
+    navigateToURL(new URLRequest(url), target);
 }

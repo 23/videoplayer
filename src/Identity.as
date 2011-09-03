@@ -13,7 +13,7 @@ public function showIdentityVideo(event:String, url:String, link:String, callbac
 	identityVideo.play();
 	identityVideo.addEventListener(MouseEvent.CLICK, function():void{
 			reportEvent(event=='before' ? 'preRollClick' : 'postRollClick');
-			goToUrl(link);
+			goToUrl(link, '_blank');
 		});
 	var onComplete:Function = function():void {
 			if(!identityVideo.visible) return;
@@ -33,7 +33,7 @@ public function showIdentityPhoto(event:String, url:String, link:String, callbac
 	var identityPhotoTimer:Timer = new Timer(5000, 1);
 	identityVideo.addEventListener(MouseEvent.CLICK, function():void{
 			reportEvent(event=='before' ? 'preRollClick' : 'postRollClick');
-			goToUrl(link);
+			goToUrl(link, '_blank');
 		});
     identityPhotoTimer.addEventListener("timer", function():void {
 			if(!identityPhoto.visible) return;

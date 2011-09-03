@@ -5,7 +5,7 @@ package preload {
 	import flash.utils.Timer;
 	
 	public class CustomPreloaderScreen extends Loader {
-		[Embed(source="preloader.gif", mimeType="application/octet-stream")] public var CustomPreloaderGraphic:Class;
+		[Embed(source="preloader.swf", mimeType="application/octet-stream")] public var CustomPreloaderGraphic:Class;
 		public var timer:Timer;
 		public var ready:Boolean = false; 
 		
