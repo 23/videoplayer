@@ -330,6 +330,7 @@
 		width="{video.width}" 
 		height="{video.height}"
 		buttonMode="true"
+		enableStageVideo="false"
 		playheadUpdate="{var secs:int=Math.round(identityVideo.totalTime-identityVideo.playheadTime); var mess:String = (secs!=1 ? props.getString('identityCountdownTextPlural') : props.getString('identityCountdownTextSingular')); identityMessage.message = mess.replace(/%/, secs);}"
 		/>
 	<com:SmoothImage id="identityPhoto" 

@@ -43,7 +43,7 @@ package com.visual {
 			var $:Object = this;
 			this.addEventListener(Event.ADDED_TO_STAGE, function(e:Event):void {
 				$.stage.addEventListener('stageVideoAvailability', function(e:Object):void{
-					if(!$.video && e.availability=='available') {
+					if(!$.video && enableStageVideo && e.availability=='available') {
 						_displayMode = 'stage';
 						$.video = $.stage.stageVideos[0];	
 					}
@@ -100,6 +100,8 @@ package com.visual {
 		private var _bufferTime:Number = 2;
 		public function get bufferTime():Number {return(_bufferTime);}
 		public function set bufferTime(bt:Number):void {if(_bufferTime>0) {_bufferTime=bt;}}
+		
+		public var enableStageVideo:Boolean = true;
 
 		private var _aspectRatio:Number = 1; 
 		private var _userAspectRatio:Number = 0; 
