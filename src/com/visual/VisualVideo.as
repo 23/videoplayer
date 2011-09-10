@@ -65,13 +65,7 @@ package com.visual {
 		public function get displayMode():String {return(_displayMode);}
 		
 		// Is this an RTMP stream?
-		public function get isLive():Boolean {
-			if(_source) {
-				return(isRTMP && !/\/vod\//.test(_source.toLowerCase()));
-			} else {
-				return(false);
-			}
-		}
+		public function get isLive():Boolean {return(isRTMP);}
 		public function get isRTMP():Boolean {
 			if(_source) {
 				return(/^rtmp:\/\//.test(_source.toLowerCase()));
@@ -80,9 +74,7 @@ package com.visual {
 			}
 		}
 		private function splitRTMPSource():Array {
-			var match:Array = [];
-			match = _source.match(/^(.+_definst_\/)(.+)/);
-			if(!match.length==3) match = _source.match(/^(.+\/)([^\/]+)/);
+			var match:Array = _source.match(/^(.+\/)([^\/]+)/);
 			if(match.length==3) {
 				return [match[1], match[2]];
 			} else {
@@ -110,7 +102,6 @@ package com.visual {
 		public function set bufferTime(bt:Number):void {if(_bufferTime>0) {_bufferTime=bt;}}
 		
 		public var enableStageVideo:Boolean = true;
-		public var useFCSubscribe:Boolean = true;
 
 		private var _aspectRatio:Number = 1; 
 		private var _userAspectRatio:Number = 0; 
@@ -294,11 +285,7 @@ package com.visual {
 				case "NetConnection.Connect.Success":
 					this.state = VideoEvent.LOADING;
 					if(this.isRTMP) {
-						if(this.useFCSubscribe) {
-							subscribe();
-						} else { 	
-							attachStreamToVideo();
-						}
+						subscribe();
 					} else {
 						attachStreamToVideo();
 					}

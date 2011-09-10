@@ -1,5 +1,4 @@
 import flash.events.ErrorEvent;
-
 import mx.events.VideoEvent;
 [Bindable] public var numVideoElements:int = 0;
 [Bindable] public var currentElementIndex:int = 0;
@@ -35,7 +34,6 @@ private function resetActiveElement():void {
 	activeElement.put('start', '0');
 	activeElement.put('skip', '0');
 	activeElement.put('live', false);
-	video.useFCSubscribe = false;
 	
 	// Reset other stuff related to the active video
 	clearVideo();
@@ -62,7 +60,6 @@ private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolea
 	activeElement.put('start', 0);
 	activeElement.put('skip', false);
 	activeElement.put('live', true);
-	video.useFCSubscribe = true;
 	activeElement.put('one', props.get('site_url') + stream.one); 
 	supportedFormats = ['live'];
 	formatsMenu.options = [];
@@ -109,7 +106,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
   	activeElement.put('hasInfo', hasInfo);
   	activeElement.put('link', o.one);
   	activeElement.put('length', o.video_length); 
-  	activeElement.put('start', 0); // We are using RTMP for this
+  	activeElement.put('start', start);
   	activeElement.put('skip', skip);
 
 	activeElement.put('beforeDownloadType', o.before_download_type);
@@ -197,30 +194,25 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	return(true);
 } 	
 
-private function getStreamzillaUrl(tree_id:int, photo_id:int, token:String, format:String, extension:String = 'mp4'):String {
-	var url:String = 'rtmp://fl2.sz.xlcdn.com:80/vod/_definst_/sz/PBS-23Video/' + tree_id + '-' + photo_id + '-' + token + '-' + format + '.' + extension;
-	trace('Streamzilla URL:', url);
-	return(url);
-}
 private function prepareSupportedFormats(o:Object):void {
 	// Reset list
 	supportedFormats = [];
 
 	// Build list of supported formats and their URLs
-	if (!h264() && typeof(o.video_small_download)!='undefined'&&o.video_small_download.length>0) {		
-		supportedFormats.push({format:'video_small', pseudo:false, label: 'Low (180p)', source:getStreamzillaUrl(o.tree_id, o.photo_id, o.token, 'video_small', 'flv')});
+	if (!h264() && typeof(o.video_small_download)!='undefined'&&o.video_small_download.length>0) {
+		supportedFormats.push({format:'video_small', pseudo:false, label: 'Low (180p)', source:props.get('site_url') + o.video_small_download});
 	}
 	if (h264()&&typeof(o.video_mobile_high_download)!='undefined'&&o.video_mobile_high_download.length>0) {
-		supportedFormats.push({format:'video_mobile_high', pseudo:true, label: 'Low (180p)', source:getStreamzillaUrl(o.tree_id, o.photo_id, o.token, 'video_mobile_high')}); 
+		supportedFormats.push({format:'video_mobile_high', pseudo:true, label: 'Low (180p)', source:props.get('site_url') + o.video_mobile_high_download}); 
 	}
 	if (h264()&&typeof(o.video_medium_download)!='undefined'&&o.video_medium_download.length>0) {
-		supportedFormats.push({format:'video_medium', pseudo:true, label: 'Standard (360p)', source:getStreamzillaUrl(o.tree_id, o.photo_id, o.token, 'video_medium')}); 
+		supportedFormats.push({format:'video_medium', pseudo:true, label: 'Standard (360p)', source:props.get('site_url') + o.video_medium_download}); 
 	}
 	if (h264()&&typeof(o.video_hd_download)!='undefined'&&o.video_hd_download.length>0) {
-		supportedFormats.push({format:'video_hd', pseudo:true, label: 'HD (720p)', source:getStreamzillaUrl(o.tree_id, o.photo_id, o.token, 'video_hd')}); 
+		supportedFormats.push({format:'video_hd', pseudo:true, label: 'HD (720p)', source:props.get('site_url') + o.video_hd_download}); 
 	}
 	if (h264()&&typeof(o.video_1080p_download)!='undefined'&&o.video_1080p_download.length>0&&o.video_1080p_size>0) {
-		supportedFormats.push({format:'video_1080p', pseudo:true, label: 'Full HD (1080p)', source:getStreamzillaUrl(o.tree_id, o.photo_id, o.token, 'video_1080p')}); 
+		supportedFormats.push({format:'video_1080p', pseudo:true, label: 'Full HD (1080p)', source:props.get('site_url') + o.video_1080p_download}); 
 	}
 	
 	// We'll want a menu for this
@@ -329,8 +321,7 @@ private function pauseVideoElement():void {
 }
 
 private function getFullVideoSource():String {
-	//var joinChar:String = (/\?/.test(activeElement.getString('videoSource')) ? '&' : '?');
-	//return(activeElement.getString('videoSource') + joinChar + 'start=' + encodeURIComponent(activeElement.getString('start')) + '&skip=' + encodeURIComponent(activeElement.getString('skip')));
-	return(activeElement.getString('videoSource'));
+	var joinChar:String = (/\?/.test(activeElement.getString('videoSource')) ? '&' : '?');
+	return(activeElement.getString('videoSource') + joinChar + 'start=' + encodeURIComponent(activeElement.getString('start')) + '&skip=' + encodeURIComponent(activeElement.getString('skip')));
 }            
 

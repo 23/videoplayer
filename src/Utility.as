@@ -37,7 +37,6 @@ public function expandReportObject(o:Object):Object {
 
 private var lastPlayTimeStart:String = '0';
 public function reportPlay(event:String, time:Number):void {
-	return; // Streamzilla doesn't use our analytics
 	if(event=='start' || time<=0) {
 		var time_start:String = new String(time+activeElement.getNumber('start'));
 		lastPlayTimeStart = time_start;
@@ -53,7 +52,6 @@ public function reportPlay(event:String, time:Number):void {
 	} catch(e:Error) {subtitles.suppportedLocales = {}; subtitlesMenu.options = [];}
 }
 public function reportEvent(event:String):void {
-	return; // Streamzilla doesn't use our analytics
 	var photo_id:int = context.photos[currentElementIndex].photo_id;
 	try {
 		doAPI('/api/analytics/report/event', expandReportObject({photo_id:photo_id, event:event, uuid:uuid}), function():void{});
