@@ -116,6 +116,8 @@
             public function seekVideoTo(time:int):void {
             	if(!_targetVideo) return;
             	if(time>activeElement.getNumber('length')) return;
+				_targetVideo.playheadTime = time;
+				/*
             	var approxBufferTime:Number = (_targetVideo.totalTime * (_targetVideo.bytesLoaded/_targetVideo.bytesTotal)) + activeElement.getNumber('start');
         		_targetVideo.bufferTime = 2; // default buffer time is two secs
             	if(time>new Number(activeElement.get('start')) && time<approxBufferTime) {
@@ -131,6 +133,7 @@
 						this.parentApplication.playVideoElement();
             		}
             	}
+				*/
             }
             private function updateBuffer(e:Event):void {
             	if(!_targetVideo) return;
