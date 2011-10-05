@@ -387,6 +387,25 @@
 			/> 
 	</mx:Box>
 
+		
+	<!-- Share panel -->
+	<mx:Tile 
+		id="sharePanel"
+		horizontalScrollPolicy="off" 
+		verticalScrollPolicy="off" 
+		visible="false"
+		includeInLayout="{sharePanel.visible}"
+		show="{reportEvent('shareEngaged');}"
+		verticalCenter="0"
+		horizontalCenter="0"
+		horizontalGap="-17"
+		verticalGap="0"
+		maxWidth="350"
+		>
+	</mx:Tile>
+	<!-- /Share panel -->		
+
+		
 	<!-- Tray -->
 	<mx:VBox id="tray" 
 		width="{video.width-20}" 
@@ -415,7 +434,7 @@
 				/>
 		</mx:Canvas>					
 		<!-- /PlayList -->
-
+		
 		<mx:VBox 
 			id="videoControls"
 			verticalGap="0" hide="sharePanel.visible=false;"
@@ -589,22 +608,6 @@
 	</com:TextPanel> 
 	<!-- / Text panel for post-roll -->
 		
-	<!-- Share panel -->
-	<mx:Tile 
-		id="sharePanel"
-		horizontalScrollPolicy="off" 
-		verticalScrollPolicy="off" 
-		visible="false"
-		includeInLayout="{sharePanel.visible}"
-		show="{reportEvent('shareEngaged');}"
-		verticalCenter="0"
-		horizontalCenter="0"
-		horizontalGap="-17"
-		verticalGap="0"
-		maxWidth="350"
-		>
-	</mx:Tile>
-	<!-- /Share panel -->
 		
 </mx:Canvas>
 </mx:Application>
