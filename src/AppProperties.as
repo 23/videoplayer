@@ -53,7 +53,7 @@ public var propDefaults:Object = {
 	socialSharing: true,
 	streaming: false,
 
-	autoPlay: false,
+	autoPlay: true,
 	loop: false,
 	playHD: false
 }
