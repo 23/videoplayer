@@ -653,6 +653,18 @@
 									/>
 							</com:PlayerButton>
 
+							<!-- Mute and Unmute -->
+							<com:PlayerButton id="muteImage"
+								imageSource="@Embed(source='assets/buttons/mute-on.swf')"
+								visible="{videoControls.visible &amp;&amp; video.volume>0}"
+								click="video.volume=0"
+								/>
+							<com:PlayerButton id="unmuteImage"
+								imageSource="@Embed(source='assets/buttons/mute-off.swf')"
+								visible="{videoControls.visible &amp;&amp; video.volume==0}"
+								click="video.volume=1"
+								/>
+							
 							<!-- Link -->
 				    		<com:PlayerButton id="linkBtn" 
 				    			imageSource="@Embed(source='assets/buttons/link.swf')"
