@@ -16,7 +16,8 @@
 	width="100%" 
 	height="100%" 
 	creationComplete="init();" 
-	keyDown="trayShow()" 
+	keyDown="trayShow()"
+	click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();"
 	>
  	<mx:Script source="Utility.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
@@ -122,6 +123,7 @@
 					}
 				}
 				trayShow();
+				infoShow();
 				applicationLoaded = true;
 			}
 			
@@ -204,7 +206,7 @@
 				descriptions.visible = false;
             }
             private function infoShow(timeout:Boolean=true):void {
-            	if(!activeElement.get('hasInfo')) {descriptions.visible = false; return;}
+            	if(!activeElement.get('hasInfo') || !props.get('showDescriptions')) {descriptions.visible = false; return;}
 				infoTimer.stop();
 				descriptions.visible = true;
 				if(timeout) infoTimer.start();
@@ -528,7 +530,7 @@
 						<!-- InfoBtn -->
 						<com:PlayerButton id="infoImage" 
 										  imageSource="@Embed(source='assets/buttons/info.swf')"
-										  visible="{(activeElement.get('hasInfo') as Boolean)}" 
+										  visible="{(activeElement.get('hasInfo') as Boolean) &amp;&amp; (props.get('showDescriptions') as Boolean)}" 
 										  click="infoToggle();"
 										  />
 
