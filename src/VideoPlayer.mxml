@@ -16,7 +16,8 @@
 	width="100%" 
 	height="100%" 
 	creationComplete="init();" 
-	keyDown="trayShow()" 
+	keyDown="trayShow()"
+	click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();"
 	>
  	<mx:Script source="Utility.as"></mx:Script>
  	<mx:Script source="Fullscreen.as"></mx:Script>
