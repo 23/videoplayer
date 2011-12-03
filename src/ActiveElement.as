@@ -114,6 +114,28 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	activeElement.put('afterDownloadUrl', props.get('site_url') + o.after_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
 	activeElement.put('afterLink', o.after_link);
 	activeElement.put('afterText', o.after_text); 
+
+	// Photo source
+	activeElement.put('photoSource', props.get('site_url') + o.large_download);
+	activeElement.put('photoWidth', new Number(o.large_width));
+	activeElement.put('photoHeight', new Number(o.large_height));
+	
+	// Aspect ratios
+	var ar:Number = parseInt(o.large_width) / parseInt(o.large_height);
+	activeElement.put('aspectRatio', ar);
+	video.aspectRatio = ar;
+	identityVideo.aspectRatio = (props.getBoolean('maintainIdentityAspectRatio') ? 0 : ar);
+	showImageElement();
+	
+	// Link back to the video
+	activeElement.put('one', props.get('site_url') + o.one); 
+	
+	if(video_p) {
+		image.source = null;
+		showVideoElement();
+	} else {
+		showImageElement();
+	}
 	
 	// Get sections and show, otherwise reset
 	if(!skip) {
@@ -156,27 +178,8 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	// Switch to format if needed
 	setVideoFormat(format || currentVideoFormat);
 	
-	// Link back to the video
-	activeElement.put('one', props.get('site_url') + o.one); 
-  	
-  	// Photo source
-  	activeElement.put('photoSource', props.get('site_url') + o.large_download);
-  	activeElement.put('photoWidth', new Number(o.large_width));
-  	activeElement.put('photoHeight', new Number(o.large_height));
-	
-	// Aspect ratios
-	var ar:Number = parseInt(o.large_width) / parseInt(o.large_height);
-  	activeElement.put('aspectRatio', ar);
-	video.aspectRatio = ar;
-	identityVideo.aspectRatio = (props.getBoolean('maintainIdentityAspectRatio') ? 0 : ar)
-	
- 
  	if(video_p) {
- 		image.source = null;
-  		showVideoElement();
   		if (props.get('autoPlay') || props.get('loop') || startPlaying) playVideoElement();
-  	} else {
-  		showImageElement();
   	}
 
 	// Make embed code current

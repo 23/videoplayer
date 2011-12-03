@@ -18,7 +18,6 @@
 	creationComplete="init(); resizeTray();" 
 	resize="resizeTray();" 
 	keyDown="trayShow()"
-	click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();"
 	>
 	<mx:Style>
      @font-face {
@@ -320,6 +319,11 @@
 		verticalScrollPolicy="off"
 		horizontalScrollPolicy="off"
 		>
+	<!-- Click Container when wmode='direct' -->
+	<mx:Canvas 
+		top="0" right="0" bottom="0" left="0"
+		click="playListHide(); if(video.playing) pauseVideoElement(); else playVideoElement();"
+		/>
 	<!-- Image and Video -->
 	<visual:VisualVideo id="video"
 		volume="1" 
