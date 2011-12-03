@@ -308,9 +308,7 @@ package com.visual {
 				case "NetStream.Play.Stop":
 					isPlaying = false;
 					this.state = VideoEvent.STOPPED;
-					if(this.stream && totalTime>0 && this.stream.time>=(totalTime-0.5)) {
-						dispatchVideoEvent(VideoEvent.COMPLETE);
-					}
+					if(this.completed) dispatchVideoEvent(VideoEvent.COMPLETE);
 					break;
 			}
 		}			
@@ -320,6 +318,10 @@ package com.visual {
 			videoEvent.state = this.state;
 			videoEvent.playheadTime = this.playheadTime;
 			dispatchEvent(videoEvent);
+		}
+		
+		public function get completed():Boolean {
+			return(this.stream && totalTime>0 && this.stream.time>=(totalTime-0.5));
 		}
 		
 		// Match size of video to the container

@@ -301,6 +301,10 @@ private function showVideoElement():void {
 
 public function playVideoElement():void {
 	if(!activeElement.get('video_p')) return;
+	if(video.completed) {
+		activeElement.put('start', 0);
+		video.playheadTime = 0;		
+	}
 	image.visible=false;
 	video.visible=true;
 	videoControls.visible=true;
