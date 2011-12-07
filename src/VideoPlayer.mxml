@@ -198,7 +198,7 @@
 						try {
 							if(video.playing) reportPlay('start', video.playheadTime);
 						}catch(e:ErrorEvent){}
-					}, 15000);
+					}, 30000);
             }             
             private function infoHide():void {
             	if(props.getNumber('infoTimeout')<=0) return;

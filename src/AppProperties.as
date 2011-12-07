@@ -199,7 +199,7 @@ private function initProperties(settings:Object):void {
 }
 
 private function getRecommendationSource():String {
-	if(!context || !context.photos) return(props.get('site_url') + '/api/photo/list?raw&format=json&size=20');
+	if(!context || !context.photos) return(props.get('site_url') + '/api/photo/list?raw&format=json&size=10');
 	
 	if(context.photos.length==1) {
 		// There's only one video to play, we'll need to construct recommendation in another fashion.
@@ -208,13 +208,13 @@ private function getRecommendationSource():String {
 		switch (method) {
 			case 'site-new':
 			case 'channel-new':
-				recommendationSource = props.get('site_url') + '/api/photo/list?raw&format=json&size=20&orderby=uploaded&order=desc';
+				recommendationSource = props.get('site_url') + '/api/photo/list?raw&format=json&size=10&orderby=uploaded&order=desc';
 				break;
 			case 'site-popular':
 			case 'channel-popular':
 			case 'similar':
 			default:
-				recommendationSource = props.get('site_url') + '/api/photo/list?raw&format=json&size=20&orderby=rank&order=desc';
+				recommendationSource = props.get('site_url') + '/api/photo/list?raw&format=json&size=10&orderby=rank&order=desc';
 				break;
 		}
 		if (playerId.length) recommendationSource += '&player_id=' + encodeURI(playerId);
