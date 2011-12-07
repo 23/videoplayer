@@ -77,6 +77,7 @@ private function initLoadURL():void{
 	if (defaultPhotoId.length) loadParameters.push('photo_id=' + encodeURI(defaultPhotoId)); 
 	if (defaultAlbumId.length) loadParameters.push('album_id=' + encodeURI(defaultAlbumId));
 	loadParameters.push('player_id=' + encodeURI(playerId));
+	loadParameters.push('size=1');
 	
 	// Use load parameters to build JSON source
 	var jsonSource:String = props.get('site_url') + '/api/photo/list?raw&format=json&' + loadParameters.join('&');
