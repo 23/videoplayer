@@ -131,7 +131,7 @@ package com.visual {
 		
 		public function get playheadTime():Number {return(this.stream ? this.stream.time : 0);}
 		public function set playheadTime(pht:Number):void {
-			if(!this.connection&&!this.stream) return;
+			if(!this.connection||!this.stream) return;
 			if(pht<0||pht>totalTime) return;
 			if(isLive) return;
 			this.stream.seek(pht);
@@ -176,6 +176,7 @@ package com.visual {
 		private function reset():void {
 			trace((new Date), 'reset()');
 			stop();
+			try {this.video.clear();}catch(e:Object){}
 			// Reset progress
 			_totalTime = 0;
 			_lastProgressBytes = 0;
@@ -291,11 +292,19 @@ package com.visual {
 					}
 					break;
 				case "NetStream.Buffer.Empty":
-					if(isPlaying) this.state = VideoEvent.BUFFERING;
+					if(this.completed) { 
+						isPlaying = false;
+						this.state = VideoEvent.STOPPED;
+						if(this.completed) dispatchVideoEvent(VideoEvent.COMPLETE);
+					} else {
+						if(isPlaying) this.state = VideoEvent.BUFFERING;
+					}
 					break;
 				case "NetStream.Seek.Notify":
 				case "NetStream.Unpause.Notify":
+					break;
 				case "NetStream.Buffer.Full":
+					if(isPlaying) this.state = VideoEvent.PLAYING;
 					break;
 				case "NetStream.Play.Start":
 					isPlaying = true;
