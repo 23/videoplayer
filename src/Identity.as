@@ -1,3 +1,4 @@
+import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.utils.Timer;
 
@@ -7,8 +8,8 @@ public var currentIdentityEvent = '';
 public function showIdentityVideo(event:String, url:String, link:String, callback:Function):void {
 	videoControls.visible = video.visible = false;
 	infoHide();
-	identityVideo.visible = true;
 	identityVideo.source = url;
+	identityVideo.visible = true;
 	identityVideo.play();
 	identityVideo.addEventListener(MouseEvent.CLICK, function():void{
 			reportEvent(event=='before' ? 'preRollClick' : 'postRollClick');
@@ -17,6 +18,8 @@ public function showIdentityVideo(event:String, url:String, link:String, callbac
 	var onComplete:Function = function():void {
 			if(!identityVideo.visible) return;
 			infoShow();
+			identityVideo.stop();
+			identityVideo.source = null;
 			identityVideo.visible = false;
 			videoControls.visible = video.visible = true;
 			identityVideo.removeEventListener(VideoEvent.COMPLETE, onComplete);
@@ -36,6 +39,7 @@ public function showIdentityPhoto(event:String, url:String, link:String, callbac
 		});
     identityPhotoTimer.addEventListener("timer", function():void {
 			if(!identityPhoto.visible) return;
+			identityPhoto.source = null;
 			identityPhoto.visible = false;
 			videoControls.visible = video.visible = true;
 			callback();
