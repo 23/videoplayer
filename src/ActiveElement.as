@@ -1,3 +1,5 @@
+import flash.events.ErrorEvent;
+import mx.events.VideoEvent;
 [Bindable] public var numVideoElements:int = 0;
 [Bindable] public var currentElementIndex:int = 0;
 [Bindable] public var activeElement:HashCollection = new HashCollection();
@@ -10,7 +12,7 @@ private function initActiveElement():void {
 	resetActiveElement();
 }
  
-private function resetActiveElement():void {
+private function resetActiveElement(skip:Boolean=false):void {
   	activeElement.put('photo_id', '');
 	activeElement.put('video_p', false);
   	activeElement.put('title', '');
@@ -38,9 +40,12 @@ private function resetActiveElement():void {
 	identityVideo.visible = false;
 	identityVideo.close();
 	showBeforeIdentity = true;
-	progress.setSections([]);
-	subtitles.suppportedLocales = {}; subtitlesMenu.options = [];
 	liveStreamsMenu.value = null;
+
+	if(!skip) {
+		progress.setSections([]);
+		subtitles.suppportedLocales = {}; subtitlesMenu.options = [];
+	}
 }
 
 private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolean=false):void {
@@ -86,7 +91,7 @@ private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolea
 
 private function setActiveElement(i:int, startPlaying:Boolean=false, start:Number=0, skip:int=0, format:String=null):Boolean {
 	if (!context || !context.photos || !context.photos[i]) return(false);
-	resetActiveElement();
+	resetActiveElement(skip);
 
 	numVideoElements = context.photos.length;
 	currentElementIndex = i;
@@ -162,15 +167,15 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 		} else {
 			subtitles.suppportedLocales = {}; subtitlesMenu.options = [];
 		}
-	}
 	
-	// Get subtitles and show, otherwise reset
-	if(o.sections_p) {
-		try {
-			doAPI('/api/photo/section/list', {photo_id:o.photo_id, token:o.token}, function(sec:Object):void{progress.setSections(sec.sections);});
-		} catch(e:Error) {progress.setSections([]);}
-	} else {
-		progress.setSections([]);
+		// Get subtitles and show, otherwise reset
+		if(o.sections_p) {
+			try {
+				doAPI('/api/photo/section/list', {photo_id:o.photo_id, token:o.token}, function(sec:Object):void{progress.setSections(sec.sections);});
+			} catch(e:Error) {progress.setSections([]);}
+		} else {
+			progress.setSections([]);
+		}
 	}
 
 	// Supported formats, default format and build menu
