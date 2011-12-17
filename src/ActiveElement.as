@@ -313,9 +313,9 @@ public function playVideoElement():void {
 	videoControls.visible=true;
 	progress.visible=(!video.isLive);
 	video.source = getFullVideoSource();
-	video.stop();
-	video.pause();
 	if(showBeforeIdentity) {
+		video.stop();
+		video.pause();
 		// We'll only do this once for every element, otherwise the preroll will start on every pause/play.
 		showBeforeIdentity = false;
 		handleIdentity('before', function():void {playVideoElement();});
