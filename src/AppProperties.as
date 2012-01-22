@@ -271,12 +271,12 @@ private function bootstrapAds():void {
 	ads.addEventListener('contentPauseRequested', function():void{
 		forceHideTray = true;
 		trayHide();
-		video.pause();
+		pauseVideoElement()
 	});
 	ads.addEventListener('contentResumeRequested', function():void{
 		forceHideTray = false;
 		trayShow();
-		video.play();	
+		playVideoElement()	
 	});
 	
 	// Append sources
