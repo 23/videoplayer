@@ -45,8 +45,8 @@ public var propDefaults:Object = {
 	subtitlesDesign: 'bars',
 	playlistClickMode:'link',
 	enableLiveStreams: true,
-	playflowInstreamVideo: 'http://prototypes.labs.23company.com/bold.xml||',
-	playflowInstreamOverlay: '|ca-video-googletest1|123',
+	playflowInstreamVideo: '',
+	playflowInstreamOverlay: '',
 	
 	start: parseFloat('0'),
 	player_id: parseFloat('0'),
