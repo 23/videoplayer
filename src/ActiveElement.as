@@ -6,7 +6,8 @@ import mx.events.VideoEvent;
 public var itemsArray: Array;
 private var supportedFormats:Array = [];
 [Bindable]public var currentVideoFormat:String = 'video_medium';
-[Bindable] public var showBeforeIdentity:Boolean = false; 
+[Bindable] public var showBeforeIdentity:Boolean = false;
+[Bindable] public var showVideoAd:Boolean = false;
 
 private function initActiveElement():void {
 	resetActiveElement();
@@ -40,6 +41,7 @@ private function resetActiveElement(skip:Boolean=false):void {
 	identityVideo.visible = false;
 	identityVideo.close();
 	showBeforeIdentity = true;
+	showVideoAd = true;
 	liveStreamsMenu.value = null;
 
 	if(!skip) {
@@ -319,6 +321,10 @@ public function playVideoElement():void {
 	videoControls.visible=true;
 	progress.visible=(!video.isLive);
 	video.source = getFullVideoSource();
+	if(showVideoAd&&ads&&ads.preroll()) {
+		showVideoAd = false;
+		return;
+	}
 	if(showBeforeIdentity) {
 		video.stop();
 		video.pause();
@@ -327,7 +333,7 @@ public function playVideoElement():void {
 		handleIdentity('before', function():void {playVideoElement();});
 		return;
 	}
-	if(!ads || !ads.preroll()) video.play();
+	video.play();	
 }
 private function pauseVideoElement():void {
 	try {
