@@ -33,6 +33,7 @@
           </libraryPathEntry>
         </excludedEntries>
       </libraryPathEntry>
+      <libraryPathEntry autoExtract="true" kind="3" linkType="3" path="/Users/steffentchr/Downloads/ima_lib_as3.swc" rslUrl="ima_lib_as3.swf" useDefaultLinkType="true"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>

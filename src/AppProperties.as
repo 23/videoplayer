@@ -1,5 +1,7 @@
 // ActionScript file
 import mx.core.FlexGlobals;
+import mx.core.UIComponent;
+import mx.events.ResizeEvent;
 import mx.utils.URLUtil;
 
 [Bindable] public var props:HashCollection = new HashCollection();
@@ -43,6 +45,8 @@ public var propDefaults:Object = {
 	subtitlesDesign: 'bars',
 	playlistClickMode:'link',
 	enableLiveStreams: true,
+	playflowInstreamVideo: '',
+	playflowInstreamOverlay: '',
 	
 	start: parseFloat('0'),
 	player_id: parseFloat('0'),
@@ -157,7 +161,7 @@ private function initProperties(settings:Object):void {
 	
 	// Should we start by playing HD? 
 	if(props.get('playHD')) currentVideoFormat = 'video_hd';
-
+	
 	// Load up featured live streams
 	if(props.get('enableLiveStreams')) {
 		var streamOptions:Object = {};
@@ -241,4 +245,44 @@ private function updateCurrentVideoEmbedCode():void {
 		// A safety net for bad code
 		props.put('currentVideoEmbedCode', props.getString('embedCode'));
 	}  
+}
+
+private function bootstrapAds():void {
+	// Clean up
+	visualAdContainer.removeAllChildren();
+	ads = null;
+	
+	// Is there advertising=
+	if(activeElement.getString('playflowInstreamVideo').length==0 && activeElement.getString('playflowInstreamOverlay').length==0) return;
+		
+	// Attach VisualAd element to the stage, and make sure it's sized correctly
+	ads = new VisualAds();
+	visualAdContainer.addChild((ads as UIComponent));
+	
+	// Make sure it's sized correctly
+	var fitSize:Function = function():void{
+		ads.width = visualAdContainer.width;
+		ads.height = visualAdContainer.height;
+	}
+	fitSize();
+	visualAdContainer.addEventListener(ResizeEvent.RESIZE, fitSize);
+	
+	// Interface with the app through events
+	ads.addEventListener('contentPauseRequested', function():void{
+		forceHideTray = true;
+		trayHide();
+		video.pause();
+	});
+	ads.addEventListener('contentResumeRequested', function():void{
+		forceHideTray = false;
+		trayShow();
+		video.play();	
+	});
+	
+	// Append sources
+	var a:Array;
+	a = activeElement.getString('playflowInstreamVideo').split('|');
+	if(a.length==3) ads.push('video', decodeURIComponent(a[0]), decodeURIComponent(a[1]), decodeURIComponent(a[2]));
+	a = activeElement.getString('playflowInstreamOverlay').split('|');
+	if(a.length==3) ads.push('overlay', decodeURIComponent(a[0]), decodeURIComponent(a[1]), decodeURIComponent(a[2]));
 }

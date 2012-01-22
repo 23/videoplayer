@@ -49,6 +49,7 @@
 			import com.SmoothImage;
 			import com.adobe.serialization.json.JSONParseError;
 			import com.philemonworks.flex.util.HashCollection;
+			import com.visual.VisualAds;
 			
 			import flash.display.StageDisplayState;
 			import flash.external.ExternalInterface;
@@ -70,6 +71,8 @@
 			[Bindable] private var showPlayList: Boolean = false;
 			[Bindable] private var cleanVideoState:String = 'paused';
 			[Bindable] private var applicationLoaded:Boolean = false;
+			public var ads = null;
+			public var forceHideTray:Boolean = false;
 			
 			public function init():void {
 				prepareTimers();
@@ -187,7 +190,7 @@
 				trayShow();
             }
             private function trayShow():void {
-            	if(!props.get('showTray')) {tray.visible=false; return;}
+            	if(forceHideTray || !props.get('showTray')) {tray.visible=false; return;}
             	trayTimer.reset(); trayTimer.start();
             	tray.visible = true;
             }            
@@ -244,6 +247,7 @@
             }
 			private function onVideoStateChange(evt:Event):void {
 				if(evt.currentTarget.state==VideoEvent.PLAYING || evt.currentTarget.state==VideoEvent.SEEKING) {
+					if(ads) ads.overlay();
 					cleanVideoState = 'playing';
 					playListHide();
 				} else if(evt.currentTarget.state==VideoEvent.LOADING || evt.currentTarget.state==VideoEvent.BUFFERING) {
@@ -423,6 +427,13 @@
 			verticalAlign="{props.get('logoVAlign')}"
 			/> 
 	</mx:Box>
+
+	<mx:Canvas id="visualAdContainer" 
+			   horizontalScrollPolicy="off"
+			   verticalScrollPolicy="off"
+			   clipContent="true"
+			   width="100%" 
+			   height="{(tray.visible ? tray.y+(descriptions.visible?0:descriptions.height) : FlexGlobals.topLevelApplication.height)}" /> 
 
 	<!-- Tray -->
 	<mx:VBox id="tray" 
@@ -620,17 +631,17 @@
 				    			/>
 
 
-				    		<!-- InfoBtn -->
-				    		<com:PlayerButton id="infoImage" 
-				    			imageSource="@Embed(source='assets/buttons/info.swf')"
-				    			visible="{(activeElement.get('hasInfo') as Boolean) &amp;&amp; (props.get('showDescriptions') as Boolean)}" 
-				    			click="infoToggle();"
-				    			/>
-
+							<!-- InfoBtn -->
+							<com:PlayerButton id="infoImage" 
+											  imageSource="@Embed(source='assets/buttons/info.swf')"
+											  visible="{(activeElement.get('hasInfo') as Boolean) &amp;&amp; (props.get('showDescriptions') as Boolean)}" 
+											  click="infoToggle();"
+											  />
+							
 							<!-- HDbutton-->
 							<com:PlayerButton id="hdBtn" 
-							  	imageSource="@Embed(source='assets/buttons/hd.swf')"
-							  	>
+											  imageSource="@Embed(source='assets/buttons/hd.swf')"
+											  >
 								<com:PlayerMenu 
 									id="formatsMenu"
 									value="{currentVideoFormat}"
@@ -644,8 +655,8 @@
 							
 							<!-- Subtitle button-->
 							<com:PlayerButton id="subtitlesBtn" 
-								imageSource="@Embed(source='assets/buttons/cc.swf')"
-								>
+											  imageSource="@Embed(source='assets/buttons/cc.swf')"
+											  >
 								<com:PlayerMenu 
 									id="subtitlesMenu"
 									value="{subtitles.locale}"
@@ -656,89 +667,89 @@
 									color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
 									/>
 							</com:PlayerButton>
-
+							
 							<!-- Mute and Unmute -->
 							<com:PlayerButton id="muteImage"
-								imageSource="@Embed(source='assets/buttons/mute-on.swf')"
-								visible="{videoControls.visible &amp;&amp; video.volume>0}"
-								click="video.volume=0"
-								/>
+											  imageSource="@Embed(source='assets/buttons/mute-on.swf')"
+											  visible="{videoControls.visible &amp;&amp; video.volume>0}"
+											  click="video.volume=0"
+											  />
 							<com:PlayerButton id="unmuteImage"
-								imageSource="@Embed(source='assets/buttons/mute-off.swf')"
-								visible="{videoControls.visible &amp;&amp; video.volume==0}"
-								click="video.volume=1"
-								/>
+											  imageSource="@Embed(source='assets/buttons/mute-off.swf')"
+											  visible="{videoControls.visible &amp;&amp; video.volume==0}"
+											  click="video.volume=1"
+											  />
 							
 							<!-- Link -->
-				    		<com:PlayerButton id="linkBtn" 
-				    			imageSource="@Embed(source='assets/buttons/link.swf')"
-				    			visible="{(props.get('showShare') as Boolean)}" 
-				    			click="{goToUrl(activeElement.get('link') + '?player_id=' + props.get('player_id'))}"
-				    			/>
+							<com:PlayerButton id="linkBtn" 
+											  imageSource="@Embed(source='assets/buttons/link.swf')"
+											  visible="{(props.get('showShare') as Boolean)}" 
+											  click="{goToUrl(activeElement.get('link') + '?player_id=' + props.get('player_id'))}"
+											  />
 							<!-- Twitter -->
-				    		<com:PlayerButton id="twitterBtn" 
-				    			imageSource="@Embed(source='assets/buttons/twitter.swf')"
-				    			visible="{(props.get('showShare') as Boolean)}" 
-				    			click="{goToUrl(activeElement.get('link') + '/twitter?player_id=' + props.get('player_id'))}"
-				    			/>
+							<com:PlayerButton id="twitterBtn" 
+											  imageSource="@Embed(source='assets/buttons/twitter.swf')"
+											  visible="{(props.get('showShare') as Boolean)}" 
+											  click="{goToUrl(activeElement.get('link') + '/twitter?player_id=' + props.get('player_id'))}"
+											  />
 							<!-- Facebook -->
-				    		<com:PlayerButton id="facebookBtn" 
-				    			imageSource="@Embed(source='assets/buttons/facebook.swf')"
-				    			visible="{(props.get('showShare') as Boolean)}" 
-				    			click="{goToUrl(activeElement.get('link') + '/facebook?player_id=' + props.get('player_id'))}"
-				    			/>
+							<com:PlayerButton id="facebookBtn" 
+											  imageSource="@Embed(source='assets/buttons/facebook.swf')"
+											  visible="{(props.get('showShare') as Boolean)}" 
+											  click="{goToUrl(activeElement.get('link') + '/facebook?player_id=' + props.get('player_id'))}"
+											  />
 							<!-- Fullscreen -->
-				    		<com:PlayerButton id="fullscreenImage"
-				    			imageSource="@Embed(source='assets/buttons/fullscreen.swf')"
-				    			click="toggleFullScreen()"
-				    			/>
-				    	</mx:HBox> 
+							<com:PlayerButton id="fullscreenImage"
+											  imageSource="@Embed(source='assets/buttons/fullscreen.swf')"
+											  click="toggleFullScreen()"
+											  />
+						</mx:HBox> 
 					</mx:HBox> 
-						
+					
 					<!-- Progress bar -->
 					<com:PlayerProgress id="progress"
-						targetVideo="{video}"
-						visible="{!activeElement.getBoolean('live') &amp;&amp; !identityVideo.visible}"
-						width="100%" 
-						height="21"
-						/>
+										targetVideo="{video}"
+										visible="{!activeElement.getBoolean('live') &amp;&amp; !identityVideo.visible}"
+										width="100%" 
+										height="21"
+										/>
 				</mx:VBox>
 			</mx:HBox>
 		</mx:VBox>	
 	</mx:VBox>
-
-	<!-- Text panel for post-roll html identity text -->
-	<com:TextPanel id="identityPanel" 
-		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}"
-		>
-		<mx:TextArea id="identityPanelText"
-			width="100%"
-			height="{(this.height-100)*0.9}" 
-			backgroundAlpha="0" 
-			borderStyle="none"
-			fontSize="12" 
-			editable="false" 
-			color="white"
-			paddingTop="10" 
-			paddingBottom="20"
-			click="{reportEvent('callToActionClick');}"
-			/>
-		<mx:HBox 
-			visible="{(props.get('showShare') as Boolean)}"
-			width="100%"
-			paddingTop="10" 
-			borderColor="#666666"
-			borderStyle="solid"
-			borderSides="top"
-			borderThickness="1"
-			>
-			<com:ActionButton
-				text="Share this video" 
-				iconSource="@Embed(source='assets/buttons/share.swf')"
-				click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible; identityPanel.close();"
-				/>
-		</mx:HBox>
-	</com:TextPanel> 
-	<!-- / Text panel for post-roll -->
-</mx:Canvas>
+		
+		<!-- Text panel for post-roll html identity text -->
+		<com:TextPanel id="identityPanel" 
+					   backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}"
+					   >
+			<mx:TextArea id="identityPanelText"
+						 width="100%"
+						 height="{(this.height-100)*0.9}" 
+						 backgroundAlpha="0" 
+						 borderStyle="none"
+						 fontSize="12" 
+						 editable="false" 
+						 color="white"
+						 paddingTop="10" 
+						 paddingBottom="20"
+						 click="{reportEvent('callToActionClick');}"
+						 />
+			<mx:HBox 
+				visible="{(props.get('showShare') as Boolean)}"
+				width="100%"
+				paddingTop="10" 
+				borderColor="#666666"
+				borderStyle="solid"
+				borderSides="top"
+				borderThickness="1"
+				>
+				<com:ActionButton
+					text="Share this video" 
+					iconSource="@Embed(source='assets/buttons/share.swf')"
+					click="embedPanel.visible=props.get('showShare') &amp;&amp; !embedPanel.visible; identityPanel.close();"
+					/>
+			</mx:HBox>
+		</com:TextPanel> 
+		<!-- / Text panel for post-roll -->
+	</mx:Canvas>
 </mx:Application>
