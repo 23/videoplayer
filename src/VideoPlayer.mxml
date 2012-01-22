@@ -433,7 +433,7 @@
 			   verticalScrollPolicy="off"
 			   clipContent="true"
 			   width="100%" 
-			   height="{(tray.visible ? tray.y+(descriptions.visible?0:descriptions.height) : FlexGlobals.topLevelApplication.height)}" /> 
+			   height="{(FlexGlobals.topLevelApplication.height - (tray.visible ? 62 : 0))}" /> 
 
 	<!-- Tray -->
 	<mx:VBox id="tray" 

@@ -270,6 +270,7 @@ private function bootstrapAds():void {
 	// Interface with the app through events
 	ads.addEventListener('contentPauseRequested', function():void{
 		forceHideTray = true;
+		playListHide()
 		trayHide();
 		pauseVideoElement()
 	});
