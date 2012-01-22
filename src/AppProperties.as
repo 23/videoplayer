@@ -1,5 +1,7 @@
 // ActionScript file
 import mx.core.FlexGlobals;
+import mx.core.UIComponent;
+import mx.events.ResizeEvent;
 import mx.utils.URLUtil;
 
 [Bindable] public var props:HashCollection = new HashCollection();
@@ -157,6 +159,9 @@ private function initProperties(settings:Object):void {
 	
 	// Should we start by playing HD? 
 	if(props.get('playHD')) currentVideoFormat = 'video_hd';
+	
+	// Add VAST 2.0 and Google InStream support
+	bootstrapAds();
 
 	// Load up featured live streams
 	if(props.get('enableLiveStreams')) {
@@ -241,4 +246,33 @@ private function updateCurrentVideoEmbedCode():void {
 		// A safety net for bad code
 		props.put('currentVideoEmbedCode', props.getString('embedCode'));
 	}  
+}
+
+private function bootstrapAds():void {
+	ads = new VisualAds();
+	
+	// Attach VisualAd element to the stage, and make sure it's sized correctly
+	visualAdContainer.addChild((ads as UIComponent));
+	var fitSize:Function = function():void{
+		ads.width = visualAdContainer.width;
+		ads.height = visualAdContainer.height;
+	}
+	fitSize();
+	visualAdContainer.addEventListener(ResizeEvent.RESIZE, fitSize);
+	
+	// Interface with the app through events
+	ads.addEventListener('contentPauseRequested', function():void{
+		forceHideTray = true;
+		trayHide();
+		video.pause();
+	});
+	ads.addEventListener('contentResumeRequested', function():void{
+		forceHideTray = false;
+		trayShow();
+		video.play();
+	});
+	
+	// Append sources
+	ads.push('video', 'http://prototypes.labs.23company.com/bold.xml');
+	ads.push('overlay', '', 'ca-video-googletest1', '123');
 }

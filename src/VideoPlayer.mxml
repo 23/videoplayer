@@ -32,6 +32,7 @@
 			import com.SmoothImage;
 			import com.adobe.serialization.json.JSONParseError;
 			import com.philemonworks.flex.util.HashCollection;
+			import com.visual.VisualAds;
 			
 			import flash.display.StageDisplayState;
 			import flash.external.ExternalInterface;
@@ -53,6 +54,8 @@
 			[Bindable] private var showPlayList: Boolean = false;
 			[Bindable] private var cleanVideoState:String = 'paused';
 			[Bindable] private var applicationLoaded:Boolean = false;
+			public var ads = null;
+			public var forceHideTray:Boolean = false;
 			
 			public function init():void {
 				prepareTimers();
@@ -167,7 +170,7 @@
 				trayShow();
             }
             private function trayShow():void {
-            	if(!props.get('showTray')) {tray.visible=false; return;}
+            	if(forceHideTray || !props.get('showTray')) {tray.visible=false; return;}
             	trayTimer.reset(); trayTimer.start();
 		        tray.y = FlexGlobals.topLevelApplication.height - tray.height + (showPlayList ? 0 : playListHolder.height); // ... to just inside, depending on context
             	tray.visible = true;
@@ -226,6 +229,7 @@
             }
 			private function onVideoStateChange(evt:Event):void {
 				if(evt.currentTarget.state==VideoEvent.PLAYING || evt.currentTarget.state==VideoEvent.SEEKING) {
+					if(ads) ads.overlay();
 					cleanVideoState = 'playing';
 				} else if(evt.currentTarget.state==VideoEvent.LOADING || evt.currentTarget.state==VideoEvent.BUFFERING) {
 					cleanVideoState = 'buffering';
@@ -393,6 +397,8 @@
 	</mx:Box>
 		
 	</mx:Canvas> 
+
+	<mx:Canvas id="visualAdContainer" width="100%" height="100%" /> 
 
 	<!-- Tray -->
 	<mx:Canvas id="tray" 
@@ -615,9 +621,9 @@
 					resize="onPlayListResize()"
 					/>
 			</mx:Canvas>					
-		</mx:VBox>	
+		</mx:VBox>
 	</mx:Canvas>
-
+	
 	<!-- Embed panel -->
 	<com:TextPanel id="embedPanel" 
 		backgroundColor="{(styleManager.getColorName(props.get('backgroundColor')) as Number)}"
@@ -665,7 +671,7 @@
 				click="{reportEvent('embedEngaged'); System.setClipboard(embedText.text);}"
 				/>
 		</mx:HBox>
-		
+
 		<!-- Share section -->		
 		<mx:VBox
 			visible="{(props.get('showShare') as Boolean)}"

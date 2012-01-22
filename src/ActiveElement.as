@@ -314,6 +314,7 @@ public function playVideoElement():void {
 	videoControls.visible=true;
 	progress.visible=(!video.isLive);
 	video.source = getFullVideoSource();
+	trace('showBeforeIdentity = ' + showBeforeIdentity);
 	if(showBeforeIdentity) {
 		video.stop();
 		video.pause();
@@ -322,7 +323,7 @@ public function playVideoElement():void {
 		handleIdentity('before', function():void {playVideoElement();});
 		return;
 	}
-	video.play();
+	if(!ads || !ads.preroll()) video.play();
 }
 private function pauseVideoElement():void {
 	try {
