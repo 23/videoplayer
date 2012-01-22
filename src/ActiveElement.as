@@ -113,6 +113,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
   	activeElement.put('start', start);
   	activeElement.put('skip', skip);
 
+	// PlayFlow
 	activeElement.put('beforeDownloadType', o.before_download_type);
 	activeElement.put('beforeDownloadUrl', props.get('site_url') + o.before_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
 	activeElement.put('beforeLink', o.before_link); 
@@ -120,6 +121,11 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	activeElement.put('afterDownloadUrl', props.get('site_url') + o.after_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
 	activeElement.put('afterLink', o.after_link);
 	activeElement.put('afterText', o.after_text); 
+	
+	// Add VAST 2.0 and Google InStream support
+	activeElement.put('playflowInstreamVideo', o.playflow_instream_video||props.getString('playflowInstreamVideo'));
+	activeElement.put('playflowInstreamOverlay', o.playflow_instream_overlay||props.getString('playflowInstreamOverlay'));
+	bootstrapAds();
 
 	// Photo source
 	activeElement.put('photoSource', props.get('site_url') + o.large_download);
@@ -314,7 +320,6 @@ public function playVideoElement():void {
 	videoControls.visible=true;
 	progress.visible=(!video.isLive);
 	video.source = getFullVideoSource();
-	trace('showBeforeIdentity = ' + showBeforeIdentity);
 	if(showBeforeIdentity) {
 		video.stop();
 		video.pause();

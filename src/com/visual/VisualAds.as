@@ -13,6 +13,7 @@ package com.visual {
 	import com.google.ads.instream.api.AdsManagerTypes;
 	import com.google.ads.instream.api.AdsRequest;
 	import com.google.ads.instream.api.FlashAdsManager;
+	import com.google.ads.instream.api.VerticalAlignment;
 	import com.google.ads.instream.api.VideoAdsManager;
 	
 	import flash.events.ErrorEvent;
@@ -31,6 +32,7 @@ package com.visual {
 		private var manager:AdsManager;
 		private var requests:Array = [];
 		private var internalVideo:Video = null;
+		private var internalFlash:UIComponent = null;
 		
 		public function VisualAds() {
 			super();
@@ -41,14 +43,6 @@ package com.visual {
 			loader = new AdsLoader();
 			loader.addEventListener(AdsLoadedEvent.ADS_LOADED, onAdsLoaded);
 			loader.addEventListener(AdErrorEvent.AD_ERROR, trace);
-			
-			// Add a video element to play within
-			internalVideo = new Video();
-			internalVideo.smoothing = true;
-			internalVideo.deblocking = 1;
-			handleChildrenSizes();
-			this.addChild(internalVideo);
-			internalVideo.visible = false;
 		}
 		public function push(type:String, url:String, publisherId:String = '', contentId:String = ''):void {
 			requests.push({type:type, url:url, publisherId:publisherId, contentId:contentId});
@@ -101,6 +95,11 @@ package com.visual {
 		}
 		
 		private function onAdsLoaded(e:AdsLoadedEvent):void {
+			// Clear previous Flash ad stages
+			try {
+				if(this.internalFlash) this.removeChild(this.internalFlash);
+			}catch(e:ArgumentError){trace(e);}
+
 			manager = e.adsManager;
 			manager.addEventListener(AdErrorEvent.AD_ERROR, onAdError);
 			manager.addEventListener(AdEvent.CONTENT_PAUSE_REQUESTED, onContentPauseRequested);
@@ -109,17 +108,26 @@ package com.visual {
 			if (manager.type == AdsManagerTypes.FLASH) {
 				var flashAdsManager:FlashAdsManager = e.adsManager as FlashAdsManager;
 				flashAdsManager.addEventListener(AdSizeChangedEvent.SIZE_CHANGED, onFlashAdSizeChanged);
-				
-				var placeHolder:UIComponent = this;
-				var point:Point = placeHolder.localToGlobal(new Point(placeHolder.x, placeHolder.y));
+				this.internalFlash = new UIComponent();
+				this.addChild(this.internalFlash);
+				var point:Point = this.internalFlash.localToGlobal(new Point(this.internalFlash.x, this.internalFlash.y));
 				flashAdsManager.x = point.x;
 				flashAdsManager.y = point.y;
 				flashAdsManager.load();
-				flashAdsManager.play(placeHolder);
+				flashAdsManager.play(this.internalFlash);
 			} else if (manager.type == AdsManagerTypes.VIDEO) {
 				var videoAdsManager:VideoAdsManager = e.adsManager as VideoAdsManager;
 				videoAdsManager.addEventListener(AdEvent.COMPLETE, onVideoAdComplete); 
 				videoAdsManager.clickTrackingElement = this;
+
+				// Add a video element to play within
+				if(!internalVideo) {
+					internalVideo = new Video();
+					internalVideo.smoothing = true;
+					internalVideo.deblocking = 1;
+					this.addChild(internalVideo);
+				}
+				handleChildrenSizes();
 				videoAdsManager.load(this.internalVideo);
 				this.internalVideo.visible = true;
 				videoAdsManager.play(this.internalVideo);
@@ -129,13 +137,20 @@ package com.visual {
 		}
 		
 		private function handleChildrenSizes(e:ResizeEvent=null):void {
-			trace('handleChildrenSizes');
+			// Video is simple, just fill the screen
 			if(this&&this.width&&this.internalVideo) {
 				this.internalVideo.width = this.width;
 				this.internalVideo.height = this.height;
-				trace('video width', this.internalVideo.width);
+			}
+			// For Flash ads, we need to also resize the place holder
+			if (manager && this.internalFlash && manager.type == AdsManagerTypes.FLASH) {
+				var flashAdsManager:FlashAdsManager = manager as FlashAdsManager;
+				var point:Point = this.internalFlash.localToGlobal(new Point(this.internalFlash.x, this.internalFlash.y));
+				flashAdsManager.x = point.x;
+				flashAdsManager.y = point.y;
+				flashAdsManager.adSlotHeight = this.height;
+				flashAdsManager.adSlotWidth = this.width;
 			}
 		}
-		
 	}
 }

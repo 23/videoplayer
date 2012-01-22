@@ -45,6 +45,8 @@ public var propDefaults:Object = {
 	subtitlesDesign: 'bars',
 	playlistClickMode:'link',
 	enableLiveStreams: true,
+	playflowInstreamVideo: 'http://prototypes.labs.23company.com/bold.xml||',
+	playflowInstreamOverlay: '|ca-video-googletest1|123',
 	
 	start: parseFloat('0'),
 	player_id: parseFloat('0'),
@@ -160,9 +162,6 @@ private function initProperties(settings:Object):void {
 	// Should we start by playing HD? 
 	if(props.get('playHD')) currentVideoFormat = 'video_hd';
 	
-	// Add VAST 2.0 and Google InStream support
-	bootstrapAds();
-
 	// Load up featured live streams
 	if(props.get('enableLiveStreams')) {
 		var streamOptions:Object = {};
@@ -249,10 +248,18 @@ private function updateCurrentVideoEmbedCode():void {
 }
 
 private function bootstrapAds():void {
-	ads = new VisualAds();
+	// Clean up
+	visualAdContainer.removeAllChildren();
+	ads = null;
 	
+	// Is there advertising=
+	if(activeElement.getString('playflowInstreamVideo').length==0 && activeElement.getString('playflowInstreamOverlay').length==0) return;
+		
 	// Attach VisualAd element to the stage, and make sure it's sized correctly
+	ads = new VisualAds();
 	visualAdContainer.addChild((ads as UIComponent));
+	
+	// Make sure it's sized correctly
 	var fitSize:Function = function():void{
 		ads.width = visualAdContainer.width;
 		ads.height = visualAdContainer.height;
@@ -269,10 +276,13 @@ private function bootstrapAds():void {
 	ads.addEventListener('contentResumeRequested', function():void{
 		forceHideTray = false;
 		trayShow();
-		video.play();
+		video.play();	
 	});
 	
 	// Append sources
-	ads.push('video', 'http://prototypes.labs.23company.com/bold.xml');
-	ads.push('overlay', '', 'ca-video-googletest1', '123');
+	var a:Array;
+	a = activeElement.getString('playflowInstreamVideo').split('|');
+	if(a.length==3) ads.push('video', decodeURIComponent(a[0]), decodeURIComponent(a[1]), decodeURIComponent(a[2]));
+	a = activeElement.getString('playflowInstreamOverlay').split('|');
+	if(a.length==3) ads.push('overlay', decodeURIComponent(a[0]), decodeURIComponent(a[1]), decodeURIComponent(a[2]));
 }

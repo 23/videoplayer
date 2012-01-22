@@ -398,7 +398,12 @@
 		
 	</mx:Canvas> 
 
-	<mx:Canvas id="visualAdContainer" width="100%" height="100%" /> 
+	<mx:Canvas id="visualAdContainer" 
+			   horizontalScrollPolicy="off"
+			   verticalScrollPolicy="off"
+			   clipContent="true"
+			   width="100%" 
+			   height="{(tray.visible ? tray.y+(descriptions.visible?0:descriptions.height) : FlexGlobals.topLevelApplication.height)}" /> 
 
 	<!-- Tray -->
 	<mx:Canvas id="tray" 
