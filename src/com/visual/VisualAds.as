@@ -1,11 +1,8 @@
-// Place overlay correctly (top?)
-// Make sure we do dynamic loading
-// Make VAST/InStream part of PlayFlow
-
 package com.visual {
 	import com.google.ads.instream.api.Ad;
 	import com.google.ads.instream.api.AdErrorEvent;
 	import com.google.ads.instream.api.AdEvent;
+	import com.google.ads.instream.api.AdLoadedEvent;
 	import com.google.ads.instream.api.AdSizeChangedEvent;
 	import com.google.ads.instream.api.AdsLoadedEvent;
 	import com.google.ads.instream.api.AdsLoader;
@@ -20,6 +17,7 @@ package com.visual {
 	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.media.Video;
+	import flash.net.NetStream;
 	
 	import mx.core.UIComponent;
 	import mx.events.ResizeEvent;
@@ -31,8 +29,9 @@ package com.visual {
 		private var loader:AdsLoader;
 		private var manager:AdsManager;
 		private var requests:Array = [];
-		private var internalVideo:Video = null;
 		private var internalFlash:UIComponent = null;
+		private var internalVideo:Video = null;
+		private var ns:NetStream = null;
 		
 		public function VisualAds() {
 			super();
@@ -59,19 +58,21 @@ package com.visual {
 		private function load(type:String):Boolean {
 			for (var i:int=0; i<requests.length; i++){
 				var req:Object = requests[i];
-				if(req.type==type) {
-					var request:AdsRequest = new AdsRequest();
-					request.adType = req.type;
-					request.adTagUrl = req.url;
-					request.publisherId = req.publisherId;
-					request.contentId = req.contentId;
-					request.adSlotWidth = this.width;
-					request.adSlotHeight = this.height;
-					requests.push(request);
-					loader.requestAds(request);
-					this.visible = true;
-					return(true);
-				}
+				try {
+					if(typeof(req.type)!='undefined' && req.type==type) {
+						var request:AdsRequest = new AdsRequest();
+						request.adType = req.type;
+						request.adTagUrl = req.url;
+						request.publisherId = req.publisherId;
+						request.contentId = req.contentId;
+						request.adSlotWidth = this.width;
+						request.adSlotHeight = this.height;
+						requests.push(request);
+						loader.requestAds(request);
+						this.visible = true;
+						return(true);
+					}
+				}catch(e:Object){}
 			}
 			return(false);
 		}
@@ -89,11 +90,15 @@ package com.visual {
 		}
 		private function onVideoAdComplete(e:AdEvent):void {
 			// Remove video element if applicable
-			(manager as VideoAdsManager).clickTrackingElement = null; 
+			(manager as VideoAdsManager).clickTrackingElement = null;
 			this.internalVideo.visible = false;
 			this.internalVideo.clear();
 		}
 		
+		private function onAdLoaded(e:AdLoadedEvent):void {
+			ns = e.netStream;
+		}
+
 		private function onAdsLoaded(e:AdsLoadedEvent):void {
 			// Clear previous Flash ad stages
 			try {
@@ -104,6 +109,7 @@ package com.visual {
 			manager.addEventListener(AdErrorEvent.AD_ERROR, onAdError);
 			manager.addEventListener(AdEvent.CONTENT_PAUSE_REQUESTED, onContentPauseRequested);
 			manager.addEventListener(AdEvent.CONTENT_RESUME_REQUESTED, onContentResumeRequested);
+			manager.addEventListener(AdLoadedEvent.LOADED, onAdLoaded);
 			
 			if (manager.type == AdsManagerTypes.FLASH) {
 				var flashAdsManager:FlashAdsManager = e.adsManager as FlashAdsManager;
@@ -151,6 +157,15 @@ package com.visual {
 				flashAdsManager.adSlotHeight = this.height;
 				flashAdsManager.adSlotWidth = this.width;
 			}
+		}
+		
+		public function stop():void{
+			try {
+				manager.unload();
+				if(ns) ns.close();
+				onVideoAdComplete(null);
+			}catch(e:Object){}
+			dispatchEvent(new Event('contentResumeRequested'));
 		}
 	}
 }

@@ -1,4 +1,6 @@
 // ActionScript file
+import flash.events.Event;
+
 import mx.core.FlexGlobals;
 import mx.core.UIComponent;
 import mx.events.ResizeEvent;
@@ -269,14 +271,22 @@ private function bootstrapAds():void {
 	
 	// Interface with the app through events
 	ads.addEventListener('contentPauseRequested', function():void{
+		if(props.getBoolean('identityAllowClose') && props.getBoolean('identityCountdown')) {
+			adMessage.visible = true;
+			adMessage.message = '';
+			adMessage.addEventListener(Event.CLOSE, function(e:Event):void{
+					ads.stop();
+				});
+		}
 		forceHideTray = true;
 		trayHide();
-		pauseVideoElement()
+		pauseVideoElement();
 	});
 	ads.addEventListener('contentResumeRequested', function():void{
 		forceHideTray = false;
+		adMessage.visible = false;
 		trayShow();
-		playVideoElement()	
+		playVideoElement();
 	});
 	
 	// Append sources

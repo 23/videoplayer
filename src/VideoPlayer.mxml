@@ -404,6 +404,13 @@
 			   clipContent="true"
 			   width="100%" 
 			   height="{(tray.visible ? tray.y+(descriptions.visible?0:descriptions.height) : FlexGlobals.topLevelApplication.height)}" /> 
+	<com:OverlayMessage id="adMessage"
+			   fontFamily="{props.get('trayFont')}" 
+			   color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+			   backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+			   allowClose="{props.get('identityAllowClose')}"
+			   visible="false"
+			   />
 
 	<!-- Tray -->
 	<mx:Canvas id="tray" 
