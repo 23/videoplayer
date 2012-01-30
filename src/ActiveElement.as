@@ -221,8 +221,7 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
  	if(video_p) {
  		image.source = null;
   		showVideoElement();
-  		//if (props.get('autoPlay') || props.get('loop') || startPlaying) playVideoElement();
-		playVideoElement();
+  		if (props.get('autoPlay') || props.get('loop') || startPlaying) playVideoElement();
   	} else {
   		showImageElement();
   	}

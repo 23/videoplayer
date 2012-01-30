@@ -53,7 +53,7 @@ public var propDefaults:Object = {
 	socialSharing: true,
 	streaming: false,
 
-	autoPlay: true,
+	autoPlay: false,
 	loop: false,
 	playHD: false
 }
@@ -196,6 +196,8 @@ private function initProperties(settings:Object):void {
 			});
 		} catch(e:Error) {}
 	}
+	
+	if (props.get('autoPlay') || props.get('loop')) playVideoElement();
 }
 
 private function getRecommendationSource():String {
