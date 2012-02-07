@@ -434,6 +434,13 @@
 			   clipContent="true"
 			   width="100%" 
 			   height="{(FlexGlobals.topLevelApplication.height - (tray.visible ? 62 : 0))}" /> 
+	<com:OverlayMessage id="adMessage"
+			   fontFamily="{props.get('trayFont')}" 
+			   color="{(styleManager.getColorName(props.get('trayTextColor')) as Number)}" 
+			   backgroundColor="{(styleManager.getColorName(props.get('trayBackgroundColor')) as Number)}" 
+			   allowClose="{props.get('identityAllowClose')}"
+			   visible="false"
+			   />
 
 	<!-- Tray -->
 	<mx:VBox id="tray" 
