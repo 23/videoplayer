@@ -73,7 +73,7 @@ private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolea
 	video.source = getFullVideoSource();
 	
 	showVideoElement();
-	if(startPlaying) playVideoElement();
+	if (props.get('autoPlay') || startPlaying) playVideoElement();
 
 	// Aspect ratios
 	activeElement.put('aspectRatio', stream.thumbnail_large_aspect_ratio*1.0);
@@ -81,6 +81,7 @@ private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolea
 	
 	// Make embed code current
 	updateCurrentVideoEmbedCode();
+	
 	
 	// We want the tray and possible the info box to show up when a new element starts playing
 	infoShow();
@@ -316,7 +317,6 @@ public function playVideoElement():void {
 		activeElement.put('start', 0);
 		video.playheadTime = 0;		
 	}
-	image.visible=false;
 	video.visible=true;
 	videoControls.visible=true;
 	progress.visible=(!video.isLive);
