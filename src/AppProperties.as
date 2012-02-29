@@ -47,7 +47,7 @@ public var propDefaults:Object = {
 	subtitlesDesign: 'bars',
 	playlistClickMode:'link',
 	enableLiveStreams: true,
-	playflowInstreamVideo: 'http://adsby.webtraffic.se/?advideo/3.0/744.1/3588387/0//cc=2;vidAS=pre_roll||',
+	playflowInstreamVideo: '',
 	playflowInstreamOverlay: '',
 	
 	start: parseFloat('0'),
