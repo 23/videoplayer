@@ -317,7 +317,6 @@ public function playVideoElement():void {
 		activeElement.put('start', 0);
 		video.playheadTime = 0;		
 	}
-	image.visible=false;
 	video.visible=true;
 	videoControls.visible=true;
 	progress.visible=(!video.isLive);

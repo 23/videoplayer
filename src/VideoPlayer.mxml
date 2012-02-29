@@ -241,6 +241,7 @@
 						reportPlay('end', video.playheadTime);
 						break;
                 	case VideoEvent.PLAYING:
+						image.visible = false;
 						reportPlay('start', video.playheadTime);
                 		break;
                     case VideoEvent.CONNECTION_ERROR:
