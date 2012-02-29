@@ -41,7 +41,7 @@ package com.visual {
 			// Google IMA Loader
 			loader = new AdsLoader();
 			loader.addEventListener(AdsLoadedEvent.ADS_LOADED, onAdsLoaded);
-			loader.addEventListener(AdErrorEvent.AD_ERROR, trace);
+			loader.addEventListener(AdErrorEvent.AD_ERROR, onAdError);
 		}
 		public function push(type:String, url:String, publisherId:String = '', contentId:String = ''):void {
 			requests.push({type:type, url:url, publisherId:publisherId, contentId:contentId});
@@ -84,6 +84,7 @@ package com.visual {
 		}
 		private function onAdError(e:AdErrorEvent):void {
 			trace('VisualAd Error:', e.error.errorMessage);
+			onContentResumeRequested(null);
 		}
 		private function onFlashAdSizeChanged(e:AdSizeChangedEvent):void {
 			trace('onFlashAdSizeChanged', e);
