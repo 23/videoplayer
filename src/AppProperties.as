@@ -62,7 +62,8 @@ public var propDefaults:Object = {
 	autoPlay: false,
 	loop: false,
 	playHD: false,
-	source: ''
+	source: '',
+	referer: ''
 }
 private function initLoadURL():void{
 	var domain:String = URLUtil.getServerName(FlexGlobals.topLevelApplication.url);
