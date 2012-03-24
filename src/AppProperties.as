@@ -76,7 +76,7 @@ private function initLoadURL():void{
 	
 	// Determine a load parameters
 	var loadParameters:Array = new Array();
-	var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size', 'source', 'rand', 'liveevent_id', 'liveevent_stream_id'];
+	var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'size', 'source', 'rand', 'liveevent_id', 'liveevent_stream_id'];
 	for (var i:int=0; i<options.length; i++) {
 		var opt:String = options[i];
 		if (FlexGlobals.topLevelApplication.parameters[opt]) {
