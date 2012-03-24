@@ -165,6 +165,9 @@ private function initProperties(settings:Object):void {
 	// Should we start by playing HD? 
 	if(props.get('playHD')) currentVideoFormat = 'video_hd';
 	
+	// Possibly auto-play
+	if(props.getBoolean('autoPlay')) playVideoElement();
+	
 	// Load up featured live streams
 	if(props.get('enableLiveStreams')) {
 		var streamOptions:Object = {};
