@@ -74,7 +74,11 @@ private function setActiveElementToLiveStream(stream:Object, startPlaying:Boolea
 	video.source = getFullVideoSource();
 	
 	showVideoElement();
-	if (props.get('autoPlay') || startPlaying) playVideoElement();
+	if (startPlaying) {
+		playVideoElement();
+	} else {
+		possiblyAutoPlay();
+	}
 
 	// Aspect ratios
 	activeElement.put('aspectRatio', stream.thumbnail_large_aspect_ratio*1.0);
@@ -347,3 +351,8 @@ private function getFullVideoSource():String {
 	return(activeElement.getString('videoSource') + joinChar + 'start=' + encodeURIComponent(activeElement.getString('start')) + '&skip=' + encodeURIComponent(activeElement.getString('skip')));
 }            
 
+private function possiblyAutoPlay():void {
+	if(props.getBoolean('settingsLoaded') && activeElement.getBoolean('video_p') && props.getBoolean('autoPlay')) { 
+		playVideoElement();
+	}
+}            

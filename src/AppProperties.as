@@ -9,6 +9,7 @@ import mx.utils.URLUtil;
 [Bindable] public var props:HashCollection = new HashCollection();
 private var prioritizeLiveStreams:Boolean = false;
 public var propDefaults:Object = {
+	settingsLoaded: false,
 	backgroundColor: 'black',
 	trayBackgroundColor: 'black',
 	trayTextColor: 'white',
@@ -150,6 +151,8 @@ private function initProperties(settings:Object):void {
 	props.put('logoAlign', (new RegExp('left').test(pos) ? 'left' : 'right'));
 	props.put('logoVAlign', (new RegExp('top').test(pos) ? 'top' : 'bottom'));
 
+	props.put('settingsLoaded', true);
+	
 	// Tray and information timeout
 	trayTimer.delay = props.getNumber('trayTimeout');
 	trayTimer.reset();
@@ -166,7 +169,7 @@ private function initProperties(settings:Object):void {
 	if(props.get('playHD')) currentVideoFormat = 'video_hd';
 	
 	// Possibly auto-play
-	if(props.getBoolean('autoPlay')) playVideoElement();
+	possiblyAutoPlay();
 	
 	// Load up featured live streams
 	if(props.get('enableLiveStreams')) {

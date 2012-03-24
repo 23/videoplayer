@@ -40,7 +40,7 @@
 			import flash.utils.setTimeout;
 			
 			// Default domain (used when testing from localhost)
-			private var defaultDomain:String = 'reference.23.steffentchr.dk';
+			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
 			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
