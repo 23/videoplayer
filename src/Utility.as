@@ -3,7 +3,6 @@ import flash.system.Capabilities;
 
 import mx.utils.UIDUtil;
 
-import preload.CustomPreloader;
 public var uuid:String = UIDUtil.createUID();
 
 public function displayError(text:String):void {
@@ -15,12 +14,8 @@ public function displayError(text:String):void {
 	errorContainer.text=text;
 }
 
-public function lowBandwidth():Boolean {
-	return(preload.CustomPreloader.kbps < props.get('lowBandwidthThresholdKbps'));
-}
 
 public function h264():Boolean {
-	if(lowBandwidth()) return(false);
 	var re:RegExp = new RegExp('([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)', 'img');
 	var v:Array = re.exec(Capabilities.version);
 	if (v[1]>9) {return(true);}
