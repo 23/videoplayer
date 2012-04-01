@@ -59,3 +59,10 @@ public function goToUrl(url:String, target:String = '_top'):void {
 	if(!new RegExp('\:\/\/').test(url)) url = props.get('site_url') + url;
     navigateToURL(new URLRequest(url), target);
 }
+public function updateBackground():void {
+	try {
+		if(ExternalInterface.available) {
+			ExternalInterface.call('setBackground', props.getString('backgroundColor'), activeElement.get('photoSource'), props.getNumber('verticalPadding'), props.getNumber('horitzontalPadding'));
+		}
+	} catch(e:Error) {}
+}
