@@ -152,6 +152,7 @@ private function initProperties(settings:Object):void {
 	props.put('logoVAlign', (new RegExp('top').test(pos) ? 'top' : 'bottom'));
 
 	props.put('settingsLoaded', true);
+	updateBackground();
 	
 	// Tray and information timeout
 	trayTimer.delay = props.getNumber('trayTimeout');
