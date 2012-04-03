@@ -11,7 +11,7 @@
 	layout="absolute" 
 	verticalScrollPolicy="off" 
 	horizontalScrollPolicy="off"
-	preloader="preload.CustomPreloader" 
+	usePreloader="false" 
 	backgroundAlpha="0"
 	width="100%" 
 	height="100%" 
@@ -307,14 +307,6 @@
 	<mx:Label id="errorContainer" 
 		color="white"
 		/>
-	
-	<!-- Keep the preloader around until everything is ready to display -->
-	<mx:Image
-		 source="@Embed(source='preload/preloader.swf')"
-		 verticalCenter="0"
-		 horizontalCenter="0"
-		 visible="{!applicationLoaded}"
-		 />
 	
 	<mx:Canvas id="contentContainer"
 		x="{props.getNumber('horizontalPadding')/2}"
