@@ -114,12 +114,13 @@
 				initLoadURL();
 				doAPI('/api/player/settings', {player_id:(playerId?playerId:''), parameters:a.join('&')}, function(o:Object):void{
 					initProperties(o.settings);
-				});
-				// Load content
-				initActiveElement();
-				doJSON((props.get('jsonSource') as String), function(o:Object):void{
-					context=o; 
-					build();
+
+					// Load content
+					initActiveElement();
+					doJSON((props.get('jsonSource') as String), function(o:Object):void{
+						context=o; 
+						build();
+					});
 				});
 			}
 			public function build():void {
@@ -145,8 +146,12 @@
 						}, (props.getBoolean('browseMode') ? 0 : 5000));
 					}
 				}
-				trayShow();
-				applicationLoaded = true;
+				if (liveStreamsMenu.options.length>0 || (context&&context.photos&&context.photos.length>0)) {
+					trayShow();
+					applicationLoaded = true;
+				} else {
+					displayError('No video to play');				
+				}
 			}
 			
             private function createPlayList():void  {
@@ -190,6 +195,7 @@
 				trayShow();
             }
             private function trayShow():void {
+				if(errorContainer.visible) return;
             	if(forceHideTray || !props.get('showTray')) {tray.visible=false; return;}
             	trayTimer.reset(); trayTimer.start();
             	tray.visible = true;
@@ -226,6 +232,7 @@
 				descriptions.visible = false;
             }
             private function infoShow(timeout:Boolean=true):void {
+				if(errorContainer.visible) return;
 				if(!activeElement.get('hasInfo') || !props.get('showDescriptions')) {descriptions.visible = false; return;}
 				infoTimer.stop();
 				descriptions.visible = true;
@@ -305,7 +312,8 @@
 	
 	<!-- Simple element to provide a backdrop when everything else fails -->
 	<mx:Label id="errorContainer" 
-		color="white"
+		color="#999999"
+		visible="false"
 		/>
 	
 	<mx:Canvas id="contentContainer"
