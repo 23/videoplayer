@@ -311,10 +311,9 @@
 	</mx:Script>	
 	
 	<!-- Simple element to provide a backdrop when everything else fails -->
-	<mx:Label id="errorContainer" 
-		color="#999999"
-		visible="false"
-		/>
+	<mx:Canvas id="errorContainer" backgroundColor="black" top="0" left="0" width="100%" height="100%" visible="false">
+		<mx:Label id="errorText" color="white" />
+	</mx:Canvas>
 	
 	<mx:Canvas id="contentContainer"
 		x="{props.getNumber('horizontalPadding')/2}"
