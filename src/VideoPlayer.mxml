@@ -42,7 +42,7 @@
 			// Default domain (used when testing from localhost)
 			private var defaultDomain:String = 'reference.dev.visualtube.net';
 			// Default photo_id (used to if you want a specific photo/video to be shown, otherwise empty)
-			private var defaultPhotoId:String = '';
+			private var defaultPhotoId:String = '1231231';
 			private var defaultAlbumId:String = '';
 			private var playerId:String = '0';
 
@@ -97,12 +97,13 @@
 				initLoadURL();
 				doAPI('/api/player/settings', {player_id:(playerId?playerId:''), parameters:a.join('&')}, function(o:Object):void{
 					initProperties(o.settings);
-				});
-				// Load content
-				initActiveElement();
-				doJSON((props.get('jsonSource') as String), function(o:Object):void{
-					context=o; 
-					build();
+
+					// Load content
+					initActiveElement();
+					doJSON((props.get('jsonSource') as String), function(o:Object):void{
+						context=o; 
+						build();
+					});
 				});
 			}
 			public function build():void {
@@ -124,9 +125,14 @@
 						}, (props.getBoolean('browseMode') ? 0 : 5000));
 					}
 				}
-				trayShow();
-				infoShow();
-				applicationLoaded = true;
+	
+				if (liveStreamsMenu.options.length>0 || (context&&context.photos&&context.photos.length>0)) {
+					trayShow();
+					infoShow();
+					applicationLoaded = true;
+				} else {
+					displayError('No video to play');				
+				}
 			}
 			
             private function createPlayList():void  {
@@ -170,6 +176,7 @@
 				trayShow();
             }
             private function trayShow():void {
+				if(errorContainer.visible) return;
             	if(forceHideTray || !props.get('showTray')) {tray.visible=false; return;}
             	trayTimer.reset(); trayTimer.start();
 		        tray.y = FlexGlobals.topLevelApplication.height - tray.height + (showPlayList ? 0 : playListHolder.height); // ... to just inside, depending on context
@@ -208,6 +215,7 @@
 				descriptions.visible = false;
             }
             private function infoShow(timeout:Boolean=true):void {
+				if(errorContainer.visible) return;
             	if(!activeElement.get('hasInfo') || !props.get('showDescriptions')) {descriptions.visible = false; return;}
 				infoTimer.stop();
 				descriptions.visible = true;
@@ -276,7 +284,8 @@
 	
 	<!-- Simple element to provide a backdrop when everything else fails -->
 	<mx:Label id="errorContainer" 
-		color="white"
+		color="#999999"
+		visible="false"
 		/>
 	
 	<mx:Canvas id="contentContainer"

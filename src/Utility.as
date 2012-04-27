@@ -62,7 +62,7 @@ public function goToUrl(url:String, target:String = '_top'):void {
 public function updateBackground():void {
 	try {
 		if(ExternalInterface.available) {
-			ExternalInterface.call('setBackground', props.getString('backgroundColor'), activeElement.get('photoSource'), props.getNumber('verticalPadding'), props.getNumber('horitzontalPadding'));
+			ExternalInterface.call('setBackground', props.getString('backgroundColor'), activeElement.get('photoSource'), props.getNumber('verticalPadding'), props.getNumber('horizontalPadding'));
 		}
 	} catch(e:Error) {}
 }
