@@ -11,7 +11,7 @@ public function displayError(text:String):void {
 	image.visible=false; 
 	tray.visible=false; 
 	errorContainer.visible=true; 
-	errorContainer.text=text;
+	errorText.text=text;
 }
 
 
