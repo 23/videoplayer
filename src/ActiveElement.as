@@ -21,7 +21,7 @@ private function resetActiveElement(skip:Boolean=false):void {
   	activeElement.put('content', '');
   	activeElement.put('link', '');
   	activeElement.put('videoSource', '');
-  	activeElement.put('photoSource', '');
+  	activeElement.put('photoSource', '/resources/um/graphics/void.gif');
   	activeElement.put('photoWidth', new Number(0));
   	activeElement.put('photoHeight', new Number(0));
   	activeElement.put('aspectRatio', new Number(1));
