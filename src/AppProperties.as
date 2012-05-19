@@ -62,7 +62,7 @@ public var propDefaults:Object = {
 
 	autoPlay: false,
 	loop: false,
-	playHD: false,
+	defaultQuality: 'standard',
 	source: '',
 	referer: ''
 }
@@ -166,8 +166,17 @@ private function initProperties(settings:Object):void {
 	// If bandwidth or player doesn't allow h264 quality, we won't allow streaming
 	if (!h264()) props.put('streaming', 0);
 	
-	// Should we start by playing HD? 
-	if(props.get('playHD')) currentVideoFormat = 'video_hd';
+	// Should we start by playing HD?
+	switch(props.get('defaultQuality')) {
+		case 'low':
+			currentVideoFormat = 'video_mobile_high';
+			break;
+		case 'high':
+			currentVideoFormat = 'video_hd';
+			break;
+		default:
+			break;
+	}
 	
 	// Possibly auto-play
 	possiblyAutoPlay();
