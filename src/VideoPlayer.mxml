@@ -357,28 +357,17 @@
 		 />
 
 	<!-- Icon/Logo -->
-	<mx:Box 
-		id="logo" 
-		visible="{(props.get('showLogo') as Boolean)}" 
-		top="15" 
-		right="15" 
-		left="15" 
-		bottom="15" 
-		horizontalAlign="{props.get('logoAlign')}" 
-		verticalAlign="{props.get('logoVAlign')}" 
-		horizontalCenter="0" 
-		verticalCenter="0"
-		buttonMode="true"
-		>
+	
 		<mx:Image 
-			source="{props.get('logoSource')}" 
-			alpha="{(props.get('logoAlpha') as Number)}" 
-			maxWidth="{(props.get('logoWidth') as Number)}" 
-			maxHeight="{(props.get('logoHeight') as Number)}" 
-			horizontalAlign="{props.get('logoAlign')}" 
-			verticalAlign="{props.get('logoVAlign')}"
+			id="logo"
+			source="@Embed(source='assets/buttons/dbulogo.swf')" 
+			top="30"
+			right="0"
+			width="22%"
+			 maxWidth="204"
+			  visible="false"
 			/> 
-	</mx:Box>
+	
 		
 	</mx:Canvas> 
 

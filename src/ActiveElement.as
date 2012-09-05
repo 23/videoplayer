@@ -32,6 +32,7 @@ private function resetActiveElement():void {
 	activeElement.put('length', '0');
 	activeElement.put('start', '0');
 	activeElement.put('skip', '0');
+	activeElement.put('show_logo', '0');
 	activeElement.put('number_of_ratings', new Number(0));
 }
 
@@ -57,7 +58,8 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
   	activeElement.put('hasInfo', hasInfo);
   	activeElement.put('link', o.one);
 	activeElement.put('number_of_ratings', o.number_of_ratings);
-  	activeElement.put('length', o.video_length); 
+  	activeElement.put('length', o.video_length);
+	activeElement.put('show_logo', (o.show_logo.length ? o.show_logo : 0));
   	activeElement.put('start', start);
   	activeElement.put('skip', skip);
 
@@ -68,6 +70,8 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
 	activeElement.put('afterDownloadUrl', 'http://' + props.get('domain') + o.after_download_url.replace(new RegExp('video_small', 'img'), (h264() ? 'video_medium' : 'video_small')));
 	activeElement.put('afterLink', o.after_link);
 	activeElement.put('afterText', o.after_text); 
+	
+	logo.visible = (new String(activeElement.get('show_logo')) == '1');
 	
 	// Get sections and show, otherwise reset
 	if(!skip) {
