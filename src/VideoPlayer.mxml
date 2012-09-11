@@ -62,6 +62,7 @@
 			private var defaultPhotoId:String = '';
 			private var defaultAlbumId:String = '';
 			private var playerId:String = '0';
+			private var playbackReportInterval = 8;
 
 			private var context:Object = {};
 			private var recommendations:Object = {};
@@ -223,9 +224,9 @@
 				// Report plays back to analytics continously
 				setInterval(function():void{
 						try {
-							if(video.playing) reportPlay('start', video.playheadTime);
+							if(video.playing) reportPlay('continue', video.playheadTime);
 						}catch(e:ErrorEvent){}
-					}, 30000);
+					}, playbackReportInterval*1000);
             }             
             private function infoHide():void {
             	if(props.getNumber('infoTimeout')<=0) return;
