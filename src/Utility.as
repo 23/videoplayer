@@ -39,6 +39,9 @@ public function reportPlay(event:String, time:Number):void {
 			var time_start:String = new String(time+activeElement.getNumber('start'));
 			lastPlayTimeStart = time_start;
 			var time_end:String = ''; 
+		} else if(event=='continue') {
+			var time_start:String = lastPlayTimeStart;
+			var time_end:String =  new String((playbackReportInterval/2)+time+activeElement.getNumber('start'));
 		} else {
 			var time_start:String = lastPlayTimeStart;
 			var time_end:String =  new String(time+activeElement.getNumber('start'));
