@@ -87,7 +87,7 @@
 					outlineFilter.blurY = 3;
 				}
 				
-				var playheadTime:Number = _targetVideo.playheadTime + this.parentApplication.activeElement.getNumber('start') + 0.05;
+				var playheadTime:Number = _targetVideo.playheadTime + this.parentApplication.activeElement.getNumber('start') - .3;
 				var matched:Boolean = false;
 				for (var i:Object in subtitles) {
 					if(subtitles[i].timestamp_begin<=playheadTime && subtitles[i].timestamp_end>=playheadTime) {
