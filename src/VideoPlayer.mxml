@@ -247,6 +247,10 @@
             private function onVideoComplete(ignoreIdentity:Boolean=false):void {
 				reportPlay('end', video.playheadTime);
 				sharePanel.visible = true;
+				video.pause();
+				video.playheadTime = 0;
+				video.pause();
+				/*
      			if(!ignoreIdentity) return(handleIdentity('after', function():void {onVideoComplete(true);}));
             	if(props.get('loop')) {
             		var more:Boolean = nextElement();
@@ -254,6 +258,7 @@
             	} else {
             		onPlayListDone();
             	}
+				*/
             }
             private function onPlayListResize():void {
             	var c:Array = playListHolder.getChildren();
