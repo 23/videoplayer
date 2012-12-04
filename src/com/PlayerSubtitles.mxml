@@ -62,7 +62,7 @@
 					var loader:URLLoader = new URLLoader();
 					loader.addEventListener(Event.COMPLETE, function(e:Event):void {
 							try {
-								subtitles = JSON.decode(loader.data).subtitles;
+								subtitles = JSON.decode(loader.data, false).subtitles;
 								subtitleTimer.start();
 							}catch(e:JSONParseError){} 
 						});
