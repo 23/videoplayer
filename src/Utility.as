@@ -48,7 +48,7 @@ public function reportPlay(event:String, time:Number):void {
 		}
 		var time_total:String = (video.totalTime>0 ? new String(video.totalTime + activeElement.getNumber('start')) : '');
 		var photo_id:int = context.photos[currentElementIndex].photo_id;
-		doAPI('/api/analytics/report/play', expandReportObject({photo_id:photo_id, time_start:time_start, time_end:time_end, time_total:time_total, uuid:uuid}), function():void{});
+		doAPI('/api/analytics/report/play', expandReportObject({photo_id:photo_id, timeStart:time_start, timeEnd:time_end, timeTotal:time_total, uuid:uuid}), function():void{});
 	} catch(e:Error) {}
 }
 public function reportEvent(event:String):void {
