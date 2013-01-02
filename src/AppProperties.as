@@ -41,6 +41,7 @@ public var propDefaults:Object = {
 	subtitlesOnByDefault: false,
 	subtitlesDesign: 'bars',
 	playlistClickMode:'link',
+	tags_related:'',
 	
 	start: parseFloat('0'),
 	player_id: parseFloat('0'),
@@ -104,7 +105,7 @@ private function initProperties(settings:Object):void {
 	}
 
 	// Determine a load parameters
-    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size', 'rand', 'liveevent_id', 'liveevent_stream_id'];
+    var options:Array = ['photo_id', 'token', 'user_id', 'search', 'tag', 'tags', 'tag_mode', 'album_id', 'year', 'month', 'day', 'datemode', 'video_p', 'audio_p', 'video_encoded_p', 'order', 'orderby', 'p', 'size', 'rand', 'liveevent_id', 'liveevent_stream_id', 'tags_related'];
     for (var i:int=0; i<options.length; i++) {
 		var opt:String = options[i];
 		if (FlexGlobals.topLevelApplication.parameters[opt]) {
@@ -156,29 +157,34 @@ private function initProperties(settings:Object):void {
 }
 
 private function getRecommendationSource():String {
-	if(!context || !context.photos) return(props.get('site_url') + '/api/photo/list?raw&format=json&size=20');
-	
-	if(context.photos.length==1) {
-		// There's only one video to play, we'll need to construct recommendation in another fashion.
-		var recommendationSource:String;
-		var method:String = new String(props.get('recommendationMethod'));
-		switch (method) {
-			case 'site-new':
-			case 'channel-new':
-				recommendationSource = props.get('site_url') + '/api/photo/list?raw&format=json&size=20&orderby=uploaded&order=desc';
-				break;
-			case 'site-popular':
-			case 'channel-popular':
-			case 'similar':
-			default:
-				recommendationSource = props.get('site_url') + '/api/photo/list?raw&format=json&size=20&orderby=rank&order=desc';
-				break;
-		}
-		if (playerId.length) recommendationSource += '&player_id=' + encodeURI(playerId);
-		if (context.photos[0].album_id!='' && (method=='channel-new' || method=='channel-popular')) recommendationSource += '&album_id=' + context.photos[0].album_id;
-		return(recommendationSource);
+	var tr:String = props.getString('tags_related');
+	if(tr.length) {
+		return(props.get('site_url') + '/api/photo/list?raw&format=json&size=20&tag='+encodeURIComponent(tr));
 	} else {
-		return(new String(props.get('jsonSource')));
+		if(!context || !context.photos) return(props.get('site_url') + '/api/photo/list?raw&format=json&size=20');
+	
+		if(context.photos.length==1) {
+			// There's only one video to play, we'll need to construct recommendation in another fashion.
+			var recommendationSource:String;
+			var method:String = new String(props.get('recommendationMethod'));
+			switch (method) {
+				case 'site-new':
+				case 'channel-new':
+					recommendationSource = props.get('site_url') + '/api/photo/list?raw&format=json&size=20&orderby=uploaded&order=desc';
+					break;
+				case 'site-popular':
+				case 'channel-popular':
+				case 'similar':
+				default:
+					recommendationSource = props.get('site_url') + '/api/photo/list?raw&format=json&size=20&orderby=rank&order=desc';
+					break;
+			}
+			if (playerId.length) recommendationSource += '&player_id=' + encodeURI(playerId);
+			if (context.photos[0].album_id!='' && (method=='channel-new' || method=='channel-popular')) recommendationSource += '&album_id=' + context.photos[0].album_id;
+			return(recommendationSource);
+		} else {
+			return(new String(props.get('jsonSource')));
+		}
 	}
 }
 
