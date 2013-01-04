@@ -159,7 +159,7 @@ private function initProperties(settings:Object):void {
 private function getRecommendationSource():String {
 	var tr:String = props.getString('tags_related');
 	if(tr.length) {
-		return(props.get('site_url') + '/api/photo/list?raw&format=json&size=20&tag='+encodeURIComponent(tr));
+		return(props.get('site_url') + '/api/photo/list?raw&format=json&size=20&tag_mode=or&tags='+encodeURIComponent(tr));
 	} else {
 		if(!context || !context.photos) return(props.get('site_url') + '/api/photo/list?raw&format=json&size=20');
 	
