@@ -196,8 +196,9 @@
 				else infoShow(false); // no timeout, since this a manual action
             }
             private function onPlayListDone():void {
-            	if(props.get('loop')) { 
-            		load();
+            	if(props.get('loop') || activeElement.getString('looping')=='1') { 
+					progress.seekVideoTo(0);
+					video.play();
             	} else {
             		if (playList) {
             			playList.headline = new String(props.get('recommendationHeadline'));

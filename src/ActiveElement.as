@@ -15,6 +15,7 @@ private function resetActiveElement():void {
   	activeElement.put('photo_id', '');
 	activeElement.put('video_p', false);
   	activeElement.put('title', '');
+	activeElement.put('looping', '');
   	activeElement.put('content', '');
   	activeElement.put('link', '');
   	activeElement.put('videoSource', '');
@@ -55,7 +56,8 @@ private function setActiveElement(i:int, startPlaying:Boolean=false, start:Numbe
   	activeElement.put('content', content);
   	activeElement.put('hasInfo', hasInfo);
   	activeElement.put('link', o.one);
-  	activeElement.put('length', o.video_length); 
+	activeElement.put('looping', o.looping);
+	activeElement.put('length', o.video_length); 
   	activeElement.put('start', start);
   	activeElement.put('skip', skip);
 
